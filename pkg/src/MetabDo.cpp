@@ -11,8 +11,7 @@ MetabDo::MetabDo
    double initialDO,
    double* time,
    double* temp,
-   double* par,
-   double parTotal,
+   double* parDist,
    double* airPressure,
    double stdAirPressure,
    int length
@@ -27,8 +26,7 @@ MetabDo::MetabDo
       initialDO,
       time,
       temp,
-      par,
-      parTotal,
+      parDist,
       airPressure,
       stdAirPressure,
       length
@@ -59,8 +57,7 @@ void MetabDo::initialize
    double initialDO,
    double* time,
    double* temp,
-   double* par,
-   double parTotal,
+   double* parDist,
    double* airPressure,
    double stdAirPressure,
    int length
@@ -75,8 +72,7 @@ void MetabDo::initialize
    this->initialDO = initialDO;
    this->time = time;
    this->temp = temp;
-   this->par = par;
-   this->parTotal = parTotal;
+   this->parDist = parDist;
    this->airPressure = airPressure;
    this->stdAirPressure = stdAirPressure;
    this->length = length;

@@ -2,7 +2,7 @@
 
 extern "C" {
 
-   SEXP MetabForwardEulerDoDic_constructor(
+   SEXP MetabCrankNicolsonDoDic_constructor(
       SEXP dailyGPP,
       SEXP ratioDoCFix,
       SEXP dailyER,
@@ -23,7 +23,7 @@ extern "C" {
    {
       int length = length(time);
 
-      MetabForwardEulerDoDic* modelPointer = new MetabForwardEulerDoDic(
+      MetabCrankNicolsonDoDic* modelPointer = new MetabCrankNicolsonDoDic(
          asReal(dailyGPP),
          asReal(ratioDoCFix),
          asReal(dailyER),
@@ -48,7 +48,7 @@ extern "C" {
 
       R_RegisterCFinalizer(
          modelExtPointer,
-         finalizerExternalPointer<MetabForwardEulerDoDic>
+         finalizerExternalPointer<MetabCrankNicolsonDoDic>
       );
 
       MetabDoDic* basePointer = dynamic_cast <MetabDoDic*> (modelPointer);
@@ -78,10 +78,10 @@ extern "C" {
 
    }
 
-   SEXP MetabForwardEulerDoDic_destructor(SEXP externalPointer)
+   SEXP MetabCrankNicolsonDoDic_destructor(SEXP externalPointer)
    {
 
-      finalizerExternalPointer<MetabForwardEulerDoDic>(externalPointer);
+      finalizerExternalPointer<MetabCrankNicolsonDoDic>(externalPointer);
 
       return R_NilValue;
 

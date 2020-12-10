@@ -11,8 +11,22 @@ void finalizerExternalPointer(SEXP externalPointer) {
 
 }
 
+SEXP MetabDo_getSummary(MetabDo*);
+
+SEXP MetabDoDic_getSummary(MetabDoDic*);
+
 extern "C"
 {
+   SEXP MetabDo_run(SEXP);
+
+   SEXP MetabDo_getSummary(SEXP);
+
+   SEXP MetabDo_getPARDist(SEXP externalPointer);
+
+   SEXP MetabDo_getDt(SEXP externalPointer);
+
+   SEXP MetabDo_setDailyGPP(SEXP externalPointer, SEXP value);
+
    SEXP MetabForwardEulerDo_constructor(
          SEXP dailyGPP,
          SEXP ratioDoCFix,
@@ -22,23 +36,32 @@ extern "C"
          SEXP initialDO,
          SEXP time,
          SEXP temp,
-         SEXP par,
-         SEXP parTotal,
+         SEXP parDist,
          SEXP airPressure,
          SEXP stdAirPressure
    );
 
    SEXP MetabForwardEulerDo_destructor(SEXP externalPointer);
 
-   SEXP MetabForwardEulerDo_run(SEXP externalPointer);
+   SEXP MetabCrankNicolsonDo_constructor(
+         SEXP dailyGPP,
+         SEXP ratioDoCFix,
+         SEXP dailyER,
+         SEXP ratioDoCResp,
+         SEXP k600,
+         SEXP initialDO,
+         SEXP time,
+         SEXP temp,
+         SEXP parDist,
+         SEXP airPressure,
+         SEXP stdAirPressure
+   );
 
-   SEXP MetabForwardEulerDo_run_extract(MetabForwardEulerDo* model);
+   SEXP MetabCrankNicolsonDo_destructor(SEXP);
 
-   SEXP MetabForwardEulerDo_getPAR(SEXP externalPointer);
+   SEXP MetabDoDic_run(SEXP);
 
-   SEXP MetabForwardEulerDo_getDt(SEXP externalPointer);
-
-   SEXP MetabForwardEulerDo_setDailyGPP(SEXP externalPointer, SEXP value);
+   SEXP MetabDoDic_getSummary(SEXP);
 
    SEXP MetabForwardEulerDoDic_constructor(
          SEXP dailyGPP,
@@ -49,8 +72,7 @@ extern "C"
          SEXP initialDO,
          SEXP time,
          SEXP temp,
-         SEXP par,
-         SEXP parTotal,
+         SEXP parDist,
          SEXP airPressure,
          SEXP stdAirPressure,
          SEXP ratioDicCfix,
@@ -62,7 +84,24 @@ extern "C"
 
    SEXP MetabForwardEulerDoDic_destructor(SEXP externalPointer);
 
-   SEXP MetabForwardEulerDoDic_run(SEXP externalPointer);
+   SEXP MetabCrankNicolsonDoDic_constructor(
+         SEXP dailyGPP,
+         SEXP ratioDoCFix,
+         SEXP dailyER,
+         SEXP ratioDoCResp,
+         SEXP k600,
+         SEXP initialDO,
+         SEXP time,
+         SEXP temp,
+         SEXP parDist,
+         SEXP airPressure,
+         SEXP stdAirPressure,
+         SEXP ratioDicCfix,
+         SEXP ratioDicCresp,
+         SEXP initialDIC,
+         SEXP pCO2air,
+         SEXP alkalinity
+   );
 
-   SEXP MetabForwardEulerDoDic_getDt(SEXP externalPointer);
+   SEXP MetabCrankNicolsonDoDic_destructor(SEXP externalPointer);
 }

@@ -7,6 +7,7 @@ void MetabForwardEulerDoDic::run()
    MetabForwardEulerDo::run();
 
    // Set the first elements for henry's coefficient and DIC
+   carbonateEq.reset(temp[0], 0);
    kH[0] = carbonateEq.kHenryCO2;
    outputDic.dic[0] = initialDIC;
 

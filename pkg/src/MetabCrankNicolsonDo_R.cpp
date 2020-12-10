@@ -1,6 +1,6 @@
 #include "metabc_R.h"
 
-SEXP MetabForwardEulerDo_constructor(
+SEXP MetabCrankNicolsonDo_constructor(
    SEXP dailyGPP,
    SEXP ratioDoCFix,
    SEXP dailyER,
@@ -16,7 +16,7 @@ SEXP MetabForwardEulerDo_constructor(
 {
    int length = length(time);
 
-   MetabForwardEulerDo* modelPointer = new MetabForwardEulerDo(
+   MetabCrankNicolsonDo* modelPointer = new MetabCrankNicolsonDo(
       asReal(dailyGPP),
       asReal(ratioDoCFix),
       asReal(dailyER),
@@ -36,7 +36,7 @@ SEXP MetabForwardEulerDo_constructor(
 
    R_RegisterCFinalizer(
       modelExtPointer,
-      finalizerExternalPointer<MetabForwardEulerDo>
+      finalizerExternalPointer<MetabCrankNicolsonDo>
    );
 
    MetabDo* basePointer = dynamic_cast <MetabDo*> (modelPointer);
@@ -58,9 +58,9 @@ SEXP MetabForwardEulerDo_constructor(
    return vecOutput;
 }
 
-SEXP MetabForwardEulerDo_destructor(SEXP externalPointer)
+SEXP MetabCrankNicolsonDo_destructor(SEXP modelExtPointer)
 {
-   finalizerExternalPointer<MetabForwardEulerDo>(externalPointer);
+   finalizerExternalPointer<MetabCrankNicolsonDo>(modelExtPointer);
 
    return R_NilValue;
 }

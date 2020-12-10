@@ -5,8 +5,7 @@ void MetabForwardEulerDo::run()
 {
    // Set the initial state
    outputDo.dox[0] = initialDO;
-   output.cFixation[0] = dailyGPP *
-      ((par[0] * dt[0]) / parTotal);
+   output.cFixation[0] = dailyGPP * parDist[0];
    output.cRespiration[0] = dailyER * dt[0];
    outputDo.doProduction[0] =
       output.cFixation[0] * ratioDoCFix;
@@ -23,8 +22,7 @@ void MetabForwardEulerDo::run()
          outputDo.doConsumption[i - 1] +
          outputDo.doEquilibration[i - 1];
 
-      output.cFixation[i] = dailyGPP *
-         ((par[i] * dt[i]) / parTotal);
+      output.cFixation[i] = dailyGPP * parDist[i];
       output.cRespiration[i] = dailyER * dt[i];
 
       outputDo.doProduction[i] =
