@@ -6,34 +6,38 @@ library(bench)
 
 load(file = "./2014-09-13/signal.RData")
 
+gpp <- 610
+gppdo <- 1
+er <- 275
+erdo <- -1
+k600 <- 19.5
+length <- length(signalOut$time)
+initDO <- signalOut$getVariable("do")[1];
+time <- as.numeric(signalOut$time) / 86400
+temp <- signalOut$getVariable("temp")
+par <- signalOut$getVariable("par")
+parTotal <- -1
+airPressure <- rep(638, length)
+stdAirPressure <- 760
+
 timers <- list(cppTimeFE = bench_time({
    
-   numTime <- as.numeric(signalOut$time) / 86400
-   dt <- c(
-      numTime[2:length(numTime)] - numTime[1:(length(numTime) - 1)],
-      0
-   );
-   
-   par <- signalOut$getVariable("par");
-   parAverage <- c(
-      0.5 * (par[1:length(numTime) - 1] + par[2:length(numTime)]),
-      0
-   );
-   parDist <- (par * dt) / sum(parAverage * dt);
-   
-   cppModelFE <- .Call(
-      "MetabForwardEulerDo_constructor",
-      610,
-      1,
-      275,
-      -1,
-      19.5,
-      signalOut$getVariable("do")[1],
-      numTime,
-      signalOut$getVariable("temp"),
-      parDist,
-      rep(638, length(numTime)),
-      760
+   cppModelFE <- .Call("MetabForwardEulerDo_constructor")
+   .Call(
+      "MetabDo_initialize",
+      cppModelFE$baseExternalPointer,
+      gpp,
+      gppdo,
+      er,
+      erdo,
+      k600,
+      initDO,
+      time,
+      temp,
+      par,
+      parTotal,
+      airPressure,
+      stdAirPressure
    )
    
    cppModelFE_output <- .Call("MetabDo_run", cppModelFE$baseExternalPointer);
@@ -42,32 +46,22 @@ timers <- list(cppTimeFE = bench_time({
 
 timers$cppTimeCN <- bench_time({
 
-   numTime <- as.numeric(signalOut$time) / 86400
-   dt <- c(
-      numTime[2:length(numTime)] - numTime[1:(length(numTime) - 1)],
-      0
-   );
-   
-   par <- signalOut$getVariable("par");
-   parAverage <- c(
-      0.5 * (par[1:length(numTime) - 1] + par[2:length(numTime)]),
-      0
-   );
-   parDist <- (par * dt) / sum(parAverage * dt);
-   
-   cppModelCN <- .Call(
-      "MetabCrankNicolsonDo_constructor",
-      610,
-      1,
-      275,
-      -1,
-      19.5,
-      signalOut$getVariable("do")[1],
-      numTime,
-      signalOut$getVariable("temp"),
-      parDist,
-      rep(638, length(numTime)),
-      760
+   cppModelCN <- .Call("MetabCrankNicolsonDo_constructor")
+   .Call(
+      "MetabDo_initialize",
+      cppModelCN$baseExternalPointer,
+      gpp,
+      gppdo,
+      er,
+      erdo,
+      k600,
+      initDO,
+      time,
+      temp,
+      par,
+      parTotal,
+      airPressure,
+      stdAirPressure
    )
    
    cppModelCN_output <- .Call("MetabDo_run", cppModelCN$baseExternalPointer)
@@ -77,14 +71,17 @@ timers$cppTimeCN <- bench_time({
 timers$rTime <- bench_time({
    
    rModel <- OneStationMetabDo$new(
-      dailyGPP = 610,
-      dailyER = 275,
-      k600 = 19.5,
-      airPressure = 638,
-      initialDO = signalOut$getVariable("do")[1],
+      dailyGPP = gpp,
+      ratioDoCfix = gppdo,
+      dailyER = er,
+      ratioDoCresp = erdo,
+      k600 = k600,
+      airPressure = airPressure[1],
+      stdAirPressure = stdAirPressure,
+      initialDO = initDO,
       time = signalOut$time,
-      temp = signalOut$getVariable("temp"),
-      par = signalOut$getVariable("par")
+      temp = temp,
+      par = par,
    )
    
    rModel$run()

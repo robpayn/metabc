@@ -3,10 +3,17 @@
 
 void MetabForwardEulerDo::run()
 {
-   // Set the initial state
+   // Set the initial oxygen concentration
    outputDo.dox[0] = initialDO;
+
+   // Calculate effects on effective organic carbon
+   parDist[0] = parDistCalculator.calc(
+      dt[0],
+      par[0]
+   );
    output.cFixation[0] = dailyGPP * parDist[0];
    output.cRespiration[0] = dailyER * dt[0];
+
    outputDo.doProduction[0] =
       output.cFixation[0] * ratioDoCFix;
    outputDo.doConsumption[0] =
@@ -22,6 +29,10 @@ void MetabForwardEulerDo::run()
          outputDo.doConsumption[i - 1] +
          outputDo.doEquilibration[i - 1];
 
+      parDist[i] = parDistCalculator.calc(
+         dt[i],
+         par[i]
+      );
       output.cFixation[i] = dailyGPP * parDist[i];
       output.cRespiration[i] = dailyER * dt[i];
 

@@ -1,46 +1,17 @@
 #include "metabc.h"
-#include "utilities.h"
 
-MetabDo::MetabDo
-(
-   double dailyGPP,
-   double ratioDoCFix,
-   double dailyER,
-   double ratioDoCResp,
-   double k600,
-   double initialDO,
-   double* time,
-   double* temp,
-   double* parDist,
-   double* airPressure,
-   double stdAirPressure,
-   int length
-)
-{
-   initialize(
-      dailyGPP,
-      ratioDoCFix,
-      dailyER,
-      ratioDoCResp,
-      k600,
-      initialDO,
-      time,
-      temp,
-      parDist,
-      airPressure,
-      stdAirPressure,
-      length
-   );
-}
+MetabDo::MetabDo() :
+   Metab()
+{}
 
 MetabDo::~MetabDo()
 {
    delete[] dt;
    delete[] satDo;
    delete[] kDo;
+   delete[] parAvg;
+   delete[] parDist;
 
-   delete[] output.cFixation;
-   delete[] output.cRespiration;
    delete[] outputDo.dox;
    delete[] outputDo.doProduction;
    delete[] outputDo.doConsumption;
@@ -57,86 +28,85 @@ void MetabDo::initialize
    double initialDO,
    double* time,
    double* temp,
-   double* parDist,
+   double* par,
+   double parTotal,
    double* airPressure,
    double stdAirPressure,
    int length
 )
 {
-   // Set attributes
-   this->dailyGPP = dailyGPP;
-   this->ratioDoCFix = ratioDoCFix;
-   this->dailyER = dailyER;
-   this->ratioDoCResp = ratioDoCResp;
-   this->k600 = k600;
-   this->initialDO = initialDO;
-   this->time = time;
-   this->temp = temp;
-   this->parDist = parDist;
-   this->airPressure = airPressure;
-   this->stdAirPressure = stdAirPressure;
-   this->length = length;
-
-   // Set the default calculators
-   setDensityCalculator(densityWaterCalc);
-   setSatDoCalculator(satDoCalc);
-   setkSchmidtDoCalculator(kSchmidtDoCalc);
+   // Initialize the base class
+   Metab::initialize(
+      dailyGPP,
+      ratioDoCFix,
+      dailyER,
+      ratioDoCResp,
+      k600,
+      length
+   );
 
    // Allocate memory
    dt = new double[length];
    satDo = new double[length];
    kDo = new double[length];
+   parAvg = new double[length];
+   parDist = new double[length];
 
    // Allocate output
-   output.cFixation = new double[length];
-   output.cRespiration = new double[length];
    outputDo.dox = new double[length];
    outputDo.doProduction = new double[length];
    outputDo.doConsumption = new double[length];
    outputDo.doEquilibration = new double[length];
 
-   // Calculate the change in time between predictions
-   //    (forward calculation context)
-   for(int i = 0; i < length - 1; i++) {
-      dt[i] = time[i + 1] - time[i];
-   }
-   dt[length - 1] = 0;
+   // Set attributes
+   this->initialDO = initialDO;
+   this->time = time;
+   this->temp = temp;
+   this->par = par;
+   this->airPressure = airPressure;
+   this->stdAirPressure = stdAirPressure;
 
-   // Calculate DO saturation concentrations and
-   //   DO gas exchange rates
+   int lastIndex = length - 1;
+
+   // Calculate the values at times or over time steps
    double densityWater;
-   for(int i = 0; i < length; i++) {
+   for(int i = 0; i < lastIndex; i++) {
+      dt[i] = time[i + 1] - time[i];
+      parAvg[i] = 0.5 * (par[i] + par[i + 1]);
+
       densityWater = densityCalculator(temp[i]);
       satDo[i] = satDoCalculator(
          temp[i],
-             densityWater,
-             airPressure[i] / stdAirPressure
+         densityWater,
+         airPressure[i] / stdAirPressure
       );
+
       kDo[i] = kSchmidtDoCalculator(temp[i], k600);
    }
-}
+   dt[lastIndex] = 0;
+   parAvg[lastIndex] = 0;
 
+   densityWater = densityCalculator(temp[lastIndex]);
+   satDo[lastIndex] = satDoCalculator(
+      temp[lastIndex],
+      densityWater,
+      airPressure[lastIndex] / stdAirPressure
+   );
 
-void MetabDo::setDensityCalculator
-(
-   double (*function)(double tempC)
-)
-{
-   densityCalculator = function;
-}
+   kDo[lastIndex] = kSchmidtDoCalculator(temp[lastIndex], k600);
 
-void MetabDo::setSatDoCalculator
-(
-   double (*function)(double tempC, double densityWater, double relativePressure)
-)
-{
-   satDoCalculator = function;
-}
+   // Calculate a total par by integration if the
+   // total PAR is not provided (i.e. totalPAR argument
+   // is <= zero)
+   if (parTotal <= 0) {
+      double sum = 0;
+      for(int i = 0; i < lastIndex; i++) {
+         sum += parAvg[i] * dt[i];
+      }
+      this->parTotal = sum;
+   } else {
+      this->parTotal = parTotal;
+   }
+   parDistCalculator.initialize(this->parTotal);
 
-void MetabDo::setkSchmidtDoCalculator
-(
-   double (*function)(double tempC, double k600)
-)
-{
-   kSchmidtDoCalculator = function;
 }

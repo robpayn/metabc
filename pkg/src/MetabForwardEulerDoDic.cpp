@@ -26,9 +26,9 @@ void MetabForwardEulerDoDic::run()
 
    // Calculate initial dic inputs and outputs
    outputDic.dicProduction[0] =
-      output.cRespiration[0] * ratioDicCresp;
+      output.cRespiration[0] * ratioDicCResp;
    outputDic.dicConsumption[0] =
-      output.cFixation[0] * ratioDicCfix;
+      output.cFixation[0] * ratioDicCFix;
    outputDic.co2Equilibration[0] =
       dt[0] * kCO2[0] *
       kH[0] * (pCO2air[0] - outputDic.pCO2[0]);
@@ -55,9 +55,9 @@ void MetabForwardEulerDoDic::run()
       outputDic.pH[i] = dicOptim[0];
 
       outputDic.dicProduction[i] =
-         output.cRespiration[i] * ratioDicCresp;
+         output.cRespiration[i] * ratioDicCResp;
       outputDic.dicConsumption[i] =
-         output.cFixation[i] * ratioDicCfix;
+         output.cFixation[i] * ratioDicCFix;
       outputDic.co2Equilibration[i] =
          dt[i] * kCO2[i] *
          kH[i] * (pCO2air[i] - outputDic.pCO2[i]);

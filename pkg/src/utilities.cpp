@@ -2,6 +2,25 @@
 #include <cmath>
 #include "utilities.h"
 
+ParDistCalculator::ParDistCalculator(double parTotal)
+{
+   initialize(parTotal);
+}
+
+void ParDistCalculator::initialize(double parTotal)
+{
+   this->parTotal = parTotal;
+}
+
+double ParDistCalculator::calc
+(
+   double duration,
+   double par
+)
+{
+   return (par * duration) / parTotal;
+}
+
 double densityWaterCalc(double tempC)
 {
    return

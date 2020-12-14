@@ -53,3 +53,14 @@ class CarbonateEq
          double pH
       );
 };
+
+struct proposeDic_info
+{
+   CarbonateEq* carbonateEq;
+   double alkalinity;
+   double kCO2;
+   double dt;
+   double target;
+};
+
+double proposeDic(double dic, void* info);

@@ -1,46 +1,8 @@
 #include "metabc.h"
-#include "utilities.h"
 
-MetabDoDic::MetabDoDic
-(
-   double dailyGPP,
-   double ratioDoCFix,
-   double dailyER,
-   double ratioDoCResp,
-   double k600,
-   double initialDO,
-   double* time,
-   double* temp,
-   double* parDist,
-   double* airPressure,
-   double stdAirPressure,
-   int length,
-   double ratioDicCfix,
-   double ratioDicCresp,
-   double initialDIC,
-   double* pCO2air,
-   double* alkalinity
-)
+MetabDoDic::MetabDoDic()
 {
-   initialize(
-      dailyGPP,
-      ratioDoCFix,
-      dailyER,
-      ratioDoCResp,
-      k600,
-      initialDO,
-      time,
-      temp,
-      parDist,
-      airPressure,
-      stdAirPressure,
-      length,
-      ratioDicCfix,
-      ratioDicCresp,
-      initialDIC,
-      pCO2air,
-      alkalinity
-   );
+   setkSchmidtCO2Calculator(kSchmidtCO2Calc);
 }
 
 MetabDoDic::~MetabDoDic()
@@ -66,12 +28,13 @@ void MetabDoDic::initialize
    double initialDO,
    double* time,
    double* temp,
-   double* parDist,
+   double* par,
+   double parTotal,
    double* airPressure,
    double stdAirPressure,
    int length,
-   double ratioDicCfix,
-   double ratioDicCresp,
+   double ratioDicCFix,
+   double ratioDicCResp,
    double initialDIC,
    double* pCO2air,
    double* alkalinity
@@ -86,21 +49,12 @@ void MetabDoDic::initialize
       initialDO,
       time,
       temp,
-      parDist,
+      par,
+      parTotal,
       airPressure,
       stdAirPressure,
       length
    );
-
-   this->ratioDicCfix = ratioDicCfix;
-   this->ratioDicCresp = ratioDicCresp;
-   this->initialDIC = initialDIC;
-   this->pCO2air = pCO2air;
-   this->alkalinity = alkalinity;
-
-   carbonateEq.reset(temp[0], 0);
-
-   setkSchmidtCO2Calculator(kSchmidtCO2Calc);
 
    kCO2 = new double[length];
    kH = new double[length];
@@ -111,6 +65,14 @@ void MetabDoDic::initialize
    outputDic.dicConsumption = new double[length];
    outputDic.co2Equilibration = new double[length];
    outputDic.pH = new double[length];
+
+   this->ratioDicCFix = ratioDicCFix;
+   this->ratioDicCResp = ratioDicCResp;
+   this->initialDIC = initialDIC;
+   this->pCO2air = pCO2air;
+   this->alkalinity = alkalinity;
+
+   carbonateEq.reset(temp[0], 0);
 
    for(int i = 0; i < length; i++) {
       kCO2[i] = kSchmidtCO2Calculator(temp[i], k600);

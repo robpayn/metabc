@@ -1,95 +1,106 @@
 #include "metabc_R.h"
 
-SEXP MetabDoDic_initialize(
+SEXP MetabLagrangeDoDic_initialize(
    SEXP baseExtPointer,
    SEXP dailyGPP,
    SEXP ratioDoCFix,
    SEXP dailyER,
    SEXP ratioDoCResp,
    SEXP k600,
-   SEXP initialDO,
-   SEXP time,
-   SEXP temp,
-   SEXP par,
+   SEXP upstreamDO,
+   SEXP upstreamTime,
+   SEXP downstreamTime,
+   SEXP upstreamTemp,
+   SEXP downstreamTemp,
+   SEXP upstreamPAR,
+   SEXP downstreamPAR,
    SEXP parTotal,
    SEXP airPressure,
    SEXP stdAirPressure,
+   SEXP timesteps,
    SEXP ratioDicCFix,
    SEXP ratioDicCResp,
-   SEXP initialDIC,
+   SEXP upstreamDIC,
    SEXP pCO2air,
-   SEXP alkalinity
+   SEXP upstreamAlkalinity,
+   SEXP downstreamAlkalinity
 )
 {
-   int length = length(time);
+   int length = length(upstreamTime);
 
-   MetabDoDic* basePointer = (MetabDoDic*)R_ExternalPtrAddr(baseExtPointer);
+   MetabLagrangeDoDic* basePointer =
+      (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExtPointer);
    basePointer->initialize(
       asReal(dailyGPP),
       asReal(ratioDoCFix),
       asReal(dailyER),
       asReal(ratioDoCResp),
       asReal(k600),
-      asReal(initialDO),
-      REAL(time),
-      REAL(temp),
-      REAL(par),
+      REAL(upstreamDO),
+      REAL(upstreamTime),
+      REAL(downstreamTime),
+      REAL(upstreamTemp),
+      REAL(downstreamTemp),
+      REAL(upstreamPAR),
+      REAL(downstreamPAR),
       asReal(parTotal),
       REAL(airPressure),
       asReal(stdAirPressure),
       length,
+      asInteger(timesteps),
       asReal(ratioDicCFix),
       asReal(ratioDicCResp),
-      asReal(initialDIC),
+      REAL(upstreamDIC),
       REAL(pCO2air),
-      REAL(alkalinity)
+      REAL(upstreamAlkalinity),
+      REAL(downstreamAlkalinity)
    );
 
    return R_NilValue;
 }
 
-SEXP MetabDoDic_run(SEXP baseExternalPointer)
+SEXP MetabLagrangeDoDic_run(SEXP baseExternalPointer)
 {
-   MetabDoDic* basePointer =
-      (MetabDoDic*)R_ExternalPtrAddr(baseExternalPointer);
+   MetabLagrangeDoDic* basePointer =
+      (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
    basePointer->run();
 
-   return MetabDoDic_getSummary(basePointer);
+   return MetabLagrangeDoDic_getSummary(basePointer);
 }
 
-SEXP MetabDoDic_getSummary(SEXP baseExternalPointer)
+SEXP MetabLagrangeDoDic_getSummary(SEXP baseExternalPointer)
 {
-   MetabDoDic* basePointer =
-      (MetabDoDic*)R_ExternalPtrAddr(baseExternalPointer);
+   MetabLagrangeDoDic* basePointer =
+      (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
 
-   return MetabDoDic_getSummary(basePointer);
+   return MetabLagrangeDoDic_getSummary(basePointer);
 }
 
-SEXP MetabDoDic_getSummary(MetabDoDic* basePointer)
+SEXP MetabLagrangeDoDic_getSummary(MetabLagrangeDoDic* basePointer)
 {
-   MetabDo* basePointerDo = dynamic_cast <MetabDo*> (basePointer);
-   SEXP oldVec = PROTECT(MetabDo_getSummary(basePointerDo));
+   MetabLagrangeDo* basePointerDo = dynamic_cast <MetabLagrangeDo*> (basePointer);
+   SEXP oldVec = PROTECT(MetabLagrangeDo_getSummary(basePointerDo));
 
    SEXP vecOutput = PROTECT(VECTOR_ELT(oldVec, 0));
    SEXP vecOutputDO = PROTECT(VECTOR_ELT(oldVec, 1));
 
-   SEXP pCO2 = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP dic = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP dicProduction = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP dicConsumption = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP co2Equilibration = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP kCO2 = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP pH = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP kH = PROTECT(allocVector(REALSXP, basePointer->length));
-   for(int i = 0; i < basePointer->length; i++) {
+   SEXP pCO2 = PROTECT(allocVector(REALSXP, basePointer->numParcels));
+   SEXP dic = PROTECT(allocVector(REALSXP, basePointer->numParcels));
+   SEXP dicProduction = PROTECT(allocVector(REALSXP, basePointer->numParcels));
+   SEXP dicConsumption = PROTECT(allocVector(REALSXP, basePointer->numParcels));
+   SEXP co2Equilibration = PROTECT(allocVector(REALSXP, basePointer->numParcels));
+   SEXP kCO2 = PROTECT(allocVector(REALSXP, basePointer->numParcels));
+   SEXP pH = PROTECT(allocVector(REALSXP, basePointer->numParcels));
+   SEXP kH = PROTECT(allocVector(REALSXP, basePointer->numParcels));
+   for(int i = 0; i < basePointer->numParcels; i++) {
       REAL(pCO2)[i] = basePointer->outputDic.pCO2[i];
       REAL(dic)[i] = basePointer->outputDic.dic[i];
       REAL(dicProduction)[i] = basePointer->outputDic.dicProduction[i];
       REAL(dicConsumption)[i] = basePointer->outputDic.dicConsumption[i];
       REAL(co2Equilibration)[i] = basePointer->outputDic.co2Equilibration[i];
-      REAL(kCO2)[i] = basePointer->kCO2[i];
+      REAL(kCO2)[i] = basePointer->downstreamkCO2[i];
       REAL(pH)[i] = basePointer->outputDic.pH[i];
-      REAL(kH)[i] = basePointer->kH[i];
+      REAL(kH)[i] = basePointer->downstreamkH[i];
    }
 
    SEXP vecOutputDIC = PROTECT(allocVector(VECSXP, 8));
@@ -108,9 +119,9 @@ SEXP MetabDoDic_getSummary(MetabDoDic* basePointer)
    SET_VECTOR_ELT(vecOutputDIC_names, 2, install("dicProduction"));
    SET_VECTOR_ELT(vecOutputDIC_names, 3, install("dicConsumption"));
    SET_VECTOR_ELT(vecOutputDIC_names, 4, install("co2Equilibration"));
-   SET_VECTOR_ELT(vecOutputDIC_names, 5, install("kCO2"));
-   SET_VECTOR_ELT(vecOutputDIC_names, 6, install("pH"));
-   SET_VECTOR_ELT(vecOutputDIC_names, 7, install("kH"));
+   SET_VECTOR_ELT(vecOutputDIC_names, 5, install("downstreamkCO2"));
+   SET_VECTOR_ELT(vecOutputDIC_names, 6, install("downstreampH"));
+   SET_VECTOR_ELT(vecOutputDIC_names, 7, install("downstreamkH"));
 
    setAttrib(vecOutputDIC, install("names"), vecOutputDIC_names);
 

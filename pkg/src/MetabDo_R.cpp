@@ -1,5 +1,43 @@
 #include "metabc_R.h"
 
+SEXP MetabDo_initialize(
+      SEXP baseExtPointer,
+      SEXP dailyGPP,
+      SEXP ratioDoCFix,
+      SEXP dailyER,
+      SEXP ratioDoCResp,
+      SEXP k600,
+      SEXP initialDO,
+      SEXP time,
+      SEXP temp,
+      SEXP par,
+      SEXP parTotal,
+      SEXP airPressure,
+      SEXP stdAirPressure
+)
+{
+   int length = length(time);
+
+   MetabDo* basePointer = (MetabDo*)R_ExternalPtrAddr(baseExtPointer);
+   basePointer->initialize(
+      asReal(dailyGPP),
+      asReal(ratioDoCFix),
+      asReal(dailyER),
+      asReal(ratioDoCResp),
+      asReal(k600),
+      asReal(initialDO),
+      REAL(time),
+      REAL(temp),
+      REAL(par),
+      asReal(parTotal),
+      REAL(airPressure),
+      asReal(stdAirPressure),
+      length
+   );
+
+   return R_NilValue;
+}
+
 SEXP MetabDo_run(SEXP baseExtPointer)
 {
    MetabDo* basePointer = (MetabDo*)R_ExternalPtrAddr(baseExtPointer);

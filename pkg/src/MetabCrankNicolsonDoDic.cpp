@@ -1,32 +1,5 @@
 #include "metabc.h"
 #include <cmath>
-#include "utilities.h"
-
-struct proposeDic_info
-{
-   CarbonateEq* carbonateEq;
-   double alkalinity;
-   double kCO2;
-   double dt;
-   double target;
-};
-
-double proposeDic(double dic, void* info)
-{
-   proposeDic_info* p = (proposeDic_info*)info;
-   double dicOptim[2];
-   p->carbonateEq->optfCO2FromDICTotalAlk(
-      dic * 1e-6,
-      p->alkalinity * 1e-6,
-      1e-5,
-      2,
-      12,
-      dicOptim
-   );
-   double CO2 = dicOptim[1] * p->carbonateEq->kHenryCO2;
-   double guess = dic + p->kCO2 * p->dt * CO2 * 0.5;
-   return fabs(p->target - guess);
-}
 
 void MetabCrankNicolsonDoDic::run()
 {
@@ -59,12 +32,13 @@ void MetabCrankNicolsonDoDic::run()
 
    // Calculate initial dic inputs and outputs
    outputDic.dicProduction[0] =
-      output.cRespiration[0] * ratioDicCresp;
+      output.cRespiration[0] * ratioDicCResp;
    outputDic.dicConsumption[0] =
-      output.cFixation[0] * ratioDicCfix;
+      output.cFixation[0] * ratioDicCFix;
+   double avgkCO2 = 0.5 * (kCO2[0] + kCO2[1]);
    outputDic.co2Equilibration[0] =
       dt[0] *
-      0.5 * (kCO2[0] + kCO2[1]) *
+      avgkCO2 *
       0.5 * (lastCO2Deficit + nextCO2Sat);
 
    for(int i = 1; i < length - 1; i++) {
@@ -73,8 +47,8 @@ void MetabCrankNicolsonDoDic::run()
       proposeDic_info info;
       info.carbonateEq = &carbonateEq;
       info.alkalinity = alkalinity[i];
-      info.kCO2 = kCO2[i];
-      info.dt = dt[i];
+      info.kCO2 = avgkCO2;
+      info.dt = dt[i - 1];
       info.target =
          outputDic.dic[i - 1] +
          outputDic.dicProduction[i - 1] +
@@ -106,12 +80,13 @@ void MetabCrankNicolsonDoDic::run()
       nextCO2Sat = carbonateEq.kHenryCO2 * pCO2air[i + 1];
 
       outputDic.dicProduction[i] =
-         output.cRespiration[i] * ratioDicCresp;
+         output.cRespiration[i] * ratioDicCResp;
       outputDic.dicConsumption[i] =
-         output.cFixation[i] * ratioDicCfix;
+         output.cFixation[i] * ratioDicCFix;
+      avgkCO2 = 0.5 * (kCO2[i] + kCO2[i + 1]);
       outputDic.co2Equilibration[i] =
          dt[i] *
-         0.5 * (kCO2[i] + kCO2[i + 1]) *
+         avgkCO2 *
          0.5 * (lastCO2Deficit + nextCO2Sat);
    }
 
@@ -122,8 +97,8 @@ void MetabCrankNicolsonDoDic::run()
    proposeDic_info info;
    info.carbonateEq = &carbonateEq;
    info.alkalinity = alkalinity[lastIndex];
-   info.kCO2 = kCO2[lastIndex];
-   info.dt = dt[lastIndex];
+   info.kCO2 = avgkCO2;
+   info.dt = dt[lastIndex - 1];
    info.target =
       outputDic.dic[lastIndex - 1] +
       outputDic.dicProduction[lastIndex - 1] +

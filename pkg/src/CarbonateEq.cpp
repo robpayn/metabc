@@ -18,6 +18,23 @@ double proposepH(double pH, void* info)
    return fabs(p->totalAlk - totalAlkFromDICpH);
 }
 
+double proposeDic(double dic, void* info)
+{
+   proposeDic_info* p = (proposeDic_info*)info;
+   double dicOptim[2];
+   p->carbonateEq->optfCO2FromDICTotalAlk(
+         dic * 1e-6,
+         p->alkalinity * 1e-6,
+         1e-5,
+         2,
+         12,
+         dicOptim
+   );
+   double CO2 = dicOptim[1] * p->carbonateEq->kHenryCO2;
+   double guess = dic + p->kCO2 * p->dt * CO2 * 0.5;
+   return fabs(p->target - guess);
+}
+
 CarbonateEq::CarbonateEq
 (
    double tempC,
