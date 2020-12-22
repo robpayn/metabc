@@ -59,13 +59,48 @@ SEXP MetabLagrangeDoDic_initialize(
    return R_NilValue;
 }
 
-SEXP MetabLagrangeDoDic_run(SEXP baseExternalPointer)
+SEXP MetabLagrangeDoDic_setRatioDoCFix(SEXP baseExternalPointer, SEXP value)
 {
-   MetabLagrangeDoDic* basePointer =
-      (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
-   basePointer->run();
+   MetabLagrangeDoDic* model = (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDoCFix;
+   model->ratioDoCFix = asReal(value);
 
-   return MetabLagrangeDoDic_getSummary(basePointer);
+   UNPROTECT(1);
+   return out;
+}
+
+SEXP MetabLagrangeDoDic_setRatioDoCResp(SEXP baseExternalPointer, SEXP value)
+{
+   MetabLagrangeDoDic* model = (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDoCResp;
+   model->ratioDoCResp = asReal(value);
+
+   UNPROTECT(1);
+   return out;
+}
+
+SEXP MetabLagrangeDoDic_setRatioDicCFix(SEXP baseExternalPointer, SEXP value)
+{
+   MetabLagrangeDoDic* model = (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDicCFix;
+   model->ratioDicCFix = asReal(value);
+
+   UNPROTECT(1);
+   return out;
+}
+
+SEXP MetabLagrangeDoDic_setRatioDicCResp(SEXP baseExternalPointer, SEXP value)
+{
+   MetabLagrangeDoDic* model = (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDicCResp;
+   model->ratioDicCResp = asReal(value);
+
+   UNPROTECT(1);
+   return out;
 }
 
 SEXP MetabLagrangeDoDic_getSummary(SEXP baseExternalPointer)

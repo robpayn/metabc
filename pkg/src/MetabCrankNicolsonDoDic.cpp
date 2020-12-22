@@ -35,13 +35,17 @@ void MetabCrankNicolsonDoDic::run()
       output.cRespiration[0] * ratioDicCResp;
    outputDic.dicConsumption[0] =
       output.cFixation[0] * ratioDicCFix;
+
+   kCO2[0] = kSchmidtCO2Calculator(temp[0], k600);
+   kCO2[1] = kSchmidtCO2Calculator(temp[1], k600);
    double avgkCO2 = 0.5 * (kCO2[0] + kCO2[1]);
    outputDic.co2Equilibration[0] =
       dt[0] *
       avgkCO2 *
       0.5 * (lastCO2Deficit + nextCO2Sat);
 
-   for(int i = 1; i < length - 1; i++) {
+   int lastIndex = length - 1;
+   for(int i = 1; i < lastIndex; i++) {
       kH[i] = carbonateEq.kHenryCO2;
 
       proposeDic_info info;
@@ -83,14 +87,14 @@ void MetabCrankNicolsonDoDic::run()
          output.cRespiration[i] * ratioDicCResp;
       outputDic.dicConsumption[i] =
          output.cFixation[i] * ratioDicCFix;
+
+      kCO2[i + 1] = kSchmidtCO2Calculator(temp[i + 1], k600);
       avgkCO2 = 0.5 * (kCO2[i] + kCO2[i + 1]);
       outputDic.co2Equilibration[i] =
          dt[i] *
          avgkCO2 *
          0.5 * (lastCO2Deficit + nextCO2Sat);
    }
-
-   int lastIndex = length - 1;
 
    kH[lastIndex] = carbonateEq.kHenryCO2;
 

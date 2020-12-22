@@ -1,19 +1,20 @@
 #include "metabc_R.h"
 
-SEXP MetabDo_initialize(
-      SEXP baseExtPointer,
-      SEXP dailyGPP,
-      SEXP ratioDoCFix,
-      SEXP dailyER,
-      SEXP ratioDoCResp,
-      SEXP k600,
-      SEXP initialDO,
-      SEXP time,
-      SEXP temp,
-      SEXP par,
-      SEXP parTotal,
-      SEXP airPressure,
-      SEXP stdAirPressure
+SEXP MetabDo_initialize
+(
+   SEXP baseExtPointer,
+   SEXP dailyGPP,
+   SEXP ratioDoCFix,
+   SEXP dailyER,
+   SEXP ratioDoCResp,
+   SEXP k600,
+   SEXP initialDO,
+   SEXP time,
+   SEXP temp,
+   SEXP par,
+   SEXP parTotal,
+   SEXP airPressure,
+   SEXP stdAirPressure
 )
 {
    int length = length(time);
@@ -38,12 +39,26 @@ SEXP MetabDo_initialize(
    return R_NilValue;
 }
 
-SEXP MetabDo_run(SEXP baseExtPointer)
+SEXP MetabDo_setRatioDoCFix(SEXP baseExternalPointer, SEXP value)
 {
-   MetabDo* basePointer = (MetabDo*)R_ExternalPtrAddr(baseExtPointer);
-   basePointer->run();
+   MetabDo* model = (MetabDo*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDoCFix;
+   model->ratioDoCFix = asReal(value);
 
-   return MetabDo_getSummary(basePointer);
+   UNPROTECT(1);
+   return out;
+}
+
+SEXP MetabDo_setRatioDoCResp(SEXP baseExternalPointer, SEXP value)
+{
+   MetabDo* model = (MetabDo*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDoCResp;
+   model->ratioDoCResp = asReal(value);
+
+   UNPROTECT(1);
+   return out;
 }
 
 SEXP MetabDo_getSummary(SEXP baseExtPointer)
@@ -142,17 +157,6 @@ SEXP MetabDo_getDt(SEXP externalPointer)
    for (int i = 0; i < model->length; i++) {
       REAL(out)[i] = model->dt[i];
    }
-
-   UNPROTECT(1);
-   return out;
-}
-
-SEXP MetabDo_setDailyGPP(SEXP externalPointer, SEXP value)
-{
-   MetabDo* model = (MetabDo*)R_ExternalPtrAddr(externalPointer);
-   SEXP out = PROTECT(allocVector(REALSXP, 1));
-   REAL(out)[0] = model->dailyGPP;
-   model->dailyGPP = asReal(value);
 
    UNPROTECT(1);
    return out;

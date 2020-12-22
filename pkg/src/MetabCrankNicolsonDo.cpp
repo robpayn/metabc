@@ -14,18 +14,22 @@ void MetabCrankNicolsonDo::run()
    output.cFixation[0] = dailyGPP * parDist[0];
    output.cRespiration[0] = dailyER * dt[0];
 
-   double avgkDO = 0.5 * (kDo[0] + kDo[1]);
    outputDo.doProduction[0] =
       output.cFixation[0] * ratioDoCFix;
    outputDo.doConsumption[0] =
       output.cRespiration[0] * ratioDoCResp;
+
+   kDo[0] = kSchmidtDoCalculator(temp[0], k600);
+   kDo[1] = kSchmidtDoCalculator(temp[1], k600);
+   double avgkDO = 0.5 * (kDo[0] + kDo[1]);
    outputDo.doEquilibration[0] =
       dt[0] *
       avgkDO *
       0.5 * (satDo[0] - outputDo.dox[0] + satDo[1]);
 
    // Loop through time steps
-   for (int i = 1; i < length - 1; i++) {
+   int lastIndex = length - 1;
+   for (int i = 1; i < lastIndex; i++) {
       outputDo.dox[i] =
          (
             outputDo.dox[i - 1] +
@@ -44,18 +48,19 @@ void MetabCrankNicolsonDo::run()
       output.cFixation[i] = dailyGPP * parDist[i];
       output.cRespiration[i] = dailyER * dt[i];
 
-      avgkDO = 0.5 * (kDo[i] + kDo[i + 1]);
       outputDo.doProduction[i] =
          output.cFixation[i] * ratioDoCFix;
       outputDo.doConsumption[i] =
          output.cRespiration[i] * ratioDoCResp;
+
+      kDo[i + 1] = kSchmidtDoCalculator(temp[i + 1], k600);
+      avgkDO = 0.5 * (kDo[i] + kDo[i + 1]);
       outputDo.doEquilibration[i] =
          dt[i] *
          avgkDO *
          0.5 * (satDo[i] - outputDo.dox[i] + satDo[i + 1]);
    }
 
-   int lastIndex = length - 1;
    outputDo.dox[lastIndex] =
       (
          outputDo.dox[lastIndex - 1] +

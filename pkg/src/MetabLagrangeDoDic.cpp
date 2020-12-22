@@ -7,6 +7,11 @@ MetabLagrangeDoDic::MetabLagrangeDoDic()
 
 MetabLagrangeDoDic::~MetabLagrangeDoDic()
 {
+   delete[] upstreamDIC;
+   delete[] pCO2air;
+   delete[] upstreamAlkalinity;
+   delete[] downstreamAlkalinity;
+
    delete[] upstreampCO2;
    delete[] upstreampH;
    delete[] upstreamSatCO2;
@@ -71,6 +76,11 @@ void MetabLagrangeDoDic::initialize
       timeSteps
    );
 
+   this->upstreamDIC = new double[numParcels];
+   this->pCO2air = new double[numParcels];
+   this->upstreamAlkalinity = new double[numParcels];
+   this->downstreamAlkalinity = new double[numParcels];
+
    upstreampCO2 = new double[numParcels];
    upstreampH = new double[numParcels];
    upstreamSatCO2 = new double[numParcels];
@@ -90,17 +100,19 @@ void MetabLagrangeDoDic::initialize
    // Set the attributes
    this->ratioDicCFix = ratioDicCFix;
    this->ratioDicCResp = ratioDicCResp;
-   this->upstreamDIC = upstreamDIC;
-   this->pCO2air = pCO2air;
-   this->upstreamAlkalinity = upstreamAlkalinity;
-   this->downstreamAlkalinity = downstreamAlkalinity;
 
    for(int i = 0; i < numParcels; i++) {
-      carbonateEq.reset(upstreamTemp[i], 0);
+      // Copy array values into attributes
+      this->upstreamDIC[i] = upstreamDIC[i];
+      this->pCO2air[i] = pCO2air[i];
+      this->upstreamAlkalinity[i] = upstreamAlkalinity[i];
+      this->downstreamAlkalinity[i] = downstreamAlkalinity[i];
+
+      carbonateEq.reset(this->upstreamTemp[i], 0);
       double equil[2];
       carbonateEq.optfCO2FromDICTotalAlk(
-         upstreamDIC[i] * 1e-6,
-         upstreamAlkalinity[i] * 1e-6,
+         this->upstreamDIC[i] * 1e-6,
+         this->upstreamAlkalinity[i] * 1e-6,
          1e-5,
          2,
          12,
@@ -109,13 +121,11 @@ void MetabLagrangeDoDic::initialize
       upstreampH[i] = equil[0];
       upstreampCO2[i] = equil[1];
       upstreamkH[i] = carbonateEq.kHenryCO2;
-      upstreamSatCO2[i] = upstreamkH[i] * pCO2air[i];
-      upstreamkCO2[i] = kSchmidtCO2Calculator(upstreamTemp[i], k600);
+      upstreamSatCO2[i] = upstreamkH[i] * this->pCO2air[i];
 
-      carbonateEq.reset(downstreamTemp[i], 0);
+      carbonateEq.reset(this->downstreamTemp[i], 0);
       downstreamkH[i] = carbonateEq.kHenryCO2;
-      downstreamSatCO2[i] = downstreamkH[i] * pCO2air[i];
-      downstreamkCO2[i] = kSchmidtCO2Calculator(downstreamTemp[i], k600);
+      downstreamSatCO2[i] = downstreamkH[i] * this->pCO2air[i];
    }
 }
 

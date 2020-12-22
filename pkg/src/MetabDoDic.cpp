@@ -7,6 +7,9 @@ MetabDoDic::MetabDoDic()
 
 MetabDoDic::~MetabDoDic()
 {
+   delete[] pCO2air;
+   delete[] alkalinity;
+
    delete[] kCO2;
    delete[] kH;
 
@@ -56,6 +59,10 @@ void MetabDoDic::initialize
       length
    );
 
+   // Allocate memory for array attributes
+   this->pCO2air = new double[length];
+   this->alkalinity = new double[length];
+
    kCO2 = new double[length];
    kH = new double[length];
 
@@ -66,17 +73,18 @@ void MetabDoDic::initialize
    outputDic.co2Equilibration = new double[length];
    outputDic.pH = new double[length];
 
+   // Assign attribute values
    this->ratioDicCFix = ratioDicCFix;
    this->ratioDicCResp = ratioDicCResp;
    this->initialDIC = initialDIC;
-   this->pCO2air = pCO2air;
-   this->alkalinity = alkalinity;
 
-   carbonateEq.reset(temp[0], 0);
-
+   // Copy array values into attributes
    for(int i = 0; i < length; i++) {
-      kCO2[i] = kSchmidtCO2Calculator(temp[i], k600);
+      this->pCO2air[i] = pCO2air[i];
+      this->alkalinity[i] = alkalinity[i];
    }
+
+   carbonateEq.reset(this->temp[0], 0);
 }
 
 void MetabDoDic::setkSchmidtCO2Calculator

@@ -23,12 +23,12 @@ double proposeDic(double dic, void* info)
    proposeDic_info* p = (proposeDic_info*)info;
    double dicOptim[2];
    p->carbonateEq->optfCO2FromDICTotalAlk(
-         dic * 1e-6,
-         p->alkalinity * 1e-6,
-         1e-5,
-         2,
-         12,
-         dicOptim
+      dic * 1e-6,
+      p->alkalinity * 1e-6,
+      1e-5,
+      2,
+      12,
+      dicOptim
    );
    double CO2 = dicOptim[1] * p->carbonateEq->kHenryCO2;
    double guess = dic + p->kCO2 * p->dt * CO2 * 0.5;
@@ -130,14 +130,15 @@ void CarbonateEq::optfCO2FromDICTotalAlk
    double out[]
 )
 {
-   out[0] = optpHFromDICTotalAlk(
+   double pH = optpHFromDICTotalAlk(
       concDIC,
       totalAlk,
       pHtolerance,
       pHmin,
       pHmax
    );
-   out[1] = calcfCO2FromDICpH(concDIC, out[0]);
+   out[1] = calcfCO2FromDICpH(concDIC, pH);
+   out[0] = pH;
 }
 
 double CarbonateEq::optpHFromDICTotalAlk

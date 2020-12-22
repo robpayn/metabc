@@ -17,9 +17,7 @@ Metab::~Metab()
 void Metab::initialize
 (
    double dailyGPP,
-   double ratioDoCFix,
    double dailyER,
-   double ratioDoCResp,
    double k600,
    int length
 )
@@ -28,9 +26,7 @@ void Metab::initialize
    output.cRespiration = new double[length];
 
    this->dailyGPP = dailyGPP;
-   this->ratioDoCFix = ratioDoCFix;
    this->dailyER = dailyER;
-   this->ratioDoCResp = ratioDoCResp;
    this->k600 = k600;
    this->length = length;
 }

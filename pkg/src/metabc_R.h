@@ -14,11 +14,12 @@ void finalizerExternalPointer(SEXP externalPointer) {
 template <class T, class B>
 SEXP Metab_constructor()
 {
-   T* genericPointer = new T();
-   B* modelPointer = dynamic_cast <B*> (genericPointer);
+   T* modelPointer = new T();
+   B* basePointer = dynamic_cast <B*> (modelPointer);
+   Metab* metabPointer = dynamic_cast <Metab*> (basePointer);
 
    SEXP modelExtPointer = PROTECT(
-      R_MakeExternalPtr(genericPointer, R_NilValue, R_NilValue)
+      R_MakeExternalPtr(modelPointer, R_NilValue, R_NilValue)
    );
 
    R_RegisterCFinalizer(
@@ -27,20 +28,25 @@ SEXP Metab_constructor()
    );
 
    SEXP baseExtPointer = PROTECT(
-      R_MakeExternalPtr(modelPointer, R_NilValue, R_NilValue)
+      R_MakeExternalPtr(basePointer, R_NilValue, R_NilValue)
+   );
+   SEXP metabExtPointer = PROTECT(
+      R_MakeExternalPtr(metabPointer, R_NilValue, R_NilValue)
    );
 
-   SEXP vecOutput = PROTECT(allocVector(VECSXP, 2));
+   SEXP vecOutput = PROTECT(allocVector(VECSXP, 3));
    SET_VECTOR_ELT(vecOutput, 0, modelExtPointer);
    SET_VECTOR_ELT(vecOutput, 1, baseExtPointer);
+   SET_VECTOR_ELT(vecOutput, 2, metabExtPointer);
 
-   SEXP vecOutput_names = PROTECT(allocVector(VECSXP, 2));
+   SEXP vecOutput_names = PROTECT(allocVector(VECSXP, 3));
    SET_VECTOR_ELT(vecOutput_names, 0, install("modelExternalPointer"));
    SET_VECTOR_ELT(vecOutput_names, 1, install("baseExternalPointer"));
+   SET_VECTOR_ELT(vecOutput_names, 2, install("metabExternalPointer"));
 
    setAttrib(vecOutput, install("names"), vecOutput_names);
 
-   UNPROTECT(4);
+   UNPROTECT(5);
    return vecOutput;
 }
 
@@ -54,6 +60,14 @@ SEXP MetabLagrangeDoDic_getSummary(MetabLagrangeDoDic*);
 
 extern "C"
 {
+   SEXP Metab_run(SEXP metabExternalPointer);
+
+   SEXP Metab_setDailyGPP(SEXP metabExternalPointer, SEXP value);
+
+   SEXP Metab_setDailyER(SEXP metabExternalPointer, SEXP value);
+
+   SEXP Metab_setk600(SEXP metabExternalPointer, SEXP value);
+
    SEXP MetabDo_initialize(
       SEXP baseExtPointer,
       SEXP dailyGPP,
@@ -70,15 +84,15 @@ extern "C"
       SEXP stdAirPressure
    );
 
-   SEXP MetabDo_run(SEXP);
+   SEXP MetabDo_setRatioDoCFix(SEXP baseExternalPointer, SEXP value);
+
+   SEXP MetabDo_setRatioDoCResp(SEXP baseExternalPointer, SEXP value);
 
    SEXP MetabDo_getSummary(SEXP);
 
    SEXP MetabDo_getPARDist(SEXP externalPointer);
 
    SEXP MetabDo_getDt(SEXP externalPointer);
-
-   SEXP MetabDo_setDailyGPP(SEXP externalPointer, SEXP value);
 
    SEXP MetabForwardEulerDo_constructor();
 
@@ -108,7 +122,9 @@ extern "C"
       SEXP timesteps
    );
 
-   SEXP MetabLagrangeDo_run(SEXP);
+   SEXP MetabLagrangeDo_setRatioDoCFix(SEXP baseExternalPointer, SEXP value);
+
+   SEXP MetabLagrangeDo_setRatioDoCResp(SEXP baseExternalPointer, SEXP value);
 
    SEXP MetabLagrangeDo_getSummary(SEXP);
 
@@ -141,7 +157,13 @@ extern "C"
       SEXP alkalinity
    );
 
-   SEXP MetabDoDic_run(SEXP);
+   SEXP MetabDoDic_setRatioDoCFix(SEXP baseExternalPointer, SEXP value);
+
+   SEXP MetabDoDic_setRatioDoCResp(SEXP baseExternalPointer, SEXP value);
+
+   SEXP MetabDoDic_setRatioDicCFix(SEXP baseExternalPointer, SEXP value);
+
+   SEXP MetabDoDic_setRatioDicCResp(SEXP baseExternalPointer, SEXP value);
 
    SEXP MetabDoDic_getSummary(SEXP);
 
@@ -179,7 +201,13 @@ extern "C"
       SEXP downstreamAlkalinity
    );
 
-   SEXP MetabLagrangeDoDic_run(SEXP);
+   SEXP MetabLagrangeDoDic_setRatioDoCFix(SEXP baseExternalPointer, SEXP value);
+
+   SEXP MetabLagrangeDoDic_setRatioDoCResp(SEXP baseExternalPointer, SEXP value);
+
+   SEXP MetabLagrangeDoDic_setRatioDicCFix(SEXP baseExternalPointer, SEXP value);
+
+   SEXP MetabLagrangeDoDic_setRatioDicCResp(SEXP baseExternalPointer, SEXP value);
 
    SEXP MetabLagrangeDoDic_getSummary(SEXP);
 

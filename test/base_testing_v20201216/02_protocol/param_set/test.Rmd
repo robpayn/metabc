@@ -1,0 +1,707 @@
+---
+title: "Parameter set test"
+author: "Rob Payn"
+date: "12/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load test data
+
+Load some realistic data for a river
+
+```{r}
+library(metab)
+library(metabc)
+
+load(file = "./01_input/2014-09-13/signal.RData")
+```
+
+## DO and DIC over time
+
+Set values for test
+
+```{r}
+
+gpp <- 610
+gppdo <- 1
+er <- 275
+erdo <- -1
+k600 <- 19.5
+initDO <- signalOut$getVariable("do")[1];
+time <- signalOut$time
+temp <- signalOut$getVariable("temp")
+par <- signalOut$getVariable("par")
+parTotal <- -1
+airPressure <- 638
+stdAirPressure <- 760
+
+gppdic <- -1
+erdic <- 1
+initDIC <- signalOut$getVariable("dic")[1]
+pCO2Air <- 400
+alkalinity <- 2857;
+
+```
+
+### DO over time
+
+Compare the GPP set to 610 (black triangles) and the GPP set to 300 (red circles), based on changing the model with the setter method.
+
+Compare the ER set to 275 (black triangles) and the ER set to 500 (red circles), based on changing the model with the setter method.
+
+Compare the k600 set to 19.5 (black triangles) and the k600 set to 10 (red circles), based on changing the model with the setter method.
+
+```{r echo = FALSE, fig.width = 10, fig.height = 4}
+
+# Create model
+cppModel <- CMetabDo$new(
+   type = "ForwardEuler",
+   dailyGPP = gpp,
+   ratioDoCFix = gppdo,
+   dailyER = er,
+   ratioDoCResp = erdo,
+   k600 = k600,
+   initialDO = initDO,
+   time = time,
+   temp = temp,
+   par = par,
+   parTotal = parTotal,
+   airPressure = airPressure,
+   stdAirPressure = stdAirPressure
+)
+
+par(
+   mfrow = c(1, 3),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+# Test GPP
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("DailyGPP", 300);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("DailyGPP", old);
+
+plotComparison <- function() 
+{
+   ymin <- min(cppModel1$do$dox, cppModel2$do$dox)
+   ymax <- max(cppModel1$do$dox, cppModel2$do$dox)
+   plot(
+      cppModel$timePOSIX,
+      cppModel1$do$dox,
+      ylim = c(ymin, ymax),
+      pch = 2
+   )
+   points(
+      cppModel$timePOSIX,
+      cppModel2$do$dox,
+      col = "red"
+   )
+}
+
+plotComparison();
+
+# Test ER
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("DailyER", 500);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("DailyER", old);
+
+plotComparison();
+
+# Test k600
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("k600", 10);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("k600", old);
+
+plotComparison();
+
+```
+
+Compare the RatioDoCFix set to 1 (black triangles) and the RatioDoCFix set to 0.8 (red circles), based on changing the model with the setter method.
+
+Compare the RatioDoCResp set to -1 (black triangles) and the RatioDoCResp set to -1.4 (red circles), based on changing the model with the setter method.
+
+```{r fig.width = 10, fig.height = 5}
+
+par(
+   mfrow = c(1, 2),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+# Test RatioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabDoParam("RatioDoCFix", 0.8);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabDoParam("RatioDoCFix", old);
+
+plotComparison();
+
+# Test RatioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabDoParam("RatioDoCResp", -1.4);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabDoParam("RatioDoCResp", old);
+
+plotComparison();
+
+```
+
+
+### DIC over time
+
+Compare the GPP set to 610 (black triangles) and the GPP set to 300 (red circles), based on changing the model with the setter method.
+
+Compare the ER set to 275 (black triangles) and the ER set to 500 (red circles), based on changing the model with the setter method.
+
+Compare the k600 set to 19.5 (black triangles) and the k600 set to 10 (red circles), based on changing the model with the setter method.
+
+```{r echo = FALSE, fig.width = 10, fig.height = 12}
+
+cppModel <- CMetabDoDic$new(
+   type = "ForwardEuler",
+   dailyGPP = gpp,
+   ratioDoCFix = gppdo,
+   dailyER = er,
+   ratioDoCResp = erdo,
+   k600 = k600,
+   initialDO = initDO,
+   time = time,
+   temp = temp,
+   par = par,
+   parTotal = parTotal,
+   airPressure = airPressure,
+   stdAirPressure = stdAirPressure,
+   ratioDicCFix = gppdic,
+   ratioDicCResp = erdic,
+   initialDIC = initDIC,
+   pCO2air = pCO2Air,
+   alkalinity = alkalinity
+)
+
+par(
+   mfcol = c(3, 3),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+# Test GPP
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("DailyGPP", 300);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("DailyGPP", old);
+
+plotComparisonpCO2 <- function() 
+{
+   ymin <- min(cppModel1$dic$pCO2, cppModel2$dic$pCO2)
+   ymax <- max(cppModel1$dic$pCO2, cppModel2$dic$pCO2)
+   plot(
+      cppModel$timePOSIX,
+      cppModel1$dic$pCO2,
+      ylim = c(ymin, ymax),
+      pch = 2
+   )
+   points(
+      cppModel$timePOSIX,
+      cppModel2$dic$pCO2,
+      col = "red"
+   )
+}
+
+plotComparisonDIC <- function() 
+{
+   ymin <- min(cppModel1$dic$dic, cppModel2$dic$dic)
+   ymax <- max(cppModel1$dic$dic, cppModel2$dic$dic)
+   plot(
+      cppModel$timePOSIX,
+      cppModel1$dic$dic,
+      ylim = c(ymin, ymax),
+      pch = 2
+   )
+   points(
+      cppModel$timePOSIX,
+      cppModel2$dic$dic,
+      col = "red"
+   )
+}
+
+plotComparison();
+plotComparisonpCO2();
+plotComparisonDIC();
+
+# Test ER
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("DailyER", 500);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("DailyER", old);
+
+plotComparison();
+plotComparisonpCO2();
+plotComparisonDIC();
+
+# Test k600
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("k600", 10);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("k600", old);
+
+plotComparison();
+plotComparisonpCO2();
+plotComparisonDIC();
+
+```
+
+Compare the RatioDoCFix set to 1 (black triangles) and the RatioDoCFix set to 0.8 (red circles), based on changing the model with the setter method.
+
+Compare the RatioDoCResp set to -1 (black triangles) and the RatioDoCResp set to -1.4 (red circles), based on changing the model with the setter method.
+
+```{r fig.width = 10, fig.height = 10}
+
+cppModel <- CMetabDoDic$new(
+   type = "ForwardEuler",
+   dailyGPP = gpp,
+   ratioDoCFix = gppdo,
+   dailyER = er,
+   ratioDoCResp = erdo,
+   k600 = k600,
+   initialDO = initDO,
+   time = time,
+   temp = temp,
+   par = par,
+   parTotal = parTotal,
+   airPressure = airPressure,
+   stdAirPressure = stdAirPressure,
+   ratioDicCFix = gppdic,
+   ratioDicCResp = erdic,
+   initialDIC = initDIC,
+   pCO2air = pCO2Air,
+   alkalinity = alkalinity
+)
+
+par(
+   mfcol = c(2, 2),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+# Test RatioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabDoDicParam("RatioDoCFix", 0.8);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabDoDicParam("RatioDoCFix", old);
+
+plotComparison();
+plotComparisonpCO2();
+
+# Test RatioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabDoDicParam("RatioDoCResp", -1.4);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabDoDicParam("RatioDoCResp", old);
+
+plotComparison();
+plotComparisonpCO2();
+
+```
+
+Compare the RatioDicCFix set to -1 (black triangles) and the RatioDicCFix set to -0.8 (red circles), based on changing the model with the setter method.
+
+Compare the RatioDicCResp set to 1 (black triangles) and the RatioDicCResp set to 1.4 (red circles), based on changing the model with the setter method.
+
+```{r fig.width = 10, fig.height = 10}
+
+par(
+   mfcol = c(2, 2),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+# Test RatioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabDoDicParam("RatioDicCFix", -0.8);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabDoDicParam("RatioDicCFix", old);
+
+plotComparison();
+plotComparisonpCO2();
+
+# Test RatioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabDoDicParam("RatioDicCResp", 1.4);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabDoDicParam("RatioDicCResp", old);
+
+plotComparison();
+plotComparisonpCO2();
+
+```
+
+## DO and DIC Lagrange
+
+Set values for test
+
+```{r}
+
+gpp <- 610
+gppdo <- 1
+er <- 275
+erdo <- -1
+k600 <- 19.5
+upstreamDO <- signalIn$getVariable("do");
+upstreamTime <- signalIn$time
+downstreamTime <- signalOut$time
+upstreamTemp <- signalIn$getVariable("temp")
+downstreamTemp <- signalOut$getVariable("temp")
+upstreamPAR <- signalIn$getVariable("par")
+downstreamPAR <- signalOut$getVariable("par")
+parTotal <- -1
+airPressure <- 638
+stdAirPressure <- 760
+
+gppdic <- -1
+erdic <- 1
+upstreamDIC <- signalOut$getVariable("dic")
+upstreamDIC[15:17] <- 2846.699
+pCO2Air <- 400;
+upstreamAlkalinity <- 2857;
+downstreamAlkalinity <- 2857;
+
+```
+
+### DO Lagrange
+
+Compare the GPP set to 610 (black triangles) and the GPP set to 300 (red circles), based on changing the model with the setter method.
+
+Compare the ER set to 275 (black triangles) and the ER set to 500 (red circles), based on changing the model with the setter method.
+
+Compare the k600 set to 19.5 (black triangles) and the k600 set to 10 (red circles), based on changing the model with the setter method.
+
+```{r echo = FALSE, fig.width = 10, fig.height = 4}
+
+cppModel <- CMetabLagrangeDo$new(
+   type = "CNOneStep",
+   dailyGPP = gpp,
+   ratioDoCFix = gppdo,
+   dailyER = er,
+   ratioDoCResp = erdo,
+   k600 = k600,
+   upstreamDO = upstreamDO,
+   upstreamTime = upstreamTime,
+   downstreamTime = downstreamTime,
+   upstreamTemp = upstreamTemp,
+   downstreamTemp = downstreamTemp,
+   upstreamPAR = upstreamPAR,
+   downstreamPAR = downstreamPAR,
+   parTotal = parTotal,
+   airPressure = airPressure,
+   stdAirPressure = stdAirPressure,
+   timesteps = 0
+)
+
+par(
+   mfrow = c(1, 3),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+# Test GPP
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("DailyGPP", 300);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("DailyGPP", old);
+
+plotComparison <- function() 
+{
+   ymin <- min(
+      cppModel1$do$dox - upstreamDO, 
+      cppModel2$do$dox - upstreamDO
+   )
+   ymax <- max(
+      cppModel1$do$dox - upstreamDO, 
+      cppModel2$do$dox - upstreamDO
+   )
+   plot(
+      cppModel$downstreamTimePOSIX,
+      cppModel1$do$dox - upstreamDO,
+      ylim = c(ymin, ymax),
+      pch = 2
+   )
+   points(
+      cppModel$downstreamTimePOSIX,
+      cppModel2$do$dox - upstreamDO,
+      col = "red"
+   )
+}
+
+plotComparison();
+
+# Test ER
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("DailyER", 500);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("DailyER", old);
+
+plotComparison();
+
+# Test k600
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("k600", 10);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("k600", old);
+
+plotComparison();
+
+```
+
+Compare the RatioDoCFix set to 1 (black triangles) and the RatioDoCFix set to 0.8 (red circles), based on changing the model with the setter method.
+
+Compare the RatioDoCResp set to -1 (black triangles) and the RatioDoCResp set to -1.4 (red circles), based on changing the model with the setter method.
+
+```{r fig.width = 10, fig.height = 5}
+
+par(
+   mfrow = c(1, 2),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+# Test ratioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabLagrangeDoParam("RatioDoCFix", 0.8);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabLagrangeDoParam("RatioDoCFix", old);
+
+plotComparison();
+
+# Test ratioDoCResp
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabLagrangeDoParam("RatioDoCResp", -1.4);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabLagrangeDoParam("RatioDoCResp", old);
+
+plotComparison();
+
+```
+
+### DIC Lagrange
+
+Compare the GPP set to 610 (black triangles) and the GPP set to 300 (red circles), based on changing the model with the setter method.
+
+Compare the ER set to 275 (black triangles) and the ER set to 500 (red circles), based on changing the model with the setter method.
+
+Compare the k600 set to 19.5 (black triangles) and the k600 set to 10 (red circles), based on changing the model with the setter method.
+
+```{r echo = FALSE, fig.width = 10, fig.height = 4}
+
+cppModel <- CMetabLagrangeDoDic$new(
+   type = "CNOneStep",
+   dailyGPP = gpp,
+   ratioDoCFix = gppdo,
+   dailyER = er,
+   ratioDoCResp = erdo,
+   k600 = k600,
+   upstreamDO = upstreamDO,
+   upstreamTime = upstreamTime,
+   downstreamTime = downstreamTime,
+   upstreamTemp = upstreamTemp,
+   downstreamTemp = downstreamTemp,
+   upstreamPAR = upstreamPAR,
+   downstreamPAR = downstreamPAR,
+   parTotal = parTotal,
+   airPressure = airPressure,
+   stdAirPressure = stdAirPressure,
+   timesteps = 0,
+   ratioDicCFix = gppdic,
+   ratioDicCResp = erdic,
+   upstreamDIC = upstreamDIC,
+   pCO2air = pCO2Air,
+   upstreamAlkalinity = upstreamAlkalinity,
+   downstreamAlkalinity = downstreamAlkalinity
+)
+
+par(
+   mfrow = c(1, 3),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+# Test GPP
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("DailyGPP", 300);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("DailyGPP", old);
+
+plotComparisonpCO2 <- function() 
+{
+   ymin <- min(
+      cppModel1$dic$pCO2 - signalIn$getVariable("pCO2"), 
+      cppModel2$dic$pCO2 - signalIn$getVariable("pCO2")
+   )
+   ymax <- max(
+      cppModel1$dic$pCO2 - signalIn$getVariable("pCO2"), 
+      cppModel2$dic$pCO2 - signalIn$getVariable("pCO2")
+   )
+   plot(
+      cppModel$downstreamTimePOSIX,
+      cppModel1$dic$pCO2 - signalIn$getVariable("pCO2"),
+      ylim = c(ymin, ymax),
+      pch = 2
+   )
+   points(
+      cppModel$downstreamTimePOSIX,
+      cppModel2$dic$pCO2 - signalIn$getVariable("pCO2"),
+      col = "red"
+   )
+}
+
+plotComparisonpCO2();
+
+# Test ER
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("DailyER", 500);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("DailyER", old);
+
+plotComparisonpCO2();
+
+# Test k600
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabParam("k600", 10);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabParam("k600", old);
+
+plotComparisonpCO2();
+
+```
+
+Compare the RatioDoCFix set to 1 (black triangles) and the RatioDoCFix set to 0.8 (red circles), based on changing the model with the setter method.
+
+Compare the RatioDoCResp set to -1 (black triangles) and the RatioDoCResp set to -1.4 (red circles), based on changing the model with the setter method.
+
+```{r fig.width = 10, fig.height = 10}
+
+par(
+   mfcol = c(2, 2),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+# Test RatioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabLagrangeDoDicParam("RatioDoCFix", 0.8);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabLagrangeDoDicParam("RatioDoCFix", old);
+
+plotComparison();
+plotComparisonpCO2();
+
+# Test RatioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabLagrangeDoDicParam("RatioDoCResp", -1.4);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabLagrangeDoDicParam("RatioDoCResp", old);
+
+plotComparison();
+plotComparisonpCO2();
+
+```
+
+Compare the RatioDicCFix set to -1 (black triangles) and the RatioDicCFix set to -0.8 (red circles), based on changing the model with the setter method.
+
+Compare the RatioDicCResp set to 1 (black triangles) and the RatioDicCResp set to 1.4 (red circles), based on changing the model with the setter method.
+
+```{r fig.width = 10, fig.height = 10}
+
+par(
+   mfcol = c(2, 2),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+# Test RatioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabLagrangeDoDicParam("RatioDicCFix", -0.8);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabLagrangeDoDicParam("RatioDicCFix", old);
+
+plotComparison();
+plotComparisonpCO2();
+
+# Test RatioDoCFix
+cppModel1 <- cppModel$run();
+
+old <- cppModel$setMetabLagrangeDoDicParam("RatioDicCResp", 1.4);
+
+cppModel2 <- cppModel$run();
+
+new <- cppModel$setMetabLagrangeDoDicParam("RatioDicCResp", old);
+
+plotComparison();
+plotComparisonpCO2();
+
+```

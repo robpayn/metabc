@@ -7,6 +7,15 @@ MetabLagrangeDo::MetabLagrangeDo() :
 MetabLagrangeDo::~MetabLagrangeDo()
 {
    // Deallocate memory
+   delete[] upstreamDO;
+   delete[] upstreamTime;
+   delete[] downstreamTime;
+   delete[] upstreamTemp;
+   delete[] downstreamTemp;
+   delete[] upstreamPAR;
+   delete[] downstreamPAR;
+   delete[] airPressure;
+
    delete[] travelTimes;
    delete[] upstreamSatDo;
    delete[] downstreamSatDo;
@@ -45,14 +54,21 @@ void MetabLagrangeDo::initialize
 {
    Metab::initialize(
      dailyGPP,
-     ratioDoCFix,
      dailyER,
-     ratioDoCResp,
      k600,
      numParcels
    );
 
    // Allocate memory
+   this->upstreamDO = new double[numParcels];
+   this->upstreamTime = new double[numParcels];
+   this->downstreamTime = new double[numParcels];
+   this->upstreamTemp = new double[numParcels];
+   this->downstreamTemp = new double[numParcels];
+   this->upstreamPAR = new double[numParcels];
+   this->downstreamPAR = new double[numParcels];
+   this->airPressure = new double[numParcels];
+
    travelTimes = new double[numParcels];
    upstreamSatDo = new double[numParcels];
    downstreamSatDo = new double[numParcels];
@@ -68,14 +84,8 @@ void MetabLagrangeDo::initialize
    outputDo.doEquilibration = new double[numParcels];
 
    // Set the attributes
-   this->upstreamDO = upstreamDO;
-   this->upstreamTime = upstreamTime;
-   this->downstreamTime = downstreamTime;
-   this->upstreamTemp = upstreamTemp;
-   this->downstreamTemp = downstreamTemp;
-   this->upstreamPAR = upstreamPAR;
-   this->downstreamPAR = downstreamPAR;
-   this->airPressure = airPressure;
+   this->ratioDoCFix = ratioDoCFix;
+   this->ratioDoCResp = ratioDoCResp;
    this->stdAirPressure = stdAirPressure;
    this->numParcels = numParcels;
 
@@ -86,27 +96,35 @@ void MetabLagrangeDo::initialize
    // and downstream times
    double densityWater;
    for(int i = 0; i < numParcels; i++) {
+      // Copy array values to attributes
+      this->upstreamDO[i] = upstreamDO[i];
+      this->upstreamTime[i] = upstreamTime[i];
+      this->downstreamTime[i] = downstreamTime[i];
+      this->upstreamTemp[i] = upstreamTemp[i];
+      this->downstreamTemp[i] = downstreamTemp[i];
+      this->upstreamPAR[i] = upstreamPAR[i];
+      this->downstreamPAR[i] = downstreamPAR[i];
+      this->airPressure[i] = airPressure[i];
+
       // Travel times and average PAR over travel times
-      travelTimes[i] = downstreamTime[i] - upstreamTime[i];
-      parAvg[i] = 0.5 * (upstreamPAR[i] + downstreamPAR[i]);
+      travelTimes[i] = this->downstreamTime[i] - this->upstreamTime[i];
+      parAvg[i] = 0.5 * (this->upstreamPAR[i] + this->downstreamPAR[i]);
 
       // Sat DO and gas exchange rates passing the upstream end
-      densityWater = densityCalculator(upstreamTemp[i]);
+      densityWater = densityCalculator(this->upstreamTemp[i]);
       upstreamSatDo[i] = satDoCalculator(
-         upstreamTemp[i],
+         this->upstreamTemp[i],
          densityWater,
-         airPressure[i] / stdAirPressure
+         this->airPressure[i] / stdAirPressure
       );
-      upstreamkDo[i] = kSchmidtDoCalculator(upstreamTemp[i], k600);
 
       // Sat DO and gas exchange rates passing the downstream end
-      densityWater = densityCalculator(downstreamTemp[i]);
+      densityWater = densityCalculator(this->downstreamTemp[i]);
       downstreamSatDo[i] = satDoCalculator(
-         downstreamTemp[i],
+         this->downstreamTemp[i],
          densityWater,
-         airPressure[i] / stdAirPressure
+         this->airPressure[i] / stdAirPressure
       );
-      downstreamkDo[i] = kSchmidtDoCalculator(downstreamTemp[i], k600);
    }
 
    // Calculate a total par by integration if the
@@ -116,15 +134,12 @@ void MetabLagrangeDo::initialize
       double upstreamSum = 0;
       double downstreamSum = 0;
       for(int i = 0; i < numParcels - 1; i++) {
-         // sum +=
-         //    (upstreamTime[i + 1] - upstreamTime[i]) *
-         //    0.5 * (parAvg[i] + parAvg[i + 1]);
          upstreamSum +=
-            (upstreamTime[i + 1] - upstreamTime[i]) *
-            0.5 * (upstreamPAR[i] + upstreamPAR[i + 1]);
+            (this->upstreamTime[i + 1] - this->upstreamTime[i]) *
+            0.5 * (this->upstreamPAR[i] + this->upstreamPAR[i + 1]);
          downstreamSum +=
-            (downstreamTime[i + 1] - downstreamTime[i]) *
-            0.5 * (downstreamPAR[i] + downstreamPAR[i + 1]);
+            (this->downstreamTime[i + 1] - this->downstreamTime[i]) *
+            0.5 * (this->downstreamPAR[i] + this->downstreamPAR[i + 1]);
       }
       this->parTotal = 0.5 * (upstreamSum + downstreamSum);
    } else {

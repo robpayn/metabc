@@ -48,13 +48,48 @@ SEXP MetabDoDic_initialize(
    return R_NilValue;
 }
 
-SEXP MetabDoDic_run(SEXP baseExternalPointer)
+SEXP MetabDoDic_setRatioDoCFix(SEXP baseExternalPointer, SEXP value)
 {
-   MetabDoDic* basePointer =
-      (MetabDoDic*)R_ExternalPtrAddr(baseExternalPointer);
-   basePointer->run();
+   MetabDoDic* model = (MetabDoDic*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDoCFix;
+   model->ratioDoCFix = asReal(value);
 
-   return MetabDoDic_getSummary(basePointer);
+   UNPROTECT(1);
+   return out;
+}
+
+SEXP MetabDoDic_setRatioDoCResp(SEXP baseExternalPointer, SEXP value)
+{
+   MetabDoDic* model = (MetabDoDic*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDoCResp;
+   model->ratioDoCResp = asReal(value);
+
+   UNPROTECT(1);
+   return out;
+}
+
+SEXP MetabDoDic_setRatioDicCFix(SEXP baseExternalPointer, SEXP value)
+{
+   MetabDoDic* model = (MetabDoDic*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDicCFix;
+   model->ratioDicCFix = asReal(value);
+
+   UNPROTECT(1);
+   return out;
+}
+
+SEXP MetabDoDic_setRatioDicCResp(SEXP baseExternalPointer, SEXP value)
+{
+   MetabDoDic* model = (MetabDoDic*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDicCResp;
+   model->ratioDicCResp = asReal(value);
+
+   UNPROTECT(1);
+   return out;
 }
 
 SEXP MetabDoDic_getSummary(SEXP baseExternalPointer)

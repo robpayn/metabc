@@ -20,12 +20,8 @@ class Metab {
 
       //! Daily gross primary production (molarity of DOC equivalent per day)
       double dailyGPP;
-      //! Ratio of moles O2 produced to moles DIC-C fixed (positive)
-      double ratioDoCFix;
       //! Daily ecosystem respiration (molarity of DOC equivalent per day)
       double dailyER;
-      //! Ratio of moles O2 consumed to moles DIC-C respired (negative)
-      double ratioDoCResp;
       //! The gas exchange rate at a Schmidt number of 600 (per day)
       double k600;
       //! Length of arrays for calculations
@@ -50,12 +46,16 @@ class Metab {
 
       void initialize(
          double dailyGPP,
-         double ratioDoCFix,
          double dailyER,
-         double ratioDoCResp,
          double k600,
          int length
       );
+
+      //!  Abstract definition of the run method
+      /*!
+       *   Inhereting classes must implement a run method to execute the model
+       */
+      virtual void run() = 0;
 
       //!  Define the PAR distribution calculator to use
       /*!
@@ -135,6 +135,10 @@ class MetabDo : virtual public Metab {
 
       // Attributes
 
+      //! Ratio of moles O2 produced to moles DIC-C fixed (positive)
+      double ratioDoCFix;
+      //! Ratio of moles O2 consumed to moles DIC-C respired (negative)
+      double ratioDoCResp;
       //! \sa initialize(double, double, double, double, double, double, double*, double*, double*, double, double*, double, int)
       double initialDO;
       //! \sa initialize(double, double, double, double, double, double, double*, double*, double*, double, double*, double, int)
@@ -257,6 +261,10 @@ class MetabLagrangeDo : virtual public Metab {
 
       // Attributes
 
+      //! Ratio of moles O2 produced to moles DIC-C fixed (positive)
+      double ratioDoCFix;
+      //! Ratio of moles O2 consumed to moles DIC-C respired (negative)
+      double ratioDoCResp;
       //! Array of upstream DO concentrations (molar)
       double* upstreamDO;
       //! An array of times water parcels pass upstream

@@ -6,6 +6,11 @@ MetabDo::MetabDo() :
 
 MetabDo::~MetabDo()
 {
+   delete[] time;
+   delete[] temp;
+   delete[] par;
+   delete[] airPressure;
+
    delete[] dt;
    delete[] satDo;
    delete[] kDo;
@@ -38,14 +43,17 @@ void MetabDo::initialize
    // Initialize the base class
    Metab::initialize(
       dailyGPP,
-      ratioDoCFix,
       dailyER,
-      ratioDoCResp,
       k600,
       length
    );
 
    // Allocate memory
+   this->time = new double[length];
+   this->temp = new double[length];
+   this->par = new double[length];
+   this->airPressure = new double[length];
+
    dt = new double[length];
    satDo = new double[length];
    kDo = new double[length];
@@ -59,41 +67,42 @@ void MetabDo::initialize
    outputDo.doEquilibration = new double[length];
 
    // Set attributes
+   this->ratioDoCFix = ratioDoCFix;
+   this->ratioDoCResp = ratioDoCResp;
    this->initialDO = initialDO;
-   this->time = time;
-   this->temp = temp;
-   this->par = par;
-   this->airPressure = airPressure;
    this->stdAirPressure = stdAirPressure;
+
+   for(int i = 0; i < length; i++) {
+      this->time[i] = time[i];
+      this->temp[i] = temp[i];
+      this->par[i] = par[i];
+      this->airPressure[i] = airPressure[i];
+   }
 
    int lastIndex = length - 1;
 
    // Calculate the values at times or over time steps
    double densityWater;
    for(int i = 0; i < lastIndex; i++) {
-      dt[i] = time[i + 1] - time[i];
-      parAvg[i] = 0.5 * (par[i] + par[i + 1]);
+      dt[i] = this->time[i + 1] - this->time[i];
+      parAvg[i] = 0.5 * (this->par[i] + this->par[i + 1]);
 
-      densityWater = densityCalculator(temp[i]);
+      densityWater = densityCalculator(this->temp[i]);
       satDo[i] = satDoCalculator(
-         temp[i],
+         this->temp[i],
          densityWater,
-         airPressure[i] / stdAirPressure
+         this->airPressure[i] / stdAirPressure
       );
-
-      kDo[i] = kSchmidtDoCalculator(temp[i], k600);
    }
    dt[lastIndex] = 0;
    parAvg[lastIndex] = 0;
 
-   densityWater = densityCalculator(temp[lastIndex]);
+   densityWater = densityCalculator(this->temp[lastIndex]);
    satDo[lastIndex] = satDoCalculator(
-      temp[lastIndex],
+      this->temp[lastIndex],
       densityWater,
-      airPressure[lastIndex] / stdAirPressure
+      this->airPressure[lastIndex] / stdAirPressure
    );
-
-   kDo[lastIndex] = kSchmidtDoCalculator(temp[lastIndex], k600);
 
    // Calculate a total par by integration if the
    // total PAR is not provided (i.e. totalPAR argument

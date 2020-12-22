@@ -13,6 +13,9 @@ void MetabLagrangeCNOneStepDoDic::run()
          output.cRespiration[i] * ratioDicCResp;
       outputDic.dicConsumption[i] =
          output.cFixation[i] * ratioDicCFix;
+
+      upstreamkCO2[i] = kSchmidtCO2Calculator(upstreamTemp[i], k600);
+      downstreamkCO2[i] = kSchmidtCO2Calculator(downstreamTemp[i], k600);
       double avgkCO2 = 0.5 * (upstreamkCO2[i] + downstreamkCO2[i]);
       outputDic.co2Equilibration[i] =
          travelTimes[i] *

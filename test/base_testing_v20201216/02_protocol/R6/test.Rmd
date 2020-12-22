@@ -1,0 +1,546 @@
+---
+title: "R6 level test"
+author: "Rob Payn"
+date: "12/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load test data
+
+Load some realistic data for a river
+
+```{r}
+library(metab)
+library(metabc)
+library(bench)
+
+load(file = "./01_input/2014-09-13/signal.RData")
+```
+
+## Model of DO over time
+
+Set values for test
+
+```{r}
+
+gpp <- 610
+gppdo <- 1
+er <- 275
+erdo <- -1
+k600 <- 19.5
+initDO <- signalOut$getVariable("do")[1];
+time <- signalOut$time
+temp <- signalOut$getVariable("temp")
+par <- signalOut$getVariable("par")
+parTotal <- -1
+airPressure <- 638
+stdAirPressure <- 760
+
+```
+
+Compare the C++ implementation of Forward Euler (black triangle) and Crank Nicolson (blue square) approximations with the R implementation of the Forward Euler (red circle) approximation.
+
+```{r echo = FALSE}
+
+timers <- list(cppTimeFE = bench_time({
+   
+   cppModelFE <- CMetabDo$new(
+      type = "ForwardEuler",
+      dailyGPP = gpp,
+      ratioDoCFix = gppdo,
+      dailyER = er,
+      ratioDoCResp = erdo,
+      k600 = k600,
+      initialDO = initDO,
+      time = time,
+      temp = temp,
+      par = par,
+      parTotal = parTotal,
+      airPressure = airPressure,
+      stdAirPressure = stdAirPressure
+   )
+   cppModelFE$run();
+
+}))
+
+timers$cppTimeCN <- bench_time({
+
+   cppModelCN <- CMetabDo$new(
+      type = "CrankNicolson",
+      dailyGPP = gpp,
+      ratioDoCFix = gppdo,
+      dailyER = er,
+      ratioDoCResp = erdo,
+      k600 = k600,
+      initialDO = initDO,
+      time = time,
+      temp = temp,
+      par = par,
+      parTotal = parTotal,
+      airPressure = airPressure,
+      stdAirPressure = stdAirPressure
+   )
+   cppModelCN$run();
+
+})
+
+timers$rTime <- bench_time({
+   
+   rModel <- OneStationMetabDo$new(
+      dailyGPP = gpp,
+      ratioDoCfix = gppdo,
+      dailyER = er,
+      ratioDoCresp = erdo,
+      k600 = k600,
+      airPressure = airPressure[1],
+      stdAirPressure = stdAirPressure,
+      initialDO = initDO,
+      time = signalOut$time,
+      temp = temp,
+      par = par,
+   )
+   
+   rModel$run()
+
+})
+
+par(mar = c(4.5, 4.5, 1, 1))
+
+plot(
+   signalOut$time,
+   cppModelFE$output$do$dox,
+   pch = 2
+)
+points(
+   rModel$output$time,
+   rModel$output$do,
+   col = "red"
+)
+points(
+   signalOut$time,
+   cppModelCN$output$do$dox,
+   pch = 0,
+   col = "blue"
+)
+
+```
+
+Show the run times.
+
+```{r}
+timers
+```
+
+## Model of DIC over time
+
+Set values for test
+
+```{r}
+
+gpp <- 610
+gppdo <- 1
+er <- 275
+erdo <- -1
+k600 <- 19.5
+initDO <- signalOut$getVariable("do")[1];
+time <- signalOut$time
+temp <- signalOut$getVariable("temp")
+par <- signalOut$getVariable("par")
+parTotal <- -1
+airPressure <- 638
+stdAirPressure <- 760
+
+gppdic <- -1
+erdic <- 1
+initDIC <- signalOut$getVariable("dic")[1]
+pCO2Air <- 400
+alkalinity <- 2857;
+
+```
+
+Compare the C++ implementation of Forward Euler (black triangle) and Crank Nicolson (blue square) approximations with the R implementation of the Forward Euler (red circle) approximation.
+
+```{r echo = FALSE, fig.width = 8, fig.height = 10}
+
+timers <- list(cppTimeFE = bench_time({
+   
+   cppModelFE <- CMetabDoDic$new(
+      type = "ForwardEuler",
+      dailyGPP = gpp,
+      ratioDoCFix = gppdo,
+      dailyER = er,
+      ratioDoCResp = erdo,
+      k600 = k600,
+      initialDO = initDO,
+      time = time,
+      temp = temp,
+      par = par,
+      parTotal = parTotal,
+      airPressure = airPressure,
+      stdAirPressure = stdAirPressure,
+      ratioDicCFix = gppdic,
+      ratioDicCResp = erdic,
+      initialDIC = initDIC,
+      pCO2air = pCO2Air,
+      alkalinity = alkalinity
+   )
+   cppModelFE$run();
+
+}))
+
+timers$cppTimeCN <- bench_time({
+
+   cppModelCN <- CMetabDoDic$new(
+      type = "CrankNicolson",
+      dailyGPP = gpp,
+      ratioDoCFix = gppdo,
+      dailyER = er,
+      ratioDoCResp = erdo,
+      k600 = k600,
+      initialDO = initDO,
+      time = time,
+      temp = temp,
+      par = par,
+      parTotal = parTotal,
+      airPressure = airPressure,
+      stdAirPressure = stdAirPressure,
+      ratioDicCFix = gppdic,
+      ratioDicCResp = erdic,
+      initialDIC = initDIC,
+      pCO2air = pCO2Air,
+      alkalinity = alkalinity
+   )
+   cppModelCN$run();
+
+})
+
+timers$rTime <- bench_time({
+   
+   rModel <- OneStationMetabDoDic$new(
+      dailyGPP = gpp,
+      ratioDoCfix = gppdo,
+      dailyER = er,
+      ratioDoCresp = erdo,
+      k600 = k600,
+      airPressure = airPressure[1],
+      stdAirPressure = stdAirPressure,
+      initialDO = initDO,
+      time = signalOut$time,
+      temp = temp,
+      par = par,
+      ratioDicCfix = gppdic,
+      ratioDicCresp = erdic,
+      initialDIC = initDIC,
+      pCO2air = pCO2Air[1],
+      alkalinity = alkalinity[1],
+   )
+   
+   rModel$run()
+   
+})
+
+par(mfrow = c(2, 1), mar = c(4.5, 4.5, 1, 1))
+
+plot(
+   signalOut$time,
+   cppModelFE$output$dic$pCO2,
+   pch = 2
+)
+points(
+   rModel$output$time,
+   rModel$output$pCO2,
+   col = "red"
+)
+points(
+   signalOut$time,
+   cppModelCN$output$dic$pCO2,
+   pch = 0,
+   col = "blue"
+)
+
+plot(
+   signalOut$time,
+   cppModelFE$output$dic$dic,
+   pch = 2
+)
+points(
+   rModel$output$time,
+   rModel$output$dic,
+   col = "red"
+)
+points(
+   signalOut$time,
+   cppModelCN$output$dic$dic,
+   pch = 0,
+   col = "blue"
+)
+
+```
+
+Show the run times
+
+```{r}
+
+timers
+
+```
+
+## Model of Lagrangian DO change
+
+Set values for test
+
+```{r}
+
+gpp <- 610
+gppdo <- 1
+er <- 275
+erdo <- -1
+k600 <- 19.5
+upstreamDO <- signalIn$getVariable("do");
+upstreamTime <- signalIn$time
+downstreamTime <- signalOut$time
+upstreamTemp <- signalIn$getVariable("temp")
+downstreamTemp <- signalOut$getVariable("temp")
+upstreamPAR <- signalIn$getVariable("par")
+downstreamPAR <- signalOut$getVariable("par")
+parTotal <- -1
+airPressure <- 638
+stdAirPressure <- 760
+
+```
+
+Compare the C++ implementation of Crank Nicolson (black triangle) approximations with the R implementation of the Forward Euler (red circle) approximation.
+
+```{r echo = FALSE, fig.width = 8, fig.height = 10}
+
+timers <- list(cppTimeFE = bench_time({
+   
+   cppLagrangeCN <- CMetabLagrangeDo$new(
+      type = "CNOneStep",
+      dailyGPP = gpp,
+      ratioDoCFix = gppdo,
+      dailyER = er,
+      ratioDoCResp = erdo,
+      k600 = k600,
+      upstreamDO = upstreamDO,
+      upstreamTime = upstreamTime,
+      downstreamTime = downstreamTime,
+      upstreamTemp = upstreamTemp,
+      downstreamTemp = downstreamTemp,
+      upstreamPAR = upstreamPAR,
+      downstreamPAR = downstreamPAR,
+      parTotal = parTotal,
+      airPressure = airPressure,
+      stdAirPressure = stdAirPressure,
+      timesteps = 0
+   )
+   cppLagrangeCN_output <- cppLagrangeCN$run();
+   
+}))
+
+timers$rTime <- bench_time({
+   
+   rModel <- TwoStationMetabDo$new(
+      dailyGPP = gpp,
+      ratioDoCfix = gppdo,
+      dailyER = er,
+      ratioDoCresp = erdo,
+      k600 = k600,
+      airPressure = airPressure[1],
+      upstreamTime = signalIn$time,
+      upstreamTemp = upstreamTemp,
+      upstreamPAR = upstreamPAR,
+      upstreamDO = upstreamDO,
+      downstreamTime = signalOut$time,
+      downstreamTemp = downstreamTemp,
+      downstreamPAR = downstreamPAR,
+      stdAirPressure = stdAirPressure
+   )
+   rModel$run()
+   
+})   
+
+par(mfrow = c(2, 1), mar = c(4.5, 4.5, 1, 1))
+
+plot(
+   signalOut$time,
+   cppLagrangeCN_output$do$dox,
+   pch = 2
+)
+points(
+   rModel$output$time,
+   rModel$output$do,
+   col = "red"
+)
+
+plot(
+   signalOut$time,
+   cppLagrangeCN_output$do$dox - upstreamDO,
+   pch = 2
+)
+points(
+   rModel$output$time,
+   rModel$output$do - upstreamDO,
+   col = "red"
+)
+
+
+```
+
+Show the run times
+
+```{r}
+timers
+```
+
+## Model of Lagrangian DIC change
+
+Set values for test
+
+```{r}
+
+gpp <- 610
+gppdo <- 1
+er <- 275
+erdo <- -1
+k600 <- 19.5
+upstreamDO <- signalIn$getVariable("do");
+upstreamTime <- signalIn$time
+downstreamTime <- signalOut$time
+upstreamTemp <- signalIn$getVariable("temp")
+downstreamTemp <- signalOut$getVariable("temp")
+upstreamPAR <- signalIn$getVariable("par")
+downstreamPAR <- signalOut$getVariable("par")
+parTotal <- -1
+airPressure <- 638
+stdAirPressure <- 760
+
+gppdic <- -1
+erdic <- 1
+upstreamDIC <- signalOut$getVariable("dic")
+upstreamDIC[15:17] <- 2846.699
+pCO2Air <- 400;
+upstreamAlkalinity <- 2857;
+downstreamAlkalinity <- 2857;
+
+```
+
+Compare the C++ implementation of Crank Nicolson (black triangle) approximations with the R implementation of the Forward Euler (red circle) approximation.
+
+```{r echo = FALSE, fig.width = 10, fig.height = 10}
+
+timers <- list(cppTimeCN = bench_time({
+   
+   cppLagrangeCN <- CMetabLagrangeDoDic$new(
+      type = "CNOneStep",
+      dailyGPP = gpp,
+      ratioDoCFix = gppdo,
+      dailyER = er,
+      ratioDoCResp = erdo,
+      k600 = k600,
+      upstreamDO = upstreamDO,
+      upstreamTime = upstreamTime,
+      downstreamTime = downstreamTime,
+      upstreamTemp = upstreamTemp,
+      downstreamTemp = downstreamTemp,
+      upstreamPAR = upstreamPAR,
+      downstreamPAR = downstreamPAR,
+      parTotal = parTotal,
+      airPressure = airPressure,
+      stdAirPressure = stdAirPressure,
+      timesteps = 0,
+      ratioDicCFix = gppdic,
+      ratioDicCResp = erdic,
+      upstreamDIC = upstreamDIC,
+      pCO2air = pCO2Air,
+      upstreamAlkalinity = upstreamAlkalinity,
+      downstreamAlkalinity = downstreamAlkalinity
+   )
+   cppLagrangeCN_output <- cppLagrangeCN$run();
+   
+}))
+
+timers$rTime <- bench_time({
+   
+   rModel <- TwoStationMetabDoDic$new(
+      dailyGPP = gpp,
+      ratioDoCfix = gppdo,
+      dailyER = er,
+      ratioDoCresp = erdo,
+      k600 = k600,
+      airPressure = airPressure[1],
+      upstreamTime = signalIn$time,
+      upstreamTemp = upstreamTemp,
+      upstreamPAR = upstreamPAR,
+      upstreamDO = upstreamDO,
+      downstreamTime = signalOut$time,
+      downstreamTemp = downstreamTemp,
+      downstreamPAR = downstreamPAR,
+      stdAirPressure = stdAirPressure,
+      ratioDicCfix = gppdic,
+      ratioDicCresp = erdic,
+      upstreamDIC = upstreamDIC,
+      pCO2air = pCO2Air[1],
+      alkalinity = upstreamAlkalinity[1]
+   )
+   rModel$run()
+   
+})   
+
+par(mfrow = c(2, 2), mar = c(4.5, 4.5, 1, 1))
+
+plot(
+   signalOut$time,
+   cppLagrangeCN_output$dic$pCO2,
+   pch = 2
+)
+points(
+   rModel$output$time,
+   rModel$output$pCO2,
+   col = "red"
+)
+
+plot(
+   signalOut$time,
+   cppLagrangeCN_output$dic$dic,
+   pch = 2
+)
+points(
+   rModel$output$time,
+   rModel$output$dic,
+   col = "red"
+)
+
+plot(
+   signalOut$time,
+   cppLagrangeCN_output$dic$pCO2 - signalIn$getVariable("pCO2"),
+   pch = 2
+)
+points(
+   rModel$output$time,
+   rModel$output$pCO2 - signalIn$getVariable("pCO2"),
+   col = "red"
+)
+
+plot(
+   signalOut$time,
+   cppLagrangeCN_output$dic$dic - upstreamDIC,
+   pch = 2
+)
+points(
+   rModel$output$time,
+   rModel$output$dic - upstreamDIC,
+   col = "red"
+)
+
+```
+
+Show the run times
+
+```{r}
+timers
+```

@@ -47,12 +47,26 @@ SEXP MetabLagrangeDo_initialize(
    return R_NilValue;
 }
 
-SEXP MetabLagrangeDo_run(SEXP baseExtPointer)
+SEXP MetabLagrangeDo_setRatioDoCFix(SEXP baseExternalPointer, SEXP value)
 {
-   MetabLagrangeDo* basePointer = (MetabLagrangeDo*)R_ExternalPtrAddr(baseExtPointer);
-   basePointer->run();
+   MetabLagrangeDo* model = (MetabLagrangeDo*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDoCFix;
+   model->ratioDoCFix = asReal(value);
 
-   return MetabLagrangeDo_getSummary(basePointer);
+   UNPROTECT(1);
+   return out;
+}
+
+SEXP MetabLagrangeDo_setRatioDoCResp(SEXP baseExternalPointer, SEXP value)
+{
+   MetabLagrangeDo* model = (MetabLagrangeDo*)R_ExternalPtrAddr(baseExternalPointer);
+   SEXP out = PROTECT(allocVector(REALSXP, 1));
+   REAL(out)[0] = model->ratioDoCResp;
+   model->ratioDoCResp = asReal(value);
+
+   UNPROTECT(1);
+   return out;
 }
 
 SEXP MetabLagrangeDo_getSummary(SEXP baseExtPointer)

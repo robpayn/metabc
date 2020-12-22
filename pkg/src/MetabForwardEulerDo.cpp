@@ -18,11 +18,14 @@ void MetabForwardEulerDo::run()
       output.cFixation[0] * ratioDoCFix;
    outputDo.doConsumption[0] =
       output.cRespiration[0] * ratioDoCResp;
+
+   kDo[0] = kSchmidtDoCalculator(temp[0], k600);
    outputDo.doEquilibration[0] =
       dt[0] * kDo[0] * (satDo[0] - outputDo.dox[0]);
 
    // Loop through time steps
-   for (int i = 1; i < length; i++) {
+   int lastIndex = length - 1;
+   for (int i = 1; i < lastIndex; i++) {
       outputDo.dox[i] =
          outputDo.dox[i - 1] +
          outputDo.doProduction[i - 1] +
@@ -40,7 +43,26 @@ void MetabForwardEulerDo::run()
          output.cFixation[i] * ratioDoCFix;
       outputDo.doConsumption[i] =
          output.cRespiration[i] * ratioDoCResp;
+
+      kDo[i] = kSchmidtDoCalculator(temp[i], k600);
       outputDo.doEquilibration[i] =
          dt[i] * kDo[i] * (satDo[i] - outputDo.dox[i]);
    }
+
+   outputDo.dox[lastIndex] =
+      outputDo.dox[lastIndex - 1] +
+      outputDo.doProduction[lastIndex - 1] +
+      outputDo.doConsumption[lastIndex - 1] +
+      outputDo.doEquilibration[lastIndex - 1];
+
+   parDist[lastIndex] = 0;
+   output.cFixation[lastIndex] = 0;
+   output.cRespiration[lastIndex] = 0;
+
+   outputDo.doConsumption[lastIndex] = 0;
+   outputDo.doProduction[lastIndex] = 0;
+
+   kDo[lastIndex] = kSchmidtDoCalculator(temp[lastIndex], k600);
+   outputDo.doEquilibration[lastIndex] = 0;
+
 }

@@ -12,11 +12,14 @@ void MetabLagrangeCNOneStepDo::run()
       output.cFixation[i] = dailyGPP * parDist[i];
       output.cRespiration[i] = dailyER * travelTimes[i];
 
-      double avgkDO = 0.5 * (upstreamkDo[i] + downstreamkDo[i]);
       outputDo.doProduction[i] =
          output.cFixation[i] * ratioDoCFix;
       outputDo.doConsumption[i] =
          output.cRespiration[i] * ratioDoCResp;
+
+      upstreamkDo[i] = kSchmidtDoCalculator(upstreamTemp[i], k600);
+      downstreamkDo[i] = kSchmidtDoCalculator(downstreamTemp[i], k600);
+      double avgkDO = 0.5 * (upstreamkDo[i] + downstreamkDo[i]);
       outputDo.doEquilibration[i] =
          travelTimes[i] *
          avgkDO *
