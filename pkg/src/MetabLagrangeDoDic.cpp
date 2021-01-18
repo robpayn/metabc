@@ -7,26 +7,26 @@ MetabLagrangeDoDic::MetabLagrangeDoDic()
 
 MetabLagrangeDoDic::~MetabLagrangeDoDic()
 {
-   delete[] upstreamDIC;
-   delete[] pCO2air;
-   delete[] upstreamAlkalinity;
-   delete[] downstreamAlkalinity;
+   delete[] upstreamDIC_;
+   delete[] pCO2air_;
+   delete[] upstreamAlkalinity_;
+   delete[] downstreamAlkalinity_;
 
-   delete[] upstreampCO2;
-   delete[] upstreampH;
-   delete[] upstreamSatCO2;
-   delete[] downstreamSatCO2;
-   delete[] upstreamkCO2;
-   delete[] downstreamkCO2;
-   delete[] upstreamkH;
-   delete[] downstreamkH;
+   delete[] upstreampCO2_;
+   delete[] upstreampH_;
+   delete[] upstreamSatCO2_;
+   delete[] downstreamSatCO2_;
+   delete[] upstreamkCO2_;
+   delete[] downstreamkCO2_;
+   delete[] upstreamkH_;
+   delete[] downstreamkH_;
 
-   delete[] outputDic.pCO2;
-   delete[] outputDic.dic;
-   delete[] outputDic.dicProduction;
-   delete[] outputDic.dicConsumption;
-   delete[] outputDic.co2Equilibration;
-   delete[] outputDic.pH;
+   delete[] outputDic_.pCO2;
+   delete[] outputDic_.dic;
+   delete[] outputDic_.dicProduction;
+   delete[] outputDic_.dicConsumption;
+   delete[] outputDic_.co2Equilibration;
+   delete[] outputDic_.pH;
 }
 
 void MetabLagrangeDoDic::initialize
@@ -76,56 +76,56 @@ void MetabLagrangeDoDic::initialize
       timeSteps
    );
 
-   this->upstreamDIC = new double[numParcels];
-   this->pCO2air = new double[numParcels];
-   this->upstreamAlkalinity = new double[numParcels];
-   this->downstreamAlkalinity = new double[numParcels];
+   upstreamDIC_ = new double[numParcels_];
+   pCO2air_ = new double[numParcels_];
+   upstreamAlkalinity_ = new double[numParcels_];
+   downstreamAlkalinity_ = new double[numParcels_];
 
-   upstreampCO2 = new double[numParcels];
-   upstreampH = new double[numParcels];
-   upstreamSatCO2 = new double[numParcels];
-   downstreamSatCO2 = new double[numParcels];
-   upstreamkCO2 = new double[numParcels];
-   downstreamkCO2 = new double[numParcels];
-   upstreamkH = new double[numParcels];
-   downstreamkH = new double[numParcels];
+   upstreampCO2_ = new double[numParcels_];
+   upstreampH_ = new double[numParcels_];
+   upstreamSatCO2_ = new double[numParcels_];
+   downstreamSatCO2_ = new double[numParcels_];
+   upstreamkCO2_ = new double[numParcels_];
+   downstreamkCO2_ = new double[numParcels_];
+   upstreamkH_ = new double[numParcels_];
+   downstreamkH_ = new double[numParcels_];
 
-   outputDic.pCO2 = new double[numParcels];
-   outputDic.dic = new double[numParcels];
-   outputDic.dicProduction = new double[numParcels];
-   outputDic.dicConsumption = new double[numParcels];
-   outputDic.co2Equilibration = new double[numParcels];
-   outputDic.pH = new double[numParcels];
+   outputDic_.pCO2 = new double[numParcels_];
+   outputDic_.dic = new double[numParcels_];
+   outputDic_.dicProduction = new double[numParcels_];
+   outputDic_.dicConsumption = new double[numParcels_];
+   outputDic_.co2Equilibration = new double[numParcels_];
+   outputDic_.pH = new double[numParcels_];
 
    // Set the attributes
-   this->ratioDicCFix = ratioDicCFix;
-   this->ratioDicCResp = ratioDicCResp;
+   ratioDicCFix_ = ratioDicCFix;
+   ratioDicCResp_ = ratioDicCResp;
 
-   for(int i = 0; i < numParcels; i++) {
+   for(int i = 0; i < numParcels_; i++) {
       // Copy array values into attributes
-      this->upstreamDIC[i] = upstreamDIC[i];
-      this->pCO2air[i] = pCO2air[i];
-      this->upstreamAlkalinity[i] = upstreamAlkalinity[i];
-      this->downstreamAlkalinity[i] = downstreamAlkalinity[i];
+      upstreamDIC_[i] = upstreamDIC[i];
+      pCO2air_[i] = pCO2air[i];
+      upstreamAlkalinity_[i] = upstreamAlkalinity[i];
+      downstreamAlkalinity_[i] = downstreamAlkalinity[i];
 
-      carbonateEq.reset(this->upstreamTemp[i], 0);
+      carbonateEq_.reset(upstreamTemp_[i], 0);
       double equil[2];
-      carbonateEq.optfCO2FromDICTotalAlk(
-         this->upstreamDIC[i] * 1e-6,
-         this->upstreamAlkalinity[i] * 1e-6,
+      carbonateEq_.optfCO2FromDICTotalAlk(
+         upstreamDIC_[i] * 1e-6,
+         upstreamAlkalinity_[i] * 1e-6,
          1e-5,
          2,
          12,
          equil
       );
-      upstreampH[i] = equil[0];
-      upstreampCO2[i] = equil[1];
-      upstreamkH[i] = carbonateEq.kHenryCO2;
-      upstreamSatCO2[i] = upstreamkH[i] * this->pCO2air[i];
+      upstreampH_[i] = equil[0];
+      upstreampCO2_[i] = equil[1];
+      upstreamkH_[i] = carbonateEq_.kHenryCO2;
+      upstreamSatCO2_[i] = upstreamkH_[i] * pCO2air_[i];
 
-      carbonateEq.reset(this->downstreamTemp[i], 0);
-      downstreamkH[i] = carbonateEq.kHenryCO2;
-      downstreamSatCO2[i] = downstreamkH[i] * this->pCO2air[i];
+      carbonateEq_.reset(downstreamTemp_[i], 0);
+      downstreamkH_[i] = carbonateEq_.kHenryCO2;
+      downstreamSatCO2_[i] = downstreamkH_[i] * pCO2air_[i];
    }
 }
 
@@ -134,5 +134,5 @@ void MetabLagrangeDoDic::setkSchmidtCO2Calculator
    double (*function)(double tempC, double k600)
 )
 {
-   kSchmidtCO2Calculator = function;
+   kSchmidtCO2Calculator_ = function;
 }

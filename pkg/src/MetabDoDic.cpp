@@ -7,18 +7,18 @@ MetabDoDic::MetabDoDic()
 
 MetabDoDic::~MetabDoDic()
 {
-   delete[] pCO2air;
-   delete[] alkalinity;
+   delete[] pCO2air_;
+   delete[] alkalinity_;
 
-   delete[] kCO2;
-   delete[] kH;
+   delete[] kCO2_;
+   delete[] kH_;
 
-   delete[] outputDic.pCO2;
-   delete[] outputDic.dic;
-   delete[] outputDic.dicProduction;
-   delete[] outputDic.dicConsumption;
-   delete[] outputDic.co2Equilibration;
-   delete[] outputDic.pH;
+   delete[] outputDic_.pCO2;
+   delete[] outputDic_.dic;
+   delete[] outputDic_.dicProduction;
+   delete[] outputDic_.dicConsumption;
+   delete[] outputDic_.co2Equilibration;
+   delete[] outputDic_.pH;
 }
 
 void MetabDoDic::initialize
@@ -60,31 +60,31 @@ void MetabDoDic::initialize
    );
 
    // Allocate memory for array attributes
-   this->pCO2air = new double[length];
-   this->alkalinity = new double[length];
+   pCO2air_ = new double[length_];
+   alkalinity_ = new double[length_];
 
-   kCO2 = new double[length];
-   kH = new double[length];
+   kCO2_ = new double[length_];
+   kH_ = new double[length_];
 
-   outputDic.pCO2 = new double[length];
-   outputDic.dic = new double[length];
-   outputDic.dicProduction = new double[length];
-   outputDic.dicConsumption = new double[length];
-   outputDic.co2Equilibration = new double[length];
-   outputDic.pH = new double[length];
+   outputDic_.pCO2 = new double[length_];
+   outputDic_.dic = new double[length_];
+   outputDic_.dicProduction = new double[length_];
+   outputDic_.dicConsumption = new double[length_];
+   outputDic_.co2Equilibration = new double[length_];
+   outputDic_.pH = new double[length_];
 
    // Assign attribute values
-   this->ratioDicCFix = ratioDicCFix;
-   this->ratioDicCResp = ratioDicCResp;
-   this->initialDIC = initialDIC;
+   ratioDicCFix_ = ratioDicCFix;
+   ratioDicCResp_ = ratioDicCResp;
+   initialDIC_ = initialDIC;
 
    // Copy array values into attributes
-   for(int i = 0; i < length; i++) {
-      this->pCO2air[i] = pCO2air[i];
-      this->alkalinity[i] = alkalinity[i];
+   for(int i = 0; i < length_; i++) {
+      pCO2air_[i] = pCO2air[i];
+      alkalinity_[i] = alkalinity[i];
    }
 
-   carbonateEq.reset(this->temp[0], 0);
+   carbonateEq_.reset(temp_[0], 0);
 }
 
 void MetabDoDic::setkSchmidtCO2Calculator
@@ -92,5 +92,5 @@ void MetabDoDic::setkSchmidtCO2Calculator
    double (*function)(double tempC, double k600)
 )
 {
-   kSchmidtCO2Calculator = function;
+   kSchmidtCO2Calculator_ = function;
 }

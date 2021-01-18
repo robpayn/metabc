@@ -71,7 +71,9 @@ Constructs an object that is a new instance of the class
   parTotal = -1,
   airPressure,
   stdAirPressure = 1,
-  timesteps = 2
+  timesteps = 2,
+  gwAlpha = NA,
+  gwDO = NA
 )}\if{html}{\out{</div>}}
 }
 
@@ -153,6 +155,16 @@ Defaults to 1 standard atmosphere.}
 Note that certain calculation algorithms (e.g. "OneStep" calculators)
 will ignore this argument.
 Defaults to 2 (a single calculation per parcel).}
+
+\item{\code{gwAlpha}}{The turnover rate of channel water due to groundwater input.
+Units of per day.
+Default value is NA, which disables groundwater inflow simulation.
+Can be a single value or a vector that provides a changing value over time.}
+
+\item{\code{gwDO}}{The concentration of DO in inflowing groundwater.
+Units of micromolarity.
+Default value is NA, which disables groundwater inflow simulation.
+Can be a single value of a vector that provides a changing value over time.}
 }
 \if{html}{\out{</div>}}
 }

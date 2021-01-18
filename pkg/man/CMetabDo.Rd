@@ -63,7 +63,9 @@ Constructs an object that is a new instance of the class
   par,
   parTotal = -1,
   airPressure,
-  stdAirPressure = 1
+  stdAirPressure = 1,
+  gwAlpha = NA,
+  gwDO = NA
 )}\if{html}{\out{</div>}}
 }
 
@@ -121,6 +123,16 @@ air pressure at sea level.}
 
 \item{\code{stdAirPressure}}{The standard air pressure in the desired units.
 Defaults to 1 standard atmosphere.}
+
+\item{\code{gwAlpha}}{The turnover rate of channel water due to groundwater input.
+Units of per day.
+Default value is NA, which disables groundwater inflow simulation.
+Can be a single value or a vector that provides a changing value over time.}
+
+\item{\code{gwDO}}{The concentration of DO in inflowing groundwater.
+Units of micromolarity.
+Default value is NA, which disables groundwater inflow simulation.
+Can be a single value of a vector that provides a changing value over time.}
 }
 \if{html}{\out{</div>}}
 }

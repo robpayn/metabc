@@ -4,65 +4,77 @@
 void MetabForwardEulerDo::run()
 {
    // Set the initial oxygen concentration
-   outputDo.dox[0] = initialDO;
+   outputDo_.dox[0] = initialDO_;
 
    // Calculate effects on effective organic carbon
-   parDist[0] = parDistCalculator.calc(
-      dt[0],
-      par[0]
+   parDist_[0] = parDistCalculator_.calc(
+      dt_[0],
+      par_[0]
    );
-   output.cFixation[0] = dailyGPP * parDist[0];
-   output.cRespiration[0] = dailyER * dt[0];
+   output_.cFixation[0] = dailyGPP_ * parDist_[0];
+   output_.cRespiration[0] = dailyER_ * dt_[0];
 
-   outputDo.doProduction[0] =
-      output.cFixation[0] * ratioDoCFix;
-   outputDo.doConsumption[0] =
-      output.cRespiration[0] * ratioDoCResp;
+   outputDo_.doProduction[0] =
+      output_.cFixation[0] * ratioDoCFix_;
+   outputDo_.doConsumption[0] =
+      output_.cRespiration[0] * ratioDoCResp_;
 
-   kDo[0] = kSchmidtDoCalculator(temp[0], k600);
-   outputDo.doEquilibration[0] =
-      dt[0] * kDo[0] * (satDo[0] - outputDo.dox[0]);
+   kDo_[0] = kSchmidtDoCalculator_(temp_[0], k600_);
+   outputDo_.doEquilibration[0] =
+      dt_[0] * kDo_[0] * (satDo_[0] - outputDo_.dox[0]);
 
    // Loop through time steps
-   int lastIndex = length - 1;
+   int lastIndex = length_ - 1;
    for (int i = 1; i < lastIndex; i++) {
-      outputDo.dox[i] =
-         outputDo.dox[i - 1] +
-         outputDo.doProduction[i - 1] +
-         outputDo.doConsumption[i - 1] +
-         outputDo.doEquilibration[i - 1];
+      long prevIndex = i - 1;
+      outputDo_.dox[i] =
+         outputDo_.dox[prevIndex] +
+         outputDo_.doProduction[prevIndex] +
+         outputDo_.doConsumption[prevIndex] +
+         outputDo_.doEquilibration[prevIndex];
+      if (gwDO_) {
+         outputDo_.dox[i] +=
+            dt_[prevIndex] * gwAlpha_[prevIndex] *
+            (gwDO_[prevIndex] - outputDo_.dox[prevIndex]);
+      }
 
-      parDist[i] = parDistCalculator.calc(
-         dt[i],
-         par[i]
+      parDist_[i] = parDistCalculator_.calc(
+         dt_[i],
+         par_[i]
       );
-      output.cFixation[i] = dailyGPP * parDist[i];
-      output.cRespiration[i] = dailyER * dt[i];
+      output_.cFixation[i] = dailyGPP_ * parDist_[i];
+      output_.cRespiration[i] = dailyER_ * dt_[i];
 
-      outputDo.doProduction[i] =
-         output.cFixation[i] * ratioDoCFix;
-      outputDo.doConsumption[i] =
-         output.cRespiration[i] * ratioDoCResp;
+      outputDo_.doProduction[i] =
+         output_.cFixation[i] * ratioDoCFix_;
+      outputDo_.doConsumption[i] =
+         output_.cRespiration[i] * ratioDoCResp_;
 
-      kDo[i] = kSchmidtDoCalculator(temp[i], k600);
-      outputDo.doEquilibration[i] =
-         dt[i] * kDo[i] * (satDo[i] - outputDo.dox[i]);
+      kDo_[i] = kSchmidtDoCalculator_(temp_[i], k600_);
+      outputDo_.doEquilibration[i] =
+         dt_[i] * kDo_[i] * (satDo_[i] - outputDo_.dox[i]);
    }
 
-   outputDo.dox[lastIndex] =
-      outputDo.dox[lastIndex - 1] +
-      outputDo.doProduction[lastIndex - 1] +
-      outputDo.doConsumption[lastIndex - 1] +
-      outputDo.doEquilibration[lastIndex - 1];
+   long prevLastIndex = lastIndex - 1;
+   outputDo_.dox[lastIndex] =
+      outputDo_.dox[prevLastIndex] +
+      outputDo_.doProduction[prevLastIndex] +
+      outputDo_.doConsumption[prevLastIndex] +
+      outputDo_.doEquilibration[prevLastIndex];
+   if (gwDO_) {
+      outputDo_.dox[lastIndex] +=
+         dt_[prevLastIndex] * gwAlpha_[prevLastIndex] *
+         (gwDO_[prevLastIndex] - outputDo_.dox[prevLastIndex]);
+   }
 
-   parDist[lastIndex] = 0;
-   output.cFixation[lastIndex] = 0;
-   output.cRespiration[lastIndex] = 0;
+   parDist_[lastIndex] = 0;
+   output_.cFixation[lastIndex] = 0;
+   output_.cRespiration[lastIndex] = 0;
 
-   outputDo.doConsumption[lastIndex] = 0;
-   outputDo.doProduction[lastIndex] = 0;
+   outputDo_.doConsumption[lastIndex] = 0;
+   outputDo_.doProduction[lastIndex] = 0;
 
-   kDo[lastIndex] = kSchmidtDoCalculator(temp[lastIndex], k600);
-   outputDo.doEquilibration[lastIndex] = 0;
+   kDo_[lastIndex] = kSchmidtDoCalculator_(temp_[lastIndex], k600_);
+   outputDo_.doEquilibration[lastIndex] = 0;
 
 }

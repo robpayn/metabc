@@ -17,32 +17,60 @@ SEXP MetabLagrangeDo_initialize(
    SEXP parTotal,
    SEXP airPressure,
    SEXP stdAirPressure,
-   SEXP timesteps
+   SEXP timesteps,
+   SEXP gwDOEnable,
+   SEXP gwAlpha,
+   SEXP gwDO
 )
 {
    int length = length(upstreamTime);
 
    MetabLagrangeDo* basePointer =
       (MetabLagrangeDo*)R_ExternalPtrAddr(baseExtPointer);
-   basePointer->initialize(
-      asReal(dailyGPP),
-      asReal(ratioDoCFix),
-      asReal(dailyER),
-      asReal(ratioDoCResp),
-      asReal(k600),
-      REAL(upstreamDO),
-      REAL(upstreamTime),
-      REAL(downstreamTime),
-      REAL(upstreamTemp),
-      REAL(downstreamTemp),
-      REAL(upstreamPAR),
-      REAL(downstreamPAR),
-      asReal(parTotal),
-      REAL(airPressure),
-      asReal(stdAirPressure),
-      length,
-      asInteger(timesteps)
-   );
+
+   if (asLogical(gwDOEnable)) {
+      basePointer->initialize(
+         asReal(dailyGPP),
+         asReal(ratioDoCFix),
+         asReal(dailyER),
+         asReal(ratioDoCResp),
+         asReal(k600),
+         REAL(upstreamDO),
+         REAL(upstreamTime),
+         REAL(downstreamTime),
+         REAL(upstreamTemp),
+         REAL(downstreamTemp),
+         REAL(upstreamPAR),
+         REAL(downstreamPAR),
+         asReal(parTotal),
+         REAL(airPressure),
+         asReal(stdAirPressure),
+         length,
+         asInteger(timesteps),
+         REAL(gwAlpha),
+         REAL(gwDO)
+      );
+   } else {
+      basePointer->initialize(
+         asReal(dailyGPP),
+         asReal(ratioDoCFix),
+         asReal(dailyER),
+         asReal(ratioDoCResp),
+         asReal(k600),
+         REAL(upstreamDO),
+         REAL(upstreamTime),
+         REAL(downstreamTime),
+         REAL(upstreamTemp),
+         REAL(downstreamTemp),
+         REAL(upstreamPAR),
+         REAL(downstreamPAR),
+         asReal(parTotal),
+         REAL(airPressure),
+         asReal(stdAirPressure),
+         length,
+         asInteger(timesteps)
+      );
+   }
 
    return R_NilValue;
 }
@@ -51,8 +79,8 @@ SEXP MetabLagrangeDo_setRatioDoCFix(SEXP baseExternalPointer, SEXP value)
 {
    MetabLagrangeDo* model = (MetabLagrangeDo*)R_ExternalPtrAddr(baseExternalPointer);
    SEXP out = PROTECT(allocVector(REALSXP, 1));
-   REAL(out)[0] = model->ratioDoCFix;
-   model->ratioDoCFix = asReal(value);
+   REAL(out)[0] = model->ratioDoCFix_;
+   model->ratioDoCFix_ = asReal(value);
 
    UNPROTECT(1);
    return out;
@@ -62,8 +90,8 @@ SEXP MetabLagrangeDo_setRatioDoCResp(SEXP baseExternalPointer, SEXP value)
 {
    MetabLagrangeDo* model = (MetabLagrangeDo*)R_ExternalPtrAddr(baseExternalPointer);
    SEXP out = PROTECT(allocVector(REALSXP, 1));
-   REAL(out)[0] = model->ratioDoCResp;
-   model->ratioDoCResp = asReal(value);
+   REAL(out)[0] = model->ratioDoCResp_;
+   model->ratioDoCResp_ = asReal(value);
 
    UNPROTECT(1);
    return out;
@@ -77,32 +105,32 @@ SEXP MetabLagrangeDo_getSummary(SEXP baseExtPointer)
 
 SEXP MetabLagrangeDo_getSummary(MetabLagrangeDo* basePointer)
 {
-   SEXP travelTimes = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP cFixation = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP cRespiration = PROTECT(allocVector(REALSXP, basePointer->numParcels));
+   SEXP travelTimes = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP cFixation = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP cRespiration = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
 
-   SEXP dox = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP upstreamDoSat = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP downstreamDoSat = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP doProduction = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP doConsumption = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP upstreamkDo = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP downstreamkDo = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP doEquilibration = PROTECT(allocVector(REALSXP, basePointer->numParcels));
+   SEXP dox = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP upstreamDoSat = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP downstreamDoSat = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP doProduction = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP doConsumption = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP upstreamkDo = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP downstreamkDo = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP doEquilibration = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
 
-   for(int i = 0; i < basePointer->numParcels; i++) {
-      REAL(travelTimes)[i] = basePointer->travelTimes[i];
-      REAL(cFixation)[i] = basePointer->output.cFixation[i];
-      REAL(cRespiration)[i] = basePointer->output.cRespiration[i];
+   for(int i = 0; i < basePointer->numParcels_; i++) {
+      REAL(travelTimes)[i] = basePointer->travelTimes_[i];
+      REAL(cFixation)[i] = basePointer->output_.cFixation[i];
+      REAL(cRespiration)[i] = basePointer->output_.cRespiration[i];
 
-      REAL(dox)[i] = basePointer->outputDo.dox[i];
-      REAL(upstreamDoSat)[i] = basePointer->upstreamSatDo[i];
-      REAL(downstreamDoSat)[i] = basePointer->downstreamSatDo[i];
-      REAL(doProduction)[i] = basePointer->outputDo.doProduction[i];
-      REAL(doConsumption)[i] = basePointer->outputDo.doConsumption[i];
-      REAL(upstreamkDo)[i] = basePointer->upstreamkDo[i];
-      REAL(downstreamkDo)[i] = basePointer->upstreamkDo[i];
-      REAL(doEquilibration)[i] = basePointer->outputDo.doEquilibration[i];
+      REAL(dox)[i] = basePointer->outputDo_.dox[i];
+      REAL(upstreamDoSat)[i] = basePointer->upstreamSatDo_[i];
+      REAL(downstreamDoSat)[i] = basePointer->downstreamSatDo_[i];
+      REAL(doProduction)[i] = basePointer->outputDo_.doProduction[i];
+      REAL(doConsumption)[i] = basePointer->outputDo_.doConsumption[i];
+      REAL(upstreamkDo)[i] = basePointer->upstreamkDo_[i];
+      REAL(downstreamkDo)[i] = basePointer->upstreamkDo_[i];
+      REAL(doEquilibration)[i] = basePointer->outputDo_.doEquilibration[i];
    }
 
    SEXP vecOutput = PROTECT(allocVector(VECSXP, 3));

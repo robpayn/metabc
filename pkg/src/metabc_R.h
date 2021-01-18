@@ -81,7 +81,10 @@ extern "C"
       SEXP par,
       SEXP parTotal,
       SEXP airPressure,
-      SEXP stdAirPressure
+      SEXP stdAirPressure,
+      SEXP gwDOEnable,
+      SEXP gwAlpha,
+      SEXP gwDO
    );
 
    SEXP MetabDo_setRatioDoCFix(SEXP baseExternalPointer, SEXP value);
@@ -119,7 +122,10 @@ extern "C"
       SEXP parTotal,
       SEXP airPressure,
       SEXP stdAirPressure,
-      SEXP timesteps
+      SEXP timesteps,
+      SEXP gwDOEnable,
+      SEXP gwAlpha,
+      SEXP gwDO
    );
 
    SEXP MetabLagrangeDo_setRatioDoCFix(SEXP baseExternalPointer, SEXP value);

@@ -7,28 +7,29 @@ MetabLagrangeDo::MetabLagrangeDo() :
 MetabLagrangeDo::~MetabLagrangeDo()
 {
    // Deallocate memory
-   delete[] upstreamDO;
-   delete[] upstreamTime;
-   delete[] downstreamTime;
-   delete[] upstreamTemp;
-   delete[] downstreamTemp;
-   delete[] upstreamPAR;
-   delete[] downstreamPAR;
-   delete[] airPressure;
+   delete[] upstreamDO_;
+   delete[] upstreamTime_;
+   delete[] downstreamTime_;
+   delete[] upstreamTemp_;
+   delete[] downstreamTemp_;
+   delete[] upstreamPAR_;
+   delete[] downstreamPAR_;
+   delete[] airPressure_;
+   delete[] gwDO_;
 
-   delete[] travelTimes;
-   delete[] upstreamSatDo;
-   delete[] downstreamSatDo;
-   delete[] upstreamkDo;
-   delete[] downstreamkDo;
-   delete[] parAvg;
-   delete[] parDist;
+   delete[] travelTimes_;
+   delete[] upstreamSatDo_;
+   delete[] downstreamSatDo_;
+   delete[] upstreamkDo_;
+   delete[] downstreamkDo_;
+   delete[] parAvg_;
+   delete[] parDist_;
 
    // Deallocate output
-   delete[] outputDo.dox;
-   delete[] outputDo.doProduction;
-   delete[] outputDo.doConsumption;
-   delete[] outputDo.doEquilibration;
+   delete[] outputDo_.dox;
+   delete[] outputDo_.doProduction;
+   delete[] outputDo_.doConsumption;
+   delete[] outputDo_.doEquilibration;
 }
 
 void MetabLagrangeDo::initialize
@@ -49,81 +50,94 @@ void MetabLagrangeDo::initialize
    double* airPressure,
    double stdAirPressure,
    int numParcels,
-   int timeSteps
+   int timeSteps,
+   double* gwAlpha,
+   double* gwDO
 )
 {
    Metab::initialize(
      dailyGPP,
      dailyER,
      k600,
-     numParcels
+     numParcels,
+     gwAlpha
    );
 
-   // Allocate memory
-   this->upstreamDO = new double[numParcels];
-   this->upstreamTime = new double[numParcels];
-   this->downstreamTime = new double[numParcels];
-   this->upstreamTemp = new double[numParcels];
-   this->downstreamTemp = new double[numParcels];
-   this->upstreamPAR = new double[numParcels];
-   this->downstreamPAR = new double[numParcels];
-   this->airPressure = new double[numParcels];
+   numParcels_ = numParcels;
 
-   travelTimes = new double[numParcels];
-   upstreamSatDo = new double[numParcels];
-   downstreamSatDo = new double[numParcels];
-   upstreamkDo = new double[numParcels];
-   downstreamkDo = new double[numParcels];
-   parAvg = new double[numParcels];
-   parDist = new double[numParcels];
+   // Allocate memory
+   upstreamDO_ = new double[numParcels_];
+   upstreamTime_ = new double[numParcels_];
+   downstreamTime_ = new double[numParcels_];
+   upstreamTemp_ = new double[numParcels_];
+   downstreamTemp_ = new double[numParcels_];
+   upstreamPAR_ = new double[numParcels_];
+   downstreamPAR_ = new double[numParcels_];
+   airPressure_ = new double[numParcels_];
+
+   if (gwAlpha_ && gwDO) {
+      gwDO_ = new double[numParcels_];
+      for(int i = 0; i < numParcels_; i++) {
+         gwDO_[i] = gwDO[i];
+      }
+   } else {
+      gwDO_ = nullptr;
+   }
+
+   travelTimes_ = new double[numParcels_];
+   upstreamSatDo_ = new double[numParcels_];
+   downstreamSatDo_ = new double[numParcels_];
+   upstreamkDo_ = new double[numParcels_];
+   downstreamkDo_ = new double[numParcels_];
+   parAvg_ = new double[numParcels_];
+   parDist_ = new double[numParcels_];
 
    // Allocate output
-   outputDo.dox = new double[numParcels];
-   outputDo.doProduction = new double[numParcels];
-   outputDo.doConsumption = new double[numParcels];
-   outputDo.doEquilibration = new double[numParcels];
+   outputDo_.dox = new double[numParcels_];
+   outputDo_.doProduction = new double[numParcels_];
+   outputDo_.doConsumption = new double[numParcels_];
+   outputDo_.doEquilibration = new double[numParcels_];
 
    // Set the attributes
-   this->ratioDoCFix = ratioDoCFix;
-   this->ratioDoCResp = ratioDoCResp;
-   this->stdAirPressure = stdAirPressure;
-   this->numParcels = numParcels;
+   ratioDoCFix_ = ratioDoCFix;
+   ratioDoCResp_ = ratioDoCResp;
+   stdAirPressure_ = stdAirPressure;
 
    // Length of time vector is one larger than the number of time steps
-   lengthTimeVector = timeSteps + 1;
+   lengthTimeVector_ = timeSteps + 1;
 
    // Calculate values over travel times or at upstream
    // and downstream times
    double densityWater;
-   for(int i = 0; i < numParcels; i++) {
+   for(int i = 0; i < numParcels_; i++) {
       // Copy array values to attributes
-      this->upstreamDO[i] = upstreamDO[i];
-      this->upstreamTime[i] = upstreamTime[i];
-      this->downstreamTime[i] = downstreamTime[i];
-      this->upstreamTemp[i] = upstreamTemp[i];
-      this->downstreamTemp[i] = downstreamTemp[i];
-      this->upstreamPAR[i] = upstreamPAR[i];
-      this->downstreamPAR[i] = downstreamPAR[i];
-      this->airPressure[i] = airPressure[i];
+      upstreamDO_[i] = upstreamDO[i];
+      upstreamTime_[i] = upstreamTime[i];
+      downstreamTime_[i] = downstreamTime[i];
+      upstreamTemp_[i] = upstreamTemp[i];
+      downstreamTemp_[i] = downstreamTemp[i];
+      upstreamPAR_[i] = upstreamPAR[i];
+      downstreamPAR_[i] = downstreamPAR[i];
+      airPressure_[i] = airPressure[i];
 
       // Travel times and average PAR over travel times
-      travelTimes[i] = this->downstreamTime[i] - this->upstreamTime[i];
-      parAvg[i] = 0.5 * (this->upstreamPAR[i] + this->downstreamPAR[i]);
+      travelTimes_[i] = downstreamTime_[i] - upstreamTime_[i];
+      parAvg_[i] = 0.5 * (upstreamPAR_[i] + downstreamPAR_[i]);
 
       // Sat DO and gas exchange rates passing the upstream end
-      densityWater = densityCalculator(this->upstreamTemp[i]);
-      upstreamSatDo[i] = satDoCalculator(
-         this->upstreamTemp[i],
+      densityWater = densityCalculator_(upstreamTemp_[i]);
+      upstreamSatDo_[i] = satDoCalculator_(
+         upstreamTemp_[i],
          densityWater,
-         this->airPressure[i] / stdAirPressure
+         airPressure_[i] / stdAirPressure
       );
 
       // Sat DO and gas exchange rates passing the downstream end
-      densityWater = densityCalculator(this->downstreamTemp[i]);
-      downstreamSatDo[i] = satDoCalculator(
-         this->downstreamTemp[i],
+      densityWater = densityCalculator_(downstreamTemp_[i]);
+      downstreamSatDo_[i] = satDoCalculator_(
+         downstreamTemp_[i],
          densityWater,
-         this->airPressure[i] / stdAirPressure
+         airPressure_[i] / stdAirPressure
       );
    }
 
@@ -133,17 +147,17 @@ void MetabLagrangeDo::initialize
    if (parTotal <= 0) {
       double upstreamSum = 0;
       double downstreamSum = 0;
-      for(int i = 0; i < numParcels - 1; i++) {
+      for(int i = 0; i < numParcels_ - 1; i++) {
          upstreamSum +=
-            (this->upstreamTime[i + 1] - this->upstreamTime[i]) *
-            0.5 * (this->upstreamPAR[i] + this->upstreamPAR[i + 1]);
+            (upstreamTime_[i + 1] - upstreamTime_[i]) *
+            0.5 * (upstreamPAR_[i] + upstreamPAR_[i + 1]);
          downstreamSum +=
-            (this->downstreamTime[i + 1] - this->downstreamTime[i]) *
-            0.5 * (this->downstreamPAR[i] + this->downstreamPAR[i + 1]);
+            (downstreamTime_[i + 1] - downstreamTime_[i]) *
+            0.5 * (downstreamPAR_[i] + downstreamPAR_[i + 1]);
       }
-      this->parTotal = 0.5 * (upstreamSum + downstreamSum);
+      parTotal_ = 0.5 * (upstreamSum + downstreamSum);
    } else {
-      this->parTotal = parTotal;
+      parTotal_ = parTotal;
    }
-   parDistCalculator.initialize(this->parTotal);
+   parDistCalculator_.initialize(parTotal_);
 }

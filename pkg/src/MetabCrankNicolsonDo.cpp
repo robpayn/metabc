@@ -4,79 +4,81 @@
 void MetabCrankNicolsonDo::run()
 {
    // Set the initial oxygen concentration
-   outputDo.dox[0] = initialDO;
+   outputDo_.dox[0] = initialDO_;
 
    // Calculate effects on effective organic carbon
-   parDist[0] = parDistCalculator.calc(
-      dt[0],
-      parAvg[0]
+   parDist_[0] = parDistCalculator_.calc(
+      dt_[0],
+      parAvg_[0]
    );
-   output.cFixation[0] = dailyGPP * parDist[0];
-   output.cRespiration[0] = dailyER * dt[0];
+   output_.cFixation[0] = dailyGPP_ * parDist_[0];
+   output_.cRespiration[0] = dailyER_ * dt_[0];
 
-   outputDo.doProduction[0] =
-      output.cFixation[0] * ratioDoCFix;
-   outputDo.doConsumption[0] =
-      output.cRespiration[0] * ratioDoCResp;
+   outputDo_.doProduction[0] =
+      output_.cFixation[0] * ratioDoCFix_;
+   outputDo_.doConsumption[0] =
+      output_.cRespiration[0] * ratioDoCResp_;
 
-   kDo[0] = kSchmidtDoCalculator(temp[0], k600);
-   kDo[1] = kSchmidtDoCalculator(temp[1], k600);
-   double avgkDO = 0.5 * (kDo[0] + kDo[1]);
-   outputDo.doEquilibration[0] =
-      dt[0] *
+   kDo_[0] = kSchmidtDoCalculator_(temp_[0], k600_);
+   kDo_[1] = kSchmidtDoCalculator_(temp_[1], k600_);
+   double avgkDO = 0.5 * (kDo_[0] + kDo_[1]);
+   outputDo_.doEquilibration[0] =
+      dt_[0] *
       avgkDO *
-      0.5 * (satDo[0] - outputDo.dox[0] + satDo[1]);
+      0.5 * (satDo_[0] - outputDo_.dox[0] + satDo_[1]);
 
    // Loop through time steps
-   int lastIndex = length - 1;
+   int lastIndex = length_ - 1;
    for (int i = 1; i < lastIndex; i++) {
-      outputDo.dox[i] =
+      long prevIndex = i - 1;
+      outputDo_.dox[i] =
          (
-            outputDo.dox[i - 1] +
-            outputDo.doProduction[i - 1] +
-            outputDo.doConsumption[i - 1] +
-            outputDo.doEquilibration[i - 1]
+            outputDo_.dox[prevIndex] +
+            outputDo_.doProduction[prevIndex] +
+            outputDo_.doConsumption[prevIndex] +
+            outputDo_.doEquilibration[prevIndex]
          ) /
          (
-            1 + (0.5 * (dt[i - 1] * avgkDO))
+            1 + (0.5 * (dt_[prevIndex] * avgkDO))
          );
 
-      parDist[i] = parDistCalculator.calc(
-         dt[i],
-         parAvg[i]
+      parDist_[i] = parDistCalculator_.calc(
+         dt_[i],
+         parAvg_[i]
       );
-      output.cFixation[i] = dailyGPP * parDist[i];
-      output.cRespiration[i] = dailyER * dt[i];
+      output_.cFixation[i] = dailyGPP_ * parDist_[i];
+      output_.cRespiration[i] = dailyER_ * dt_[i];
 
-      outputDo.doProduction[i] =
-         output.cFixation[i] * ratioDoCFix;
-      outputDo.doConsumption[i] =
-         output.cRespiration[i] * ratioDoCResp;
+      outputDo_.doProduction[i] =
+         output_.cFixation[i] * ratioDoCFix_;
+      outputDo_.doConsumption[i] =
+         output_.cRespiration[i] * ratioDoCResp_;
 
-      kDo[i + 1] = kSchmidtDoCalculator(temp[i + 1], k600);
-      avgkDO = 0.5 * (kDo[i] + kDo[i + 1]);
-      outputDo.doEquilibration[i] =
-         dt[i] *
+      kDo_[i + 1] = kSchmidtDoCalculator_(temp_[i + 1], k600_);
+      avgkDO = 0.5 * (kDo_[i] + kDo_[i + 1]);
+      outputDo_.doEquilibration[i] =
+         dt_[i] *
          avgkDO *
-         0.5 * (satDo[i] - outputDo.dox[i] + satDo[i + 1]);
+         0.5 * (satDo_[i] - outputDo_.dox[i] + satDo_[i + 1]);
    }
 
-   outputDo.dox[lastIndex] =
+   long prevLastIndex = lastIndex - 1;
+   outputDo_.dox[lastIndex] =
       (
-         outputDo.dox[lastIndex - 1] +
-         outputDo.doProduction[lastIndex - 1] +
-         outputDo.doConsumption[lastIndex - 1] +
-         outputDo.doEquilibration[lastIndex - 1]
+         outputDo_.dox[prevLastIndex] +
+         outputDo_.doProduction[prevLastIndex] +
+         outputDo_.doConsumption[prevLastIndex] +
+         outputDo_.doEquilibration[prevLastIndex]
       ) /
       (
-         1 + (0.5 * (dt[lastIndex - 1] * avgkDO))
+         1 + (0.5 * (dt_[prevLastIndex] * avgkDO))
       );
 
-   parDist[lastIndex] = 0;
-   output.cFixation[lastIndex] = 0;
-   output.cRespiration[lastIndex] = 0;
+   parDist_[lastIndex] = 0;
+   output_.cFixation[lastIndex] = 0;
+   output_.cRespiration[lastIndex] = 0;
 
-   outputDo.doProduction[lastIndex] = 0;
-   outputDo.doConsumption[lastIndex] = 0;
-   outputDo.doEquilibration[lastIndex] = 0;
+   outputDo_.doProduction[lastIndex] = 0;
+   outputDo_.doConsumption[lastIndex] = 0;
+   outputDo_.doEquilibration[lastIndex] = 0;
 }

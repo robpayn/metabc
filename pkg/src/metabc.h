@@ -7,48 +7,68 @@
  *   fundamental model ouput
  */
 struct Metab_Output {
-   /*! Moles of carbon per liter fixed over a time step */
+   /*! Moles of carbon fixed over a time step per liter of channel water */
    double* cFixation;
-   /*! Moles of carbon per liter respired over a time step */
+   /*! Moles of carbon respired over a time step per liter of channel water */
    double* cRespiration;
 };
 
+//!  An abstract class providing the basic functions of a metabolism model
+/*!
+ *   Provides the basic interface to a metabolism model, and defines
+ *   some of the basic attributes.
+ */
 class Metab {
    public:
       Metab();
       virtual ~Metab();
 
-      //! Daily gross primary production (molarity of DOC equivalent per day)
-      double dailyGPP;
-      //! Daily ecosystem respiration (molarity of DOC equivalent per day)
-      double dailyER;
+      //! Daily gross primary production (moles of carbon per day per volume of water)
+      double dailyGPP_;
+      //! Daily ecosystem respiration (moles of carbon per day per volume of water)
+      double dailyER_;
       //! The gas exchange rate at a Schmidt number of 600 (per day)
-      double k600;
-      //! Length of arrays for calculations
-      int length;
+      double k600_;
+      //! The turnover rate of channel water due to groundwater input (per day)
+      double* gwAlpha_;
+      //! Integer length of arrays for calculations
+      int length_;
 
       //! Object that will determine how GPP should be distributed based on PAR
-      ParDistCalculator parDistCalculator;
+      ParDistCalculator parDistCalculator_;
       //! Pointer to function used to calculate water density from water temperature
-      double (*densityCalculator)(double tempC);
+      double (*densityCalculator_)(double tempC);
       //! Pointer to function used to calculate DO saturation concentration
-      double (*satDoCalculator)(
+      double (*satDoCalculator_)(
          double tempC,
          double densityWater,
          double relativePressure
       );
       //! Pointer to function used to calculate DO gas exchange rate from k600
-      double (*kSchmidtDoCalculator)(double tempC, double k600);
-
+      double (*kSchmidtDoCalculator_)(double tempC, double k600);
 
       //! Output structure for fundamental output
-      Metab_Output output;
+      Metab_Output output_;
 
-      void initialize(
+      //! Initialize the attributes of the object
+      /*!
+       *   \param dailyGPP
+       *     Daily gross primary production (moles of carbon per day per volume of water)
+       *   \param dailyER
+       *     Daily ecosystem respiration (moles of carbon per day per volume of water)
+       *   \param k600
+       *     The gas exchange rate at a Schmidt number of 600 (per day)
+       *   \param length
+       *     Integer length of arrays for calculations
+       *   \param gwAlpha
+       *     The turnover rate of channel water due to groundwater input (per day)
+       */
+       void initialize(
          double dailyGPP,
          double dailyER,
          double k600,
-         int length
+         int length,
+         double* gwAlpha = nullptr
       );
 
       //!  Abstract definition of the run method
@@ -110,13 +130,13 @@ class Metab {
  *   output regarding dissolved oxygen dynamics
  */
 struct MetabDo_Output {
-   /*! Dissolved oxygen (DO) concentration (molar) */
+   /*! Dissolved oxygen (DO) concentration (micromolariy) */
    double* dox;
-   /*! DO produced over a time step */
+   /*! DO produced over a time step (micromoles) */
    double* doProduction;
-   /*! DO consumed over a time step */
+   /*! DO consumed over a time step (micromoles) */
    double* doConsumption;
-   /*! DO exchanged with air over a time step (positive in, negative out) */
+   /*! DO exchanged with air over a time step (micromole: positive in, negative out) */
    double* doEquilibration;
 };
 
@@ -136,37 +156,39 @@ class MetabDo : virtual public Metab {
       // Attributes
 
       //! Ratio of moles O2 produced to moles DIC-C fixed (positive)
-      double ratioDoCFix;
+      double ratioDoCFix_;
       //! Ratio of moles O2 consumed to moles DIC-C respired (negative)
-      double ratioDoCResp;
-      //! \sa initialize(double, double, double, double, double, double, double*, double*, double*, double, double*, double, int)
-      double initialDO;
-      //! \sa initialize(double, double, double, double, double, double, double*, double*, double*, double, double*, double, int)
-      double* time;
-      //! \sa initialize(double, double, double, double, double, double, double*, double*, double*, double, double*, double, int)
-      double* temp;
-      //! \sa initialize(double, double, double, double, double, double, double*, double*, double*, double, double*, double, int)
-      double* par;
-      //! \sa initialize(double, double, double, double, double, double, double*, double*, double*, double, double*, double, int)
-      double parTotal;
-      //! \sa initialize(double, double, double, double, double, double, double*, double*, double*, double, double*, double, int)
-      double* airPressure;
-      //! \sa initialize(double, double, double, double, double, double, double*, double*, double*, double, double*, double, int)
-      double stdAirPressure;
+      double ratioDoCResp_;
+      //! The initial DO concentration (micromolarity)
+      double initialDO_;
+      //! The times for calculations (days)
+      double* time_;
+      //! Water temperatures corresponding to each time (deg C)
+      double* temp_;
+      //! PAR associated with each time (units consistent with total PAR)
+      double* par_;
+      //! PAR integrated over the full analysis time (units consistent with PAR)
+      double parTotal_;
+      //! Air pressures corresponding to each time (same units as std air pressure)
+      double* airPressure_;
+      //! Air pressure at standard conditions (establishes units of air pressure used)
+      double stdAirPressure_;
+      //! DO concentration in inflowing groundwater (micromolarity)
+      double* gwDO_;
 
       //! Average PAR over the time steps (last element will be zero)
-      double* parAvg;
+      double* parAvg_;
       //! Fractions of GPP corresponding to each time step (last element not used)
-      double* parDist;
+      double* parDist_;
       //! Array of the durations of the time steps (last element not used)
-      double* dt;
+      double* dt_;
       //! Array of saturated DO concentrations corresponding to time elements
-      double* satDo;
+      double* satDo_;
       //! Array of the gas exchange rates for DO (per day)
-      double* kDo;
+      double* kDo_;
 
       //! Output structure for DO related output
-      MetabDo_Output outputDo;
+      MetabDo_Output outputDo_;
 
       // Methods
 
@@ -176,13 +198,13 @@ class MetabDo : virtual public Metab {
        *   for a description of the arguments
        *
        *   \param dailyGPP
-       *     Daily gross primary production (molarity of DOC equivalent per day)
+       *     Daily gross primary production (moles of carbon per day per volume of water)
        *   \param ratioDoCFix
-       *     The ratio of moles O2 produced per moles OC fixed (positive)
+       *     The ratio of moles O2 produced per moles carbon fixed (positive)
        *   \param dailyER
-       *     Daily ecosystem respiration (molarity of DOC equivalent per day)
+       *     Daily ecosystem respiration (moles of carbon per day per volume of water)
        *   \param ratioDoCResp
-       *     The ratio of moles O2 consumed per moles OC respired (negative)
+       *     The ratio of moles O2 consumed per moles carbon respired (negative)
        *   \param k600
        *     The gas exchange rate at a Schmidt number of 600 (per day)
        *   \param initialDO
@@ -200,7 +222,11 @@ class MetabDo : virtual public Metab {
        *   \param stdAirPressure
        *     Air pressure at standard conditions (establishes units of air pressure used)
        *   \param length
-       *     Number of elements in the time array
+       *     Integer length of arrays for calculations (count)
+       *   \param gwAlpha
+       *     The turnover rate of channel water due to groundwater input (per day)
+       *   \param gwDO
+       *     DO concentration in inflowing groundwater (micromolarity)
        */
       void initialize(
          double dailyGPP,
@@ -215,7 +241,9 @@ class MetabDo : virtual public Metab {
          double parTotal,
          double* airPressure,
          double stdAirPressure,
-         int length
+         int length,
+         double* gwAlpha = nullptr,
+         double* gwDO = nullptr
       );
 
       //!  Abstract definition of the run method
@@ -262,51 +290,53 @@ class MetabLagrangeDo : virtual public Metab {
       // Attributes
 
       //! Ratio of moles O2 produced to moles DIC-C fixed (positive)
-      double ratioDoCFix;
+      double ratioDoCFix_;
       //! Ratio of moles O2 consumed to moles DIC-C respired (negative)
-      double ratioDoCResp;
-      //! Array of upstream DO concentrations (molar)
-      double* upstreamDO;
+      double ratioDoCResp_;
+      //! Array of upstream DO concentrations (micromolarity)
+      double* upstreamDO_;
       //! An array of times water parcels pass upstream
-      double* upstreamTime;
+      double* upstreamTime_;
       //! An array of times water parcels pass downstream
-      double* downstreamTime;
+      double* downstreamTime_;
       //! At array of temperatures when the water parcels pass upstream
-      double* upstreamTemp;
+      double* upstreamTemp_;
       //! At array of temperatures when the water parcels pass downstream
-      double* downstreamTemp;
+      double* downstreamTemp_;
       //! PAR values when the water parcels pass upstream
-      double* upstreamPAR;
+      double* upstreamPAR_;
       //! PAR values when the water parcels pass downstream
-      double* downstreamPAR;
+      double* downstreamPAR_;
       //! Total PAR
-      double parTotal;
+      double parTotal_;
       //! Air pressures corresponding to each time (same units as std air pressure)
-      double* airPressure;
+      double* airPressure_;
       //!  The air pressure at standard conditions (establishes units of pressure)
-      double stdAirPressure;
+      double stdAirPressure_;
       //! The number of water parcels in the upstream and downstream arrays
-      int numParcels;
+      int numParcels_;
       //! The number of elements in the time vector for each parcel
-      int lengthTimeVector;
-      //! Array of the durations of the parcel travel times
+      int lengthTimeVector_;
+      //! DO concentration in inflowing groundwater
+      double* gwDO_;
 
-      double* travelTimes;
+      //! Array of the durations of the parcel travel times
+      double* travelTimes_;
       //! Average PAR for each parcel's travel time
-      double* parAvg;
+      double* parAvg_;
       //! Fractions of GPP corresponding to each parcel's travel time
-      double* parDist;
+      double* parDist_;
       //! Array of saturated DO concentrations when the parcels are passing the upstream end
-      double* upstreamSatDo;
+      double* upstreamSatDo_;
       //! Array of saturated DO concentrations when the parcels are passing the downstream end
-      double* downstreamSatDo;
+      double* downstreamSatDo_;
       //! Array of the gas exchange rates for DO (per day) when the parcels are passing the upstream end
-      double* upstreamkDo;
+      double* upstreamkDo_;
       //! Array of the gas exchange rates for DO (per day) when the parcels are passing the downstream end
-      double* downstreamkDo;
+      double* downstreamkDo_;
 
       //! Output structure for DO related output
-      MetabDo_Output outputDo;
+      MetabDo_Output outputDo_;
 
       // Methods
 
@@ -367,7 +397,9 @@ class MetabLagrangeDo : virtual public Metab {
          double* airPressure,
          double stdAirPressure,
          int numParcels,
-         int timeSteps
+         int timeSteps,
+         double* gwAlpha = nullptr,
+         double* gwDO = nullptr
       );
 
       //!  Abstract definition of the run method
@@ -449,21 +481,21 @@ class MetabDoDic : virtual public MetabDo {
       // Attributes
 
       //! Ratio of the moles of DIC-C consumed per mole of organic carbon fixed (negative)
-      double ratioDicCFix;
-      double ratioDicCResp;
-      double initialDIC;
-      double* pCO2air;
-      double* alkalinity;
+      double ratioDicCFix_;
+      double ratioDicCResp_;
+      double initialDIC_;
+      double* pCO2air_;
+      double* alkalinity_;
       //! Array of gas exchange rates (per day) for carbon dioxide for each time element
-      double* kCO2;
+      double* kCO2_;
       //! Array of henry's constants for carbon dioxide corresponding to each time element
-      double* kH;
+      double* kH_;
       //! Pointer to the function to use to calculate the gas exchange rate for carbon dioxide from the k600
-      double (*kSchmidtCO2Calculator)(double tempC, double k600);
+      double (*kSchmidtCO2Calculator_)(double tempC, double k600);
       //! Structure for DIC related output
-      MetabDic_Output outputDic;
+      MetabDic_Output outputDic_;
       //! The object to use for carbonate equilibrium calculations
-      CarbonateEq carbonateEq;
+      CarbonateEq carbonateEq_;
 
       // Methods
 
@@ -626,42 +658,42 @@ class MetabLagrangeDoDic : virtual public MetabLagrangeDo {
       // Attributes
 
       //! \sa MetabDoDic(double, double, double, double, double, double, double*, double*, double*, double*, double, int, double, double, double, double*, double*)
-      double ratioDicCFix;
+      double ratioDicCFix_;
       //! \sa MetabDoDic(double, double, double, double, double, double, double*, double*, double*, double*, double, int, double, double, double, double*, double*)
-      double ratioDicCResp;
+      double ratioDicCResp_;
       //! \sa MetabDoDic(double, double, double, double, double, double, double*, double*, double*, double*, double, int, double, double, double, double*, double*)   double ratioDicCresp;
-      double* upstreamDIC;
+      double* upstreamDIC_;
       //! \sa MetabDoDic(double, double, double, double, double, double, double*, double*, double*, double*, double, int, double, double, double, double*, double*)   double ratioDicCresp;
-      double* pCO2air;
+      double* pCO2air_;
       //! \sa MetabDoDic(double, double, double, double, double, double, double*, double*, double*, double*, double, int, double, double, double, double*, double*)   double* pCO2air;
-      double* upstreamAlkalinity;
+      double* upstreamAlkalinity_;
       //! \sa MetabDoDic(double, double, double, double, double, double, double*, double*, double*, double*, double, int, double, double, double, double*, double*)   double* pCO2air;
-      double* downstreamAlkalinity;
+      double* downstreamAlkalinity_;
 
       //! pCO2 as a parcel passes the upstream end
-      double* upstreampCO2;
+      double* upstreampCO2_;
       //! pH as a parcel passes the upstream end
-      double* upstreampH;
+      double* upstreampH_;
       //! CO2 saturation concentration as parcel passes upstream end
-      double* upstreamSatCO2;
+      double* upstreamSatCO2_;
       //! CO2 saturation concentration as parcel passes downstream end
-      double* downstreamSatCO2;
+      double* downstreamSatCO2_;
       //! Gas exchange rate for CO2 as a parcel passes upstream end
-      double* upstreamkCO2;
+      double* upstreamkCO2_;
       //! Gas exchange rate for CO2 as a parcel passes downstream end
-      double* downstreamkCO2;
+      double* downstreamkCO2_;
       //! Henry's constant as a parcel passes the upstream end
-      double* upstreamkH;
+      double* upstreamkH_;
       //! Henry's constant as a parcel passes the downstream end
-      double* downstreamkH;
+      double* downstreamkH_;
 
       //! Pointer to the function to use to calculate the gas exchange rate for carbon dioxide from the k600
-      double (*kSchmidtCO2Calculator)(double tempC, double k600);
+      double (*kSchmidtCO2Calculator_)(double tempC, double k600);
       //! The object to use for carbonate equilibrium calculations
-      CarbonateEq carbonateEq;
+      CarbonateEq carbonateEq_;
 
       //! Structure for DIC related output
-      MetabDic_Output outputDic;
+      MetabDic_Output outputDic_;
 
       // Methods
 

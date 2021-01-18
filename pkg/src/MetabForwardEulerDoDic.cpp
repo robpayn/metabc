@@ -7,90 +7,92 @@ void MetabForwardEulerDoDic::run()
    MetabForwardEulerDo::run();
 
    // Set the first elements for henry's coefficient and DIC
-   carbonateEq.reset(temp[0], 0);
-   kH[0] = carbonateEq.kHenryCO2;
-   outputDic.dic[0] = initialDIC;
+   carbonateEq_.reset(temp_[0], 0);
+   kH_[0] = carbonateEq_.kHenryCO2;
+   outputDic_.dic[0] = initialDIC_;
 
    // Run the carbonate equilibrium for initial pH and pCO2
    double dicOptim[2];
-   carbonateEq.optfCO2FromDICTotalAlk(
-      outputDic.dic[0] * 1e-6,
-      alkalinity[0] * 1e-6,
+   carbonateEq_.optfCO2FromDICTotalAlk(
+      outputDic_.dic[0] * 1e-6,
+      alkalinity_[0] * 1e-6,
       1e-5,
       2,
       12,
       dicOptim
    );
-   outputDic.pCO2[0] = dicOptim[1];
-   outputDic.pH[0] = dicOptim[0];
+   outputDic_.pCO2[0] = dicOptim[1];
+   outputDic_.pH[0] = dicOptim[0];
 
    // Calculate initial dic inputs and outputs
-   outputDic.dicProduction[0] =
-      output.cRespiration[0] * ratioDicCResp;
-   outputDic.dicConsumption[0] =
-      output.cFixation[0] * ratioDicCFix;
+   outputDic_.dicProduction[0] =
+      output_.cRespiration[0] * ratioDicCResp_;
+   outputDic_.dicConsumption[0] =
+      output_.cFixation[0] * ratioDicCFix_;
 
-   kCO2[0] = kSchmidtCO2Calculator(temp[0], k600);
-   outputDic.co2Equilibration[0] =
-      dt[0] * kCO2[0] *
-      kH[0] * (pCO2air[0] - outputDic.pCO2[0]);
+   kCO2_[0] = kSchmidtCO2Calculator_(temp_[0], k600_);
+   outputDic_.co2Equilibration[0] =
+      dt_[0] * kCO2_[0] *
+      kH_[0] * (pCO2air_[0] - outputDic_.pCO2[0]);
 
-   int lastIndex = length - 1;
+   int lastIndex = length_ - 1;
    for(int i = 1; i < lastIndex; i++) {
-      carbonateEq.reset(temp[i], 0);
-      kH[i] = carbonateEq.kHenryCO2;
+      carbonateEq_.reset(temp_[i], 0);
+      kH_[i] = carbonateEq_.kHenryCO2;
 
-      outputDic.dic[i] =
-         outputDic.dic[i - 1] +
-         outputDic.dicProduction[i - 1] +
-         outputDic.dicConsumption[i - 1] +
-         outputDic.co2Equilibration[i - 1];
+      long prevIndex = i - 1;
+      outputDic_.dic[i] =
+         outputDic_.dic[prevIndex] +
+         outputDic_.dicProduction[prevIndex] +
+         outputDic_.dicConsumption[prevIndex] +
+         outputDic_.co2Equilibration[prevIndex];
 
-      carbonateEq.optfCO2FromDICTotalAlk(
-         outputDic.dic[i] * 1e-6,
-         alkalinity[i] * 1e-6,
+      carbonateEq_.optfCO2FromDICTotalAlk(
+         outputDic_.dic[i] * 1e-6,
+         alkalinity_[i] * 1e-6,
          1e-5,
          2,
          12,
          dicOptim
       );
-      outputDic.pCO2[i] = dicOptim[1];
-      outputDic.pH[i] = dicOptim[0];
+      outputDic_.pCO2[i] = dicOptim[1];
+      outputDic_.pH[i] = dicOptim[0];
 
-      outputDic.dicProduction[i] =
-         output.cRespiration[i] * ratioDicCResp;
-      outputDic.dicConsumption[i] =
-         output.cFixation[i] * ratioDicCFix;
+      outputDic_.dicProduction[i] =
+         output_.cRespiration[i] * ratioDicCResp_;
+      outputDic_.dicConsumption[i] =
+         output_.cFixation[i] * ratioDicCFix_;
 
-      kCO2[i] = kSchmidtCO2Calculator(temp[i], k600);
-      outputDic.co2Equilibration[i] =
-         dt[i] * kCO2[i] *
-         kH[i] * (pCO2air[i] - outputDic.pCO2[i]);
+      kCO2_[i] = kSchmidtCO2Calculator_(temp_[i], k600_);
+      outputDic_.co2Equilibration[i] =
+         dt_[i] * kCO2_[i] *
+         kH_[i] * (pCO2air_[i] - outputDic_.pCO2[i]);
    }
 
-   carbonateEq.reset(temp[lastIndex], 0);
-   kH[lastIndex] = carbonateEq.kHenryCO2;
+   carbonateEq_.reset(temp_[lastIndex], 0);
+   kH_[lastIndex] = carbonateEq_.kHenryCO2;
 
-   outputDic.dic[lastIndex] =
-      outputDic.dic[lastIndex - 1] +
-      outputDic.dicProduction[lastIndex - 1] +
-      outputDic.dicConsumption[lastIndex - 1] +
-      outputDic.co2Equilibration[lastIndex - 1];
+   long prevLastIndex = lastIndex - 1;
+   outputDic_.dic[lastIndex] =
+      outputDic_.dic[prevLastIndex] +
+      outputDic_.dicProduction[prevLastIndex] +
+      outputDic_.dicConsumption[prevLastIndex] +
+      outputDic_.co2Equilibration[prevLastIndex];
 
-   carbonateEq.optfCO2FromDICTotalAlk(
-      outputDic.dic[lastIndex] * 1e-6,
-      alkalinity[lastIndex] * 1e-6,
+   carbonateEq_.optfCO2FromDICTotalAlk(
+      outputDic_.dic[lastIndex] * 1e-6,
+      alkalinity_[lastIndex] * 1e-6,
       1e-5,
       2,
       12,
       dicOptim
    );
-   outputDic.pCO2[lastIndex] = dicOptim[1];
-   outputDic.pH[lastIndex] = dicOptim[0];
+   outputDic_.pCO2[lastIndex] = dicOptim[1];
+   outputDic_.pH[lastIndex] = dicOptim[0];
 
-   outputDic.dicProduction[lastIndex] = 0;
-   outputDic.dicConsumption[lastIndex] = 0;
+   outputDic_.dicProduction[lastIndex] = 0;
+   outputDic_.dicConsumption[lastIndex] = 0;
 
-   kCO2[lastIndex] = kSchmidtCO2Calculator(temp[lastIndex], k600);
-   outputDic.co2Equilibration[lastIndex] = 0;
+   kCO2_[lastIndex] = kSchmidtCO2Calculator_(temp_[lastIndex], k600_);
+   outputDic_.co2Equilibration[lastIndex] = 0;
 }

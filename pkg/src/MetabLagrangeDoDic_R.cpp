@@ -63,8 +63,8 @@ SEXP MetabLagrangeDoDic_setRatioDoCFix(SEXP baseExternalPointer, SEXP value)
 {
    MetabLagrangeDoDic* model = (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
    SEXP out = PROTECT(allocVector(REALSXP, 1));
-   REAL(out)[0] = model->ratioDoCFix;
-   model->ratioDoCFix = asReal(value);
+   REAL(out)[0] = model->ratioDoCFix_;
+   model->ratioDoCFix_ = asReal(value);
 
    UNPROTECT(1);
    return out;
@@ -74,8 +74,8 @@ SEXP MetabLagrangeDoDic_setRatioDoCResp(SEXP baseExternalPointer, SEXP value)
 {
    MetabLagrangeDoDic* model = (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
    SEXP out = PROTECT(allocVector(REALSXP, 1));
-   REAL(out)[0] = model->ratioDoCResp;
-   model->ratioDoCResp = asReal(value);
+   REAL(out)[0] = model->ratioDoCResp_;
+   model->ratioDoCResp_ = asReal(value);
 
    UNPROTECT(1);
    return out;
@@ -85,8 +85,8 @@ SEXP MetabLagrangeDoDic_setRatioDicCFix(SEXP baseExternalPointer, SEXP value)
 {
    MetabLagrangeDoDic* model = (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
    SEXP out = PROTECT(allocVector(REALSXP, 1));
-   REAL(out)[0] = model->ratioDicCFix;
-   model->ratioDicCFix = asReal(value);
+   REAL(out)[0] = model->ratioDicCFix_;
+   model->ratioDicCFix_ = asReal(value);
 
    UNPROTECT(1);
    return out;
@@ -96,8 +96,8 @@ SEXP MetabLagrangeDoDic_setRatioDicCResp(SEXP baseExternalPointer, SEXP value)
 {
    MetabLagrangeDoDic* model = (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExternalPointer);
    SEXP out = PROTECT(allocVector(REALSXP, 1));
-   REAL(out)[0] = model->ratioDicCResp;
-   model->ratioDicCResp = asReal(value);
+   REAL(out)[0] = model->ratioDicCResp_;
+   model->ratioDicCResp_ = asReal(value);
 
    UNPROTECT(1);
    return out;
@@ -119,23 +119,23 @@ SEXP MetabLagrangeDoDic_getSummary(MetabLagrangeDoDic* basePointer)
    SEXP vecOutput = PROTECT(VECTOR_ELT(oldVec, 0));
    SEXP vecOutputDO = PROTECT(VECTOR_ELT(oldVec, 1));
 
-   SEXP pCO2 = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP dic = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP dicProduction = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP dicConsumption = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP co2Equilibration = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP kCO2 = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP pH = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   SEXP kH = PROTECT(allocVector(REALSXP, basePointer->numParcels));
-   for(int i = 0; i < basePointer->numParcels; i++) {
-      REAL(pCO2)[i] = basePointer->outputDic.pCO2[i];
-      REAL(dic)[i] = basePointer->outputDic.dic[i];
-      REAL(dicProduction)[i] = basePointer->outputDic.dicProduction[i];
-      REAL(dicConsumption)[i] = basePointer->outputDic.dicConsumption[i];
-      REAL(co2Equilibration)[i] = basePointer->outputDic.co2Equilibration[i];
-      REAL(kCO2)[i] = basePointer->downstreamkCO2[i];
-      REAL(pH)[i] = basePointer->outputDic.pH[i];
-      REAL(kH)[i] = basePointer->downstreamkH[i];
+   SEXP pCO2 = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP dic = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP dicProduction = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP dicConsumption = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP co2Equilibration = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP kCO2 = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP pH = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   SEXP kH = PROTECT(allocVector(REALSXP, basePointer->numParcels_));
+   for(int i = 0; i < basePointer->numParcels_; i++) {
+      REAL(pCO2)[i] = basePointer->outputDic_.pCO2[i];
+      REAL(dic)[i] = basePointer->outputDic_.dic[i];
+      REAL(dicProduction)[i] = basePointer->outputDic_.dicProduction[i];
+      REAL(dicConsumption)[i] = basePointer->outputDic_.dicConsumption[i];
+      REAL(co2Equilibration)[i] = basePointer->outputDic_.co2Equilibration[i];
+      REAL(kCO2)[i] = basePointer->downstreamkCO2_[i];
+      REAL(pH)[i] = basePointer->outputDic_.pH[i];
+      REAL(kH)[i] = basePointer->downstreamkH_[i];
    }
 
    SEXP vecOutputDIC = PROTECT(allocVector(VECSXP, 8));

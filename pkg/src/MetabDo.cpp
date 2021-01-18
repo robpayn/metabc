@@ -6,21 +6,22 @@ MetabDo::MetabDo() :
 
 MetabDo::~MetabDo()
 {
-   delete[] time;
-   delete[] temp;
-   delete[] par;
-   delete[] airPressure;
+   delete[] time_;
+   delete[] temp_;
+   delete[] par_;
+   delete[] airPressure_;
+   delete[] gwDO_;
 
-   delete[] dt;
-   delete[] satDo;
-   delete[] kDo;
-   delete[] parAvg;
-   delete[] parDist;
+   delete[] dt_;
+   delete[] satDo_;
+   delete[] kDo_;
+   delete[] parAvg_;
+   delete[] parDist_;
 
-   delete[] outputDo.dox;
-   delete[] outputDo.doProduction;
-   delete[] outputDo.doConsumption;
-   delete[] outputDo.doEquilibration;
+   delete[] outputDo_.dox;
+   delete[] outputDo_.doProduction;
+   delete[] outputDo_.doConsumption;
+   delete[] outputDo_.doEquilibration;
 }
 
 void MetabDo::initialize
@@ -37,7 +38,9 @@ void MetabDo::initialize
    double parTotal,
    double* airPressure,
    double stdAirPressure,
-   int length
+   int length,
+   double* gwAlpha,
+   double* gwDO
 )
 {
    // Initialize the base class
@@ -45,63 +48,73 @@ void MetabDo::initialize
       dailyGPP,
       dailyER,
       k600,
-      length
+      length,
+      gwAlpha
    );
 
    // Allocate memory
-   this->time = new double[length];
-   this->temp = new double[length];
-   this->par = new double[length];
-   this->airPressure = new double[length];
+   time_ = new double[length_];
+   temp_ = new double[length_];
+   par_ = new double[length_];
+   airPressure_ = new double[length_];
 
-   dt = new double[length];
-   satDo = new double[length];
-   kDo = new double[length];
-   parAvg = new double[length];
-   parDist = new double[length];
-
-   // Allocate output
-   outputDo.dox = new double[length];
-   outputDo.doProduction = new double[length];
-   outputDo.doConsumption = new double[length];
-   outputDo.doEquilibration = new double[length];
-
-   // Set attributes
-   this->ratioDoCFix = ratioDoCFix;
-   this->ratioDoCResp = ratioDoCResp;
-   this->initialDO = initialDO;
-   this->stdAirPressure = stdAirPressure;
-
-   for(int i = 0; i < length; i++) {
-      this->time[i] = time[i];
-      this->temp[i] = temp[i];
-      this->par[i] = par[i];
-      this->airPressure[i] = airPressure[i];
+   if (gwAlpha_ && gwDO) {
+      gwDO_ = new double[length_];
+      for(int i = 0; i < length_; i++) {
+         gwDO_[i] = gwDO[i];
+      }
+   } else {
+      gwDO_ = nullptr;
    }
 
-   int lastIndex = length - 1;
+   dt_ = new double[length_];
+   satDo_ = new double[length_];
+   kDo_ = new double[length_];
+   parAvg_ = new double[length_];
+   parDist_ = new double[length_];
+
+   // Allocate output
+   outputDo_.dox = new double[length_];
+   outputDo_.doProduction = new double[length_];
+   outputDo_.doConsumption = new double[length_];
+   outputDo_.doEquilibration = new double[length_];
+
+   // Set attributes
+   ratioDoCFix_ = ratioDoCFix;
+   ratioDoCResp_ = ratioDoCResp;
+   initialDO_ = initialDO;
+   stdAirPressure_ = stdAirPressure;
+
+   for(int i = 0; i < length_; i++) {
+      time_[i] = time[i];
+      temp_[i] = temp[i];
+      par_[i] = par[i];
+      airPressure_[i] = airPressure[i];
+   }
+
+   int lastIndex = length_ - 1;
 
    // Calculate the values at times or over time steps
    double densityWater;
    for(int i = 0; i < lastIndex; i++) {
-      dt[i] = this->time[i + 1] - this->time[i];
-      parAvg[i] = 0.5 * (this->par[i] + this->par[i + 1]);
+      dt_[i] = time_[i + 1] - time_[i];
+      parAvg_[i] = 0.5 * (par_[i] + par_[i + 1]);
 
-      densityWater = densityCalculator(this->temp[i]);
-      satDo[i] = satDoCalculator(
-         this->temp[i],
+      densityWater = densityCalculator_(temp_[i]);
+      satDo_[i] = satDoCalculator_(
+         temp_[i],
          densityWater,
-         this->airPressure[i] / stdAirPressure
+         airPressure_[i] / stdAirPressure
       );
    }
-   dt[lastIndex] = 0;
-   parAvg[lastIndex] = 0;
+   dt_[lastIndex] = 0;
+   parAvg_[lastIndex] = 0;
 
-   densityWater = densityCalculator(this->temp[lastIndex]);
-   satDo[lastIndex] = satDoCalculator(
-      this->temp[lastIndex],
+   densityWater = densityCalculator_(temp_[lastIndex]);
+   satDo_[lastIndex] = satDoCalculator_(
+      temp_[lastIndex],
       densityWater,
-      this->airPressure[lastIndex] / stdAirPressure
+      airPressure_[lastIndex] / stdAirPressure
    );
 
    // Calculate a total par by integration if the
@@ -110,12 +123,12 @@ void MetabDo::initialize
    if (parTotal <= 0) {
       double sum = 0;
       for(int i = 0; i < lastIndex; i++) {
-         sum += parAvg[i] * dt[i];
+         sum += parAvg_[i] * dt_[i];
       }
-      this->parTotal = sum;
+      parTotal_ = sum;
    } else {
-      this->parTotal = parTotal;
+      parTotal_ = parTotal;
    }
-   parDistCalculator.initialize(this->parTotal);
+   parDistCalculator_.initialize(parTotal_);
 
 }

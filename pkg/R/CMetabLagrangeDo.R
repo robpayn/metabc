@@ -126,6 +126,17 @@ CMetabLagrangeDo <- R6Class(
       #'    Note that certain calculation algorithms (e.g. "OneStep" calculators)
       #'    will ignore this argument.
       #'    Defaults to 2 (a single calculation per parcel).
+      #' @param gwAlpha
+      #'    The turnover rate of channel water due to groundwater input.
+      #'    Units of per day.
+      #'    Default value is NA, which disables groundwater inflow simulation.
+      #'    Can be a single value or a vector that provides a changing value over time.
+      #' @param gwDO
+      #'    The concentration of DO in inflowing groundwater.
+      #'    Units of micromolarity.
+      #'    Default value is NA, which disables groundwater inflow simulation.
+      #'    Can be a single value of a vector that provides a changing value over time.
+      #'
       #'
       initialize = function
       (
@@ -145,7 +156,9 @@ CMetabLagrangeDo <- R6Class(
          parTotal = -1,
          airPressure,
          stdAirPressure = 1,
-         timesteps = 2
+         timesteps = 2,
+         gwAlpha = NA,
+         gwDO = NA
       )
       {
          self$type <- type;
@@ -158,6 +171,13 @@ CMetabLagrangeDo <- R6Class(
          self$pointers <- .Call(
             sprintf("MetabLagrange%sDo_constructor", self$type)
          );
+
+         gwDOEnable = !(is.na(gwAlpha) || is.na(gwDO));
+         if (gwDOEnable) {
+            gwAlpha <- rep(0, length(upstreamTime)) + gwAlpha;
+            gwDO <- rep(0, length(upstreamTime)) + gwDO;
+         }
+
          .Call(
             "MetabLagrangeDo_initialize",
             self$pointers$baseExternalPointer,
@@ -176,7 +196,10 @@ CMetabLagrangeDo <- R6Class(
             parTotal,
             airPressure,
             stdAirPressure,
-            timesteps
+            timesteps,
+            gwDOEnable,
+            gwAlpha,
+            gwDO
          )
       },
 

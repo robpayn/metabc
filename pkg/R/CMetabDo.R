@@ -97,6 +97,16 @@ CMetabDo <- R6Class(
       #' @param stdAirPressure
       #'    The standard air pressure in the desired units.
       #'    Defaults to 1 standard atmosphere.
+      #' @param gwAlpha
+      #'    The turnover rate of channel water due to groundwater input.
+      #'    Units of per day.
+      #'    Default value is NA, which disables groundwater inflow simulation.
+      #'    Can be a single value or a vector that provides a changing value over time.
+      #' @param gwDO
+      #'    The concentration of DO in inflowing groundwater.
+      #'    Units of micromolarity.
+      #'    Default value is NA, which disables groundwater inflow simulation.
+      #'    Can be a single value of a vector that provides a changing value over time.
       #'
       initialize = function
       (
@@ -112,7 +122,9 @@ CMetabDo <- R6Class(
          par,
          parTotal = -1,
          airPressure,
-         stdAirPressure = 1
+         stdAirPressure = 1,
+         gwAlpha = NA,
+         gwDO = NA
       )
       {
          self$type <- type;
@@ -123,6 +135,13 @@ CMetabDo <- R6Class(
          self$pointers <- .Call(
             sprintf("Metab%sDo_constructor", self$type)
          );
+
+         gwDOEnable = !(is.na(gwAlpha) || is.na(gwDO));
+         if (gwDOEnable) {
+            gwAlpha <- rep(0, length(time)) + gwAlpha;
+            gwDO <- rep(0, length(time)) + gwDO;
+         }
+
          .Call(
             "MetabDo_initialize",
             self$pointers$baseExternalPointer,
@@ -137,7 +156,10 @@ CMetabDo <- R6Class(
             par,
             parTotal,
             airPressure,
-            stdAirPressure
+            stdAirPressure,
+            gwDOEnable,
+            gwAlpha,
+            gwDO
          )
       },
 

@@ -14,27 +14,51 @@ SEXP MetabDo_initialize
    SEXP par,
    SEXP parTotal,
    SEXP airPressure,
-   SEXP stdAirPressure
+   SEXP stdAirPressure,
+   SEXP gwDOEnable,
+   SEXP gwAlpha,
+   SEXP gwDO
 )
 {
    int length = length(time);
 
    MetabDo* basePointer = (MetabDo*)R_ExternalPtrAddr(baseExtPointer);
-   basePointer->initialize(
-      asReal(dailyGPP),
-      asReal(ratioDoCFix),
-      asReal(dailyER),
-      asReal(ratioDoCResp),
-      asReal(k600),
-      asReal(initialDO),
-      REAL(time),
-      REAL(temp),
-      REAL(par),
-      asReal(parTotal),
-      REAL(airPressure),
-      asReal(stdAirPressure),
-      length
-   );
+
+   if (asLogical(gwDOEnable)) {
+      basePointer->initialize(
+         asReal(dailyGPP),
+         asReal(ratioDoCFix),
+         asReal(dailyER),
+         asReal(ratioDoCResp),
+         asReal(k600),
+         asReal(initialDO),
+         REAL(time),
+         REAL(temp),
+         REAL(par),
+         asReal(parTotal),
+         REAL(airPressure),
+         asReal(stdAirPressure),
+         length,
+         REAL(gwAlpha),
+         REAL(gwDO)
+      );
+   } else {
+      basePointer->initialize(
+         asReal(dailyGPP),
+         asReal(ratioDoCFix),
+         asReal(dailyER),
+         asReal(ratioDoCResp),
+         asReal(k600),
+         asReal(initialDO),
+         REAL(time),
+         REAL(temp),
+         REAL(par),
+         asReal(parTotal),
+         REAL(airPressure),
+         asReal(stdAirPressure),
+         length
+      );
+   }
 
    return R_NilValue;
 }
@@ -43,8 +67,8 @@ SEXP MetabDo_setRatioDoCFix(SEXP baseExternalPointer, SEXP value)
 {
    MetabDo* model = (MetabDo*)R_ExternalPtrAddr(baseExternalPointer);
    SEXP out = PROTECT(allocVector(REALSXP, 1));
-   REAL(out)[0] = model->ratioDoCFix;
-   model->ratioDoCFix = asReal(value);
+   REAL(out)[0] = model->ratioDoCFix_;
+   model->ratioDoCFix_ = asReal(value);
 
    UNPROTECT(1);
    return out;
@@ -54,8 +78,8 @@ SEXP MetabDo_setRatioDoCResp(SEXP baseExternalPointer, SEXP value)
 {
    MetabDo* model = (MetabDo*)R_ExternalPtrAddr(baseExternalPointer);
    SEXP out = PROTECT(allocVector(REALSXP, 1));
-   REAL(out)[0] = model->ratioDoCResp;
-   model->ratioDoCResp = asReal(value);
+   REAL(out)[0] = model->ratioDoCResp_;
+   model->ratioDoCResp_ = asReal(value);
 
    UNPROTECT(1);
    return out;
@@ -69,28 +93,28 @@ SEXP MetabDo_getSummary(SEXP baseExtPointer)
 
 SEXP MetabDo_getSummary(MetabDo* basePointer)
 {
-   SEXP dt = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP cFixation = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP cRespiration = PROTECT(allocVector(REALSXP, basePointer->length));
+   SEXP dt = PROTECT(allocVector(REALSXP, basePointer->length_));
+   SEXP cFixation = PROTECT(allocVector(REALSXP, basePointer->length_));
+   SEXP cRespiration = PROTECT(allocVector(REALSXP, basePointer->length_));
 
-   SEXP dox = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP doSat = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP doProduction = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP doConsumption = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP k = PROTECT(allocVector(REALSXP, basePointer->length));
-   SEXP doEquilibration = PROTECT(allocVector(REALSXP, basePointer->length));
+   SEXP dox = PROTECT(allocVector(REALSXP, basePointer->length_));
+   SEXP doSat = PROTECT(allocVector(REALSXP, basePointer->length_));
+   SEXP doProduction = PROTECT(allocVector(REALSXP, basePointer->length_));
+   SEXP doConsumption = PROTECT(allocVector(REALSXP, basePointer->length_));
+   SEXP k = PROTECT(allocVector(REALSXP, basePointer->length_));
+   SEXP doEquilibration = PROTECT(allocVector(REALSXP, basePointer->length_));
 
-   for(int i = 0; i < basePointer->length; i++) {
-      REAL(dt)[i] = basePointer->dt[i];
-      REAL(cFixation)[i] = basePointer->output.cFixation[i];
-      REAL(cRespiration)[i] = basePointer->output.cRespiration[i];
+   for(int i = 0; i < basePointer->length_; i++) {
+      REAL(dt)[i] = basePointer->dt_[i];
+      REAL(cFixation)[i] = basePointer->output_.cFixation[i];
+      REAL(cRespiration)[i] = basePointer->output_.cRespiration[i];
 
-      REAL(dox)[i] = basePointer->outputDo.dox[i];
-      REAL(doSat)[i] = basePointer->satDo[i];
-      REAL(doProduction)[i] = basePointer->outputDo.doProduction[i];
-      REAL(doConsumption)[i] = basePointer->outputDo.doConsumption[i];
-      REAL(k)[i] = basePointer->kDo[i];
-      REAL(doEquilibration)[i] = basePointer->outputDo.doEquilibration[i];
+      REAL(dox)[i] = basePointer->outputDo_.dox[i];
+      REAL(doSat)[i] = basePointer->satDo_[i];
+      REAL(doProduction)[i] = basePointer->outputDo_.doProduction[i];
+      REAL(doConsumption)[i] = basePointer->outputDo_.doConsumption[i];
+      REAL(k)[i] = basePointer->kDo_[i];
+      REAL(doEquilibration)[i] = basePointer->outputDo_.doEquilibration[i];
    }
 
    SEXP vecOutput = PROTECT(allocVector(VECSXP, 3));
@@ -141,9 +165,9 @@ SEXP MetabDo_getPARDist(SEXP externalPointer)
 {
    MetabDo* model = (MetabDo*)R_ExternalPtrAddr(externalPointer);
 
-   SEXP out = PROTECT(allocVector(REALSXP, model->length));
-   for (int i = 0; i < model->length; i++) {
-      REAL(out)[i] = model->parDist[i];
+   SEXP out = PROTECT(allocVector(REALSXP, model->length_));
+   for (int i = 0; i < model->length_; i++) {
+      REAL(out)[i] = model->parDist_[i];
    }
 
    UNPROTECT(1);
@@ -153,9 +177,9 @@ SEXP MetabDo_getPARDist(SEXP externalPointer)
 SEXP MetabDo_getDt(SEXP externalPointer)
 {
    MetabDo* model = (MetabDo*)R_ExternalPtrAddr(externalPointer);
-   SEXP out = PROTECT(allocVector(REALSXP, model->length));
-   for (int i = 0; i < model->length; i++) {
-      REAL(out)[i] = model->dt[i];
+   SEXP out = PROTECT(allocVector(REALSXP, model->length_));
+   for (int i = 0; i < model->length_; i++) {
+      REAL(out)[i] = model->dt_[i];
    }
 
    UNPROTECT(1);

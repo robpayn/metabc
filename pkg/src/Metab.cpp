@@ -1,4 +1,5 @@
 #include "metabc.h"
+#include <cmath>
 
 Metab::Metab()
 {
@@ -10,8 +11,9 @@ Metab::Metab()
 
 Metab::~Metab()
 {
-   delete[] output.cFixation;
-   delete[] output.cRespiration;
+   delete[] output_.cFixation;
+   delete[] output_.cRespiration;
+   delete[] gwAlpha_;
 }
 
 void Metab::initialize
@@ -19,21 +21,31 @@ void Metab::initialize
    double dailyGPP,
    double dailyER,
    double k600,
-   int length
+   int length,
+   double* gwAlpha
 )
 {
-   output.cFixation = new double[length];
-   output.cRespiration = new double[length];
+   output_.cFixation = new double[length];
+   output_.cRespiration = new double[length];
 
-   this->dailyGPP = dailyGPP;
-   this->dailyER = dailyER;
-   this->k600 = k600;
-   this->length = length;
+   if (gwAlpha) {
+      gwAlpha_ = new double[length];
+      for(int i = 0; i < length; i++) {
+         gwAlpha_[i] = gwAlpha[i];
+      }
+   } else {
+      gwAlpha_ = nullptr;
+   }
+
+   dailyGPP_ = dailyGPP;
+   dailyER_ = dailyER;
+   k600_ = k600;
+   length_ = length;
 }
 
 void Metab::setPARDistCalculator(ParDistCalculator calculator)
 {
-   parDistCalculator = calculator;
+   parDistCalculator_ = calculator;
 }
 
 void Metab::setDensityCalculator
@@ -41,7 +53,7 @@ void Metab::setDensityCalculator
    double (*function)(double tempC)
 )
 {
-   densityCalculator = function;
+   densityCalculator_ = function;
 }
 
 void Metab::setSatDoCalculator
@@ -49,7 +61,7 @@ void Metab::setSatDoCalculator
    double (*function)(double tempC, double densityWater, double relativePressure)
 )
 {
-   satDoCalculator = function;
+   satDoCalculator_ = function;
 }
 
 void Metab::setkSchmidtDoCalculator
@@ -57,6 +69,6 @@ void Metab::setkSchmidtDoCalculator
    double (*function)(double tempC, double k600)
 )
 {
-   kSchmidtDoCalculator = function;
+   kSchmidtDoCalculator_ = function;
 }
 

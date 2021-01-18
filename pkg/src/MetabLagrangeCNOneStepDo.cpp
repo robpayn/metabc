@@ -4,37 +4,42 @@
 void MetabLagrangeCNOneStepDo::run()
 {
    // Loop through time steps
-   for (int i = 0; i < numParcels; i++) {
-      parDist[i] = parDistCalculator.calc(
-         travelTimes[i],
-         parAvg[i]
+   for (int i = 0; i < numParcels_; i++) {
+      parDist_[i] = parDistCalculator_.calc(
+         travelTimes_[i],
+         parAvg_[i]
       );
-      output.cFixation[i] = dailyGPP * parDist[i];
-      output.cRespiration[i] = dailyER * travelTimes[i];
+      output_.cFixation[i] = dailyGPP_ * parDist_[i];
+      output_.cRespiration[i] = dailyER_ * travelTimes_[i];
 
-      outputDo.doProduction[i] =
-         output.cFixation[i] * ratioDoCFix;
-      outputDo.doConsumption[i] =
-         output.cRespiration[i] * ratioDoCResp;
+      outputDo_.doProduction[i] =
+         output_.cFixation[i] * ratioDoCFix_;
+      outputDo_.doConsumption[i] =
+         output_.cRespiration[i] * ratioDoCResp_;
 
-      upstreamkDo[i] = kSchmidtDoCalculator(upstreamTemp[i], k600);
-      downstreamkDo[i] = kSchmidtDoCalculator(downstreamTemp[i], k600);
-      double avgkDO = 0.5 * (upstreamkDo[i] + downstreamkDo[i]);
-      outputDo.doEquilibration[i] =
-         travelTimes[i] *
+      upstreamkDo_[i] = kSchmidtDoCalculator_(upstreamTemp_[i], k600_);
+      downstreamkDo_[i] = kSchmidtDoCalculator_(downstreamTemp_[i], k600_);
+      double avgkDO = 0.5 * (upstreamkDo_[i] + downstreamkDo_[i]);
+      outputDo_.doEquilibration[i] =
+         travelTimes_[i] *
          avgkDO *
-         0.5 * (upstreamSatDo[i] - upstreamDO[i] + downstreamSatDo[i]);
+         0.5 * (upstreamSatDo_[i] - upstreamDO_[i] + downstreamSatDo_[i]);
 
-      outputDo.dox[i] =
-         (
-            upstreamDO[i] +
-            outputDo.doProduction[i] +
-            outputDo.doConsumption[i] +
-            outputDo.doEquilibration[i]
-         ) /
-         (
-            1 + (0.5 * (travelTimes[i] * avgkDO))
-         );
+      double numerator =
+         upstreamDO_[i] +
+         outputDo_.doProduction[i] +
+         outputDo_.doConsumption[i] +
+         outputDo_.doEquilibration[i];
+      double denominator =
+         1 + (0.5 * (travelTimes_[i] * avgkDO));
+
+      if (gwDO_) {
+         numerator += travelTimes_[i] * gwAlpha_[i] *
+            (gwDO_[i] - (0.5 * upstreamDO_[i]));
+         denominator += 0.5 * (travelTimes_[i] * gwAlpha_[i]);
+      }
+
+      outputDo_.dox[i] = numerator / denominator;
    }
 
 }
