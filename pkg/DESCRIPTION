@@ -1,7 +1,7 @@
 Package: metabc
 Type: Package
 Title: Aquatic metabolism models based in C code
-Version: 0.1.0
+Version: 0.1
 Author: Rob Payn
 Maintainer: Rob Payn <robpayn@gmail.com>
 Description: Metabolism models executed on the local processor

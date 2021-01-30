@@ -22,6 +22,7 @@ A parameter translator allowing GPP, ER, and k600 to be used
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="inferno" data-topic="ParameterTranslator" data-id="initialize">}\href{../../inferno/html/ParameterTranslator.html#method-initialize}{\code{inferno::ParameterTranslator$initialize()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="inferno" data-topic="ParameterTranslator" data-id="setModel">}\href{../../inferno/html/ParameterTranslator.html#method-setModel}{\code{inferno::ParameterTranslator$setModel()}}\out{</span>}
 }
 \out{</details>}
 }

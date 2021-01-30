@@ -206,7 +206,6 @@ CMetabDo <- R6Class(
          return(self$output);
       },
 
-
       #' @description
       #'   Sets one of the DO related model parameters to a new value.
       #'
@@ -230,5 +229,6 @@ CMetabDo <- R6Class(
             value
          )
       }
+
    )
 )

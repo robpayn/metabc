@@ -43,17 +43,17 @@ ParameterTranslatorMetabc <- R6Class(
          params
       )
       {
-         gppValue <- params["gpp"];
-         erValue <- params["er"];
+         gppValue <- params["dailyGPP"];
+         erValue <- params["dailyER"];
          k600Value <- params["k600"];
          if (!is.na(gppValue)) {
-            model$setMetabParam(param = "DailyGPP", value = gppValue);
+            self$model$setMetabParam(param = "DailyGPP", value = gppValue);
          }
          if (!is.na(erValue)) {
-            model$setMetabParam(param = "DailyER", value = erValue);
+            self$model$setMetabParam(param = "DailyER", value = erValue);
          }
          if (!is.na(k600Value)) {
-            model$setMetabParam(param = "k600", value = k600Value);
+            self$model$setMetabParam(param = "k600", value = k600Value);
          }
          return( NULL );
       }

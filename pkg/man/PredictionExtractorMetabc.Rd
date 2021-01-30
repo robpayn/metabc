@@ -31,6 +31,7 @@ A prediction extractor allowing dissolved oxygen outputs
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="inferno" data-topic="PredictionExtractor" data-id="setModel">}\href{../../inferno/html/PredictionExtractor.html#method-setModel}{\code{inferno::PredictionExtractor$setModel()}}\out{</span>}
 }
 \out{</details>}
 }

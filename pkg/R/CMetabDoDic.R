@@ -264,6 +264,7 @@ CMetabDoDic <- R6Class(
             self$pointers$baseExternalPointer,
             value
          )
+
       }
    )
 )
