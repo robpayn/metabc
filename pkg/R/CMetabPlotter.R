@@ -255,108 +255,52 @@ CMetabPlotter <- R6Class(
       {
          super$open(path);
 
-         plot(
-            x = NULL,
-            xaxt = 'n',
-            xlim = 0:1,
-            xlab = '',
-            yaxt = 'n',
-            ylim = 0:1,
-            ylab = '',
-            bty = 'n',
-            main = "One Station Metabolism Analysis Summary"
-         );
+         plot.new();
+         plot.window(xlim = 0:1, ylim = 0:1);
+         title(main = "One Station Metabolism Analysis Summary");
+
          text(
             x = 0.5,
             y = 0.9,
             labels = "Left panel legend:",
             font = 2
          );
+         ordered <- self$format[
+            c("doObs", "doPred", "pCO2Obs", "pCO2Pred", "doSat", "par"),
+            # All columns
+         ];
          legend(
             x = "center",
             bty = 'n',
-            legend = c(
-               self$format["doObs", "name"],
-               self$format["doPred", "name"],
-               self$format["pCO2Obs", "name"],
-               self$format["pCO2Pred", "name"],
-               self$format["doSat", "name"],
-               self$format["par", "name"]
-            ),
-            lty = c(
-               self$format["doObs", "lty"],
-               self$format["doPred", "lty"],
-               self$format["pCO2Obs", "lty"],
-               self$format["pCO2Pred", "lty"],
-               self$format["doSat", "lty"],
-               self$format["par", "lty"]
-            ),
-            lwd = c(
-               self$format["doObs", "lwd"],
-               self$format["doPred", "lwd"],
-               self$format["pCO2Obs", "lwd"],
-               self$format["pCO2Pred", "lwd"],
-               self$format["doSat", "lwd"],
-               self$format["par", "lwd"]
-            ),
-            pch = c(
-               self$format["doObs", "pch"],
-               self$format["doPred", "pch"],
-               self$format["pCO2Obs", "pch"],
-               self$format["pCO2Pred", "pch"],
-               self$format["doSat", "pch"],
-               self$format["par", "pch"]
-            ),
-            col = c(
-               self$format["doObs", "col"],
-               self$format["doPred", "col"],
-               self$format["pCO2Obs", "col"],
-               self$format["pCO2Pred", "col"],
-               self$format["doSat", "col"],
-               self$format["par", "col"]
-            )
+            legend = ordered$name,
+            lty = ordered$lty,
+            lwd = ordered$lwd,
+            pch = ordered$pch,
+            col = ordered$col
          );
 
-         plot(
-            x = NULL,
-            xaxt = 'n',
-            xlim = 0:1,
-            xlab = '',
-            yaxt = 'n',
-            ylim = 0:1,
-            ylab = '',
-            bty = 'n',
-            main = self$subTitle
-         );
+         plot.new();
+         plot.window(xlim = 0:1, ylim = 0:1);
+         title(main = self$subTitle)
+
          text(
             x = 0.5,
             y = 0.7,
             labels = "Right panel legend:",
             font = 2
          );
+         ordered <- self$format[
+            c("temp", "par"),
+            # All columns
+         ];
          legend(
             x = "center",
             bty = 'n',
-            legend = c(
-               self$format["temp", "name"],
-               self$format["par", "name"]
-            ),
-            lty = c(
-               self$format["temp", "lty"],
-               self$format["par", "lty"]
-            ),
-            lwd = c(
-               self$format["temp", "lwd"],
-               self$format["par", "lwd"]
-            ),
-            pch = c(
-               self$format["temp", "pch"],
-               self$format["par", "pch"]
-            ),
-            col = c(
-               self$format["temp", "col"],
-               self$format["par", "col"]
-            )
+            legend = ordered$name,
+            lty = ordered$lty,
+            lwd = ordered$lwd,
+            pch = ordered$pch,
+            col = ordered$col
          );
       },
 
@@ -426,42 +370,40 @@ CMetabPlotter <- R6Class(
                   do = self$results$pred$do$dox,
                   doSat = self$results$pred$do$doSat
                );
+               allvals <- c(ylim, unlist(y.res.vars));
                ylim <- c(
-                  min(
-                     ylim[1],
-                     unlist(y.res.vars),
-                     na.rm = TRUE
-                  ),
-                  max(
-                     ylim[2],
-                     unlist(y.res.vars),
-                     na.rm = TRUE
-                  )
+                  min(allvals, na.rm = TRUE),
+                  max(allvals, na.rm = TRUE)
                );
             }
+
+            format <- self$format["doObs",];
             self$signal$plot(
                header = self$doHeader,
                xaxt = "n",
                ylim = ylim,
                ylab = "",
-               pch = self$format["doObs", "pch"],
-               col = self$format["doObs", "col"],
-               lwd = self$format["doObs", "lwd"]
+               pch = format$pch,
+               col = format$col,
+               lwd = format$lwd
             );
+
             if(plotResults) {
+               format <- self$format["doSat",];
                lines(
                   x = self$results$time,
                   y = y.res.vars$doSat,
-                  lty = self$format["doSat", "lty"],
-                  col = self$format["doSat", "col"],
-                  lwd = self$format["doSat", "lwd"]
+                  lty = format$lty,
+                  col = format$col,
+                  lwd = format$lwd
                );
+               format <- self$format["doPred",];
                lines(
                   x = self$results$time,
                   y = y.res.vars$do,
-                  lty = self$format["doPred", "lty"],
-                  col = self$format["doPred", "col"],
-                  lwd = self$format["doPred", "lwd"]
+                  lty = format$lty,
+                  col = format$col,
+                  lwd = format$lwd
                );
                mtext(
                   text = bquote(paste(
@@ -482,16 +424,12 @@ CMetabPlotter <- R6Class(
                do = self$results$pred$do$dox,
                doSat = self$results$pred$doSat
             );
+            allvals <- unlist(y.res.vars);
             ylim <- c(
-               min(
-                  unlist(y.res.vars),
-                  na.rm = TRUE
-               ),
-               max(
-                  unlist(y.res.vars),
-                  na.rm = TRUE
-               )
+               min(allvals, na.rm = TRUE),
+               max(allvals, na.rm = TRUE)
             );
+            format <- self$format["doSat",];
             plot(
                x = self$results$time,
                y = y.res.vars$doSat,
@@ -500,16 +438,17 @@ CMetabPlotter <- R6Class(
                xlab = "time",
                ylim = ylim,
                ylab = "",
-               lty = self$format["doSat", "lty"],
-               col = self$format["doSat", "col"],
-               lwd = self$format["doSat", "lwd"]
+               lty = format$lty,
+               col = format$col,
+               lwd = format$lwd
             );
+            format <- self$format["doPred",];
             lines(
                x = self$results$time,
                y = y.res.vars$do,
-               lty = self$format["doPred", "lty"],
-               col = self$format["doPred", "col"],
-               lwd = self$format["doPred", "lwd"]
+               lty = format$lty,
+               col = format$col,
+               lwd = format$lwd
             );
             mtext(
                text = bquote(paste(
@@ -572,52 +511,42 @@ CMetabPlotter <- R6Class(
                   max(self$signal$getVariable(self$pCO2Header), na.rm = TRUE)
                );
                if(plotResults && plotDICResults) {
+                  allvals <- c(ylim, self$results$pred$dic$pCO2);
                   ylim <- c(
-                     min(
-                        ylim[1],
-                        self$results$pred$dic$pCO2,
-                        na.rm = TRUE
-                     ),
-                     max(
-                        ylim[2],
-                        self$results$pred$dic$pCO2,
-                        na.rm = TRUE
-                     )
+                     min(allvals, na.rm = TRUE),
+                     max(allvals, na.rm = TRUE)
                   );
                }
+               format <- self$format["pCO2Obs",];
                self$signal$plot(
                   header = self$pCO2Header,
                   xaxt = "n",
                   yaxt = "n",
                   ylim = ylim,
                   ylab = "",
-                  pch = self$format["pCO2Obs", "pch"],
-                  col = self$format["pCO2Obs", "col"],
-                  lwd = self$format["pCO2Obs", "lwd"]
+                  pch = format$pch,
+                  col = format$col,
+                  lwd = format$lwd
                );
                if (plotResults && plotDICResults) {
                   if (!is.null(self$results$pred$dic$pCO2)) {
+                     format <- self$format["pCO2Pred",];
                      lines(
                         x = self$results$time,
                         y = self$results$pred$dic$pCO2,
-                        lty = self$format["pCO2Pred", "lty"],
-                        col = self$format["pCO2Pred", "col"],
-                        lwd = self$format["pCO2Pred", "lwd"]
+                        lty = format$lty,
+                        col = format$col,
+                        lwd = format$lwd
                      );
                   }
                }
             } else if (plotDICResults) {
                ylim <- c(
-                  min(
-                     self$results$pred$dic$pCO2,
-                     na.rm = TRUE
-                  ),
-                  max(
-                     self$results$pred$dic$pCO2,
-                     na.rm = TRUE
-                  )
+                  min(self$results$pred$dic$pCO2, na.rm = TRUE),
+                  max(self$results$pred$dic$pCO2, na.rm = TRUE)
                );
                if (!is.null(self$results$pred$dic$pCO2)) {
+                  format <- self$format["pCO2Pred",];
                   plot(
                      x = self$results$time,
                      y = self$results$pred$dic$pCO2,
@@ -627,9 +556,9 @@ CMetabPlotter <- R6Class(
                      yaxt = "n",
                      ylim = ylim,
                      ylab = "",
-                     lty = self$format["pCO2Pred", "lty"],
-                     col = self$format["pCO2Pred", "col"],
-                     lwd = self$format["pCO2Pred", "lwd"]
+                     lty = format$lty,
+                     col = format$col,
+                     lwd = format$lwd
                   );
                }
             }
@@ -655,19 +584,13 @@ CMetabPlotter <- R6Class(
                   max(self$signal$getVariable(self$dicHeader), na.rm = TRUE)
                );
                if(plotResults && plotDICResults) {
+                  allvals <- c(ylim, self$results$pred$dic$dic);
                   ylim <- c(
-                     min(
-                        ylim[1],
-                        self$results$pred$dic$dic,
-                        na.rm = TRUE
-                     ),
-                     max(
-                        ylim[2],
-                        self$results$pred$dic$dic,
-                        na.rm = TRUE
-                     )
+                     min(allvals, na.rm = TRUE),
+                     max(allvals, na.rm = TRUE)
                   );
                }
+               format <- self$format["dicObs",];
                self$signal$plot(
                   header = self$dicHeader,
                   xaxt = "n",
@@ -675,30 +598,26 @@ CMetabPlotter <- R6Class(
                   ylim = ylim,
                   yaxt = "n",
                   ylab = "",
-                  pch = self$format["dicObs", "pch"],
-                  col = self$format["dicObs", "col"],
-                  lwd = self$format["dicObs", "lwd"]
+                  pch = format$pch,
+                  col = format$col,
+                  lwd = format$lwd
                );
                if(plotResults && plotDICResults) {
+                  format <- self$format["dicPred",];
                   lines(
                      x = self$results$time,
                      y = self$results$pred$dic$dic,
-                     lty = self$format["dicPred", "lty"],
-                     col = self$format["dicPred", "col"],
-                     lwd = self$format["dicPred", "lwd"]
+                     lty = format$lty,
+                     col = format$col,
+                     lwd = format$lwd
                   );
                }
             } else if (plotDICResults) {
                ylim <- c(
-                  min(
-                     self$results$pred$dic$dic,
-                     na.rm = TRUE
-                  ),
-                  max(
-                     self$results$pred$dic$dic,
-                     na.rm = TRUE
-                  )
+                  min(self$results$pred$dic$dic, na.rm = TRUE),
+                  max(self$results$pred$dic$dic, na.rm = TRUE)
                );
+               format <- self$format["dicPred",];
                plot(
                   x = self$results$time,
                   y = self$results$pred$dic$dic,
@@ -708,9 +627,9 @@ CMetabPlotter <- R6Class(
                   ylim = ylim,
                   yaxt = "n",
                   ylab = "",
-                  lty = self$format["dicPred", "lty"],
-                  col = self$format["dicPred", "col"],
-                  lwd = self$format["dicPred", "lwd"]
+                  lty = format$lty,
+                  col = format$col,
+                  lwd = format$lwd
                );
             }
             if(plotDICSignal || plotDICResults) {
@@ -731,60 +650,54 @@ CMetabPlotter <- R6Class(
          # Reset the axes scaling for PAR reference
          par(new = TRUE);
 
+         format <- self$format["par",];
          if(plotSignal) {
             self$signal$plot(
                header = self$parHeader,
                type = "l",
-               lty = self$format["par", "lty"],
-               col = self$format["par", "col"],
-               lwd = self$format["par", "lwd"],
                yaxt = "n",
                ylab = "",
                xaxt = "n",
                xlab = "",
-               ylim = c(
-                  max(self$signal$getVariable(self$parHeader)),
-                  min(self$signal$getVariable(self$parHeader))
-               )
+               lty = format$lty,
+               col = format$col,
+               lwd = format$lwd
             );
          } else {
             plot(
                x = self$results$time,
                y = self$results$par,
                type = "l",
-               lty = self$format["par", "lty"],
-               col = self$format["par", "col"],
-               lwd = self$format["par", "lwd"],
                yaxt = "n",
                ylab = "",
                xaxt = "n",
                xlab = "",
-               ylim = c(
-                  max(self$results$par),
-                  min(self$results$par)
-               )
+               lty = format$lty,
+               col = format$col,
+               lwd = format$lwd
             );
          }
 
          # Plot temperature on a new plot
+         format <- self$format["temp",];
          if(plotSignal) {
             self$signal$plot(
                header = self$tempHeader,
-               pch = self$format["temp", "pch"],
-               col = self$format["temp", "col"],
-               lwd = self$format["temp", "lwd"],
-               xaxt = "n"
+               xaxt = "n",
+               pch = format$pch,
+               col = format$col,
+               lwd = format$lwd
             );
          } else {
             plot(
                x = self$results$time,
                y = self$results$temp,
                ylab = "temp (deg C)",
-               pch = self$format["temp", "pch"],
-               col = self$format["temp", "col"],
-               lwd = self$format["temp", "lwd"],
                xaxt = "n",
-               xlab = "time"
+               xlab = "time",
+               pch = format$pch,
+               col = format$col,
+               lwd = format$lwd
             );
          }
          axis.POSIXct(
@@ -830,38 +743,31 @@ CMetabPlotter <- R6Class(
          par(new = TRUE);
 
          # Plot PAR on the temperature plot
+         format <- self$format["par",];
          if(plotSignal) {
             self$signal$plot(
                header = self$parHeader,
                type = "l",
-               lty = self$format["par", "lty"],
-               col = self$format["par", "col"],
-               lwd = self$format["par", "lwd"],
                yaxt = "n",
                ylab = "",
                xaxt = "n",
                xlab = "",
-               ylim = c(
-                  max(self$signal$getVariable(self$parHeader)),
-                  min(self$signal$getVariable(self$parHeader))
-               )
+               lty = format$lty,
+               col = format$col,
+               lwd = format$lwd
             );
          } else {
             plot(
                x = self$results$time,
                y = self$results$par,
                type = "l",
-               lty = self$format["par", "lty"],
-               col = self$format["par", "col"],
-               lwd = self$format["par", "lwd"],
                yaxt = "n",
                ylab = "",
                xaxt = "n",
                xlab = "",
-               ylim = c(
-                  max(self$results$par),
-                  min(self$results$par)
-               )
+               lty = format$lty,
+               col = format$col,
+               lwd = format$lwd
             );
          }
          axis(

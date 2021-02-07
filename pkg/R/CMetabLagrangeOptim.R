@@ -411,7 +411,7 @@ CMetabLagrangeOptim <- R6Class(
          results <- list(
             params = optimr$par,
             upstreamTime = self$signalIn$getTime()[validIndices],
-            downstreamTime = self$signalIn$getTime()[validIndices],
+            downstreamTime = self$signalOut$getTime()[validIndices],
             upstreamTemp = upstreamTemp[validIndices],
             downstreamTemp = downstreamTemp[validIndices],
             upstreamPAR = upstreamPAR[validIndices],
