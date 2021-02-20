@@ -5,6 +5,7 @@
 extern "C"
 {
    SEXP CarbonateEq_constructor(SEXP tempC, SEXP eConduct);
+   SEXP CarbonateEq_destructor(SEXP externalPointer);
    SEXP CarbonateEq_reset(SEXP externalPointer, SEXP tempC, SEXP eConduct);
    SEXP CarbonateEq_optfCO2FromDICTotalAlk(
       SEXP externalPointer,

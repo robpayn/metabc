@@ -8,6 +8,13 @@ void finalizerCarbonateEq(SEXP externalPointer) {
 
 }
 
+SEXP CarbonateEq_destructor(SEXP externalPointer)
+{
+   finalizerCarbonateEq(externalPointer);
+
+   return R_NilValue;
+}
+
 SEXP CarbonateEq_constructor(SEXP tempC, SEXP eConduct)
 {
    CarbonateEq* pointer = dynamic_cast <CarbonateEq*> (

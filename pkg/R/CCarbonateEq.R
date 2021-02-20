@@ -37,6 +37,20 @@ CCarbonateEq <- R6Class(
       },
 
       #' @description
+      #'   Calls the R wrapper of the destructor of the
+      #'   underlying C object to release memory.
+      #'   Do not call this manually unless you really know what you are doing.
+      #'
+      #' @return
+      #'   SEXP object returned by the destructor method
+      #'
+      finalize = function()
+      {
+         .Call("CarbonateEq_destructor", self$externalPointer)
+         invisible(NULL)
+      },
+
+      #' @description
       #'   Resets the calculator to a new temperature and electrical conductivity
       #'
       #' @param tempC

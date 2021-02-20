@@ -20,6 +20,7 @@ Provides tools for calculating activities of inorganic carbon
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{CCarbonateEq$new()}}
+\item \href{#method-finalize}{\code{CCarbonateEq$finalize()}}
 \item \href{#method-reset}{\code{CCarbonateEq$reset()}}
 \item \href{#method-optfCO2FromDICTotalAlk}{\code{CCarbonateEq$optfCO2FromDICTotalAlk()}}
 \item \href{#method-clone}{\code{CCarbonateEq$clone()}}
@@ -43,6 +44,21 @@ Constructs an object that is a new instance of the class
 Default value is 0 (results in an ionic strength of 0)}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-finalize"></a>}}
+\if{latex}{\out{\hypertarget{method-finalize}{}}}
+\subsection{Method \code{finalize()}}{
+Calls the R wrapper of the destructor of the
+  underlying C object to release memory.
+  Do not call this manually unless you really know what you are doing.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CCarbonateEq$finalize()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+SEXP object returned by the destructor method
 }
 }
 \if{html}{\out{<hr>}}
