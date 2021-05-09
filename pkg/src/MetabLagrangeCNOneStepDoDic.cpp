@@ -34,6 +34,14 @@ void MetabLagrangeCNOneStepDoDic::run()
          outputDic_.dicProduction[i] +
          outputDic_.dicConsumption[i] +
          outputDic_.co2Equilibration[i];
+      if (gwDIC_) {
+         info.gwAlpha = gwAlpha_[i];
+         info.target +=
+            travelTimes_[i] * gwAlpha_[i] *
+            (gwDIC_[i] - 0.5 * upstreamDIC_[i]);
+      } else {
+         info.gwAlpha = -1;
+      }
 
       outputDic_.dic[i] = Brent_fmin(
          minDIC,

@@ -146,7 +146,7 @@ CMetabDo <- R6Class(
       #'    The concentration of DO in inflowing groundwater.
       #'    Units of micromolarity.
       #'    Default value is NA, which disables groundwater inflow simulation.
-      #'    Can be a single value of a vector that provides a changing value over time.
+      #'    Can be a single value or a vector that provides a changing value over time.
       #'
       initialize = function
       (

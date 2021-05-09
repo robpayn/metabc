@@ -157,6 +157,16 @@ CMetabDoDic <- R6Class(
       #' @param stdAirPressure
       #'    The standard air pressure in the desired units.
       #'    Defaults to 1 standard atmosphere.
+      #' @param gwAlpha
+      #'    The turnover rate of channel water due to groundwater input.
+      #'    Units of per day.
+      #'    Default value is NA, which disables groundwater inflow simulation.
+      #'    Can be a single value or a vector that provides a changing value over time.
+      #' @param gwDO
+      #'    The concentration of DO in inflowing groundwater.
+      #'    Units of micromolarity.
+      #'    Default value is NA, which disables groundwater inflow simulation.
+      #'    Can be a single value or a vector that provides a changing value over time.
       #' @param ratioDicCFix
       #'    Ratio of DIC-C atoms consumed relative to organic carbon atoms fixed.
       #'    Defaults to -1.
@@ -176,6 +186,11 @@ CMetabDoDic <- R6Class(
       #'   values are to be simulated.
       #'   If a single value is provided, a vector of the length of the time vector
       #'   will be created from that value.
+      #' @param gwDIC
+      #'    The concentration of DIC in inflowing groundwater.
+      #'    Units of micromolarity of C.
+      #'    Default value is NA, which disables groundwater inflow simulation.
+      #'    Can be a single value or a vector that provides a changing value over time.
       #'
       initialize = function
       (
@@ -192,11 +207,14 @@ CMetabDoDic <- R6Class(
          parTotal = -1,
          airPressure,
          stdAirPressure = 1,
+         gwAlpha = NA,
+         gwDO = NA,
          ratioDicCFix = -1,
          ratioDicCResp = 1,
          initialDIC,
          pCO2air,
-         alkalinity
+         alkalinity,
+         gwDIC = NA
       )
       {
          self$type <- type;
@@ -211,6 +229,14 @@ CMetabDoDic <- R6Class(
          self$pointers <- .Call(
             sprintf("Metab%sDoDic_constructor", self$type)
          );
+
+         gwEnable = !(is.na(gwAlpha) || is.na(gwDO) || is.na(gwDIC));
+         if (gwEnable) {
+            gwAlpha <- rep(0, length(time)) + gwAlpha;
+            gwDO <- rep(0, length(time)) + gwDO;
+            gwDIC <- rep(0, length(time)) + gwDIC;
+         }
+
          .Call(
             "MetabDoDic_initialize",
             self$pointers$baseExternalPointer,
@@ -230,7 +256,11 @@ CMetabDoDic <- R6Class(
             ratioDicCResp,
             initialDIC,
             self$pCO2air,
-            self$alkalinity
+            self$alkalinity,
+            gwEnable,
+            gwAlpha,
+            gwDO,
+            gwDIC
          )
       },
 

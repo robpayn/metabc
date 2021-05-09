@@ -60,6 +60,7 @@ struct proposeDic_info
    double alkalinity;
    double kCO2;
    double dt;
+   double gwAlpha;
    double target;
 };
 

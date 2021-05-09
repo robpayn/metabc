@@ -9,6 +9,7 @@ MetabDoDic::~MetabDoDic()
 {
    delete[] pCO2air_;
    delete[] alkalinity_;
+   delete[] gwDIC_;
 
    delete[] kCO2_;
    delete[] kH_;
@@ -40,7 +41,10 @@ void MetabDoDic::initialize
    double ratioDicCResp,
    double initialDIC,
    double* pCO2air,
-   double* alkalinity
+   double* alkalinity,
+   double* gwAlpha,
+   double* gwDO,
+   double* gwDIC
 )
 {
    MetabDo::initialize(
@@ -56,12 +60,23 @@ void MetabDoDic::initialize
       parTotal,
       airPressure,
       stdAirPressure,
-      length
+      length,
+      gwAlpha,
+      gwDO
    );
 
    // Allocate memory for array attributes
    pCO2air_ = new double[length_];
    alkalinity_ = new double[length_];
+
+   if (gwAlpha_ && gwDIC) {
+      gwDIC_ = new double[length_];
+      for(int i = 0; i < length_; i++) {
+         gwDIC_[i] = gwDIC[i];
+      }
+   } else {
+      gwDIC_ = nullptr;
+   }
 
    kCO2_ = new double[length_];
    kH_ = new double[length_];

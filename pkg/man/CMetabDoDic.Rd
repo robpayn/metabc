@@ -115,11 +115,14 @@ Constructs an object that is a new instance of the class
   parTotal = -1,
   airPressure,
   stdAirPressure = 1,
+  gwAlpha = NA,
+  gwDO = NA,
   ratioDicCFix = -1,
   ratioDicCResp = 1,
   initialDIC,
   pCO2air,
-  alkalinity
+  alkalinity,
+  gwDIC = NA
 )}\if{html}{\out{</div>}}
 }
 
@@ -180,6 +183,16 @@ air pressure at sea level.}
 \item{\code{stdAirPressure}}{The standard air pressure in the desired units.
 Defaults to 1 standard atmosphere.}
 
+\item{\code{gwAlpha}}{The turnover rate of channel water due to groundwater input.
+Units of per day.
+Default value is NA, which disables groundwater inflow simulation.
+Can be a single value or a vector that provides a changing value over time.}
+
+\item{\code{gwDO}}{The concentration of DO in inflowing groundwater.
+Units of micromolarity.
+Default value is NA, which disables groundwater inflow simulation.
+Can be a single value or a vector that provides a changing value over time.}
+
 \item{\code{ratioDicCFix}}{Ratio of DIC-C atoms consumed relative to organic carbon atoms fixed.
 Defaults to -1.}
 
@@ -198,6 +211,11 @@ will be created from that value.}
 values are to be simulated.
 If a single value is provided, a vector of the length of the time vector
 will be created from that value.}
+
+\item{\code{gwDIC}}{The concentration of DIC in inflowing groundwater.
+Units of micromolarity of C.
+Default value is NA, which disables groundwater inflow simulation.
+Can be a single value or a vector that provides a changing value over time.}
 }
 \if{html}{\out{</div>}}
 }

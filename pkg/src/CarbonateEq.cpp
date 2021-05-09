@@ -30,9 +30,11 @@ double proposeDic(double dic, void* info)
       12,
       dicOptim
    );
-   double CO2 = dicOptim[1] * p->carbonateEq->kHenryCO2;
-   double guess = dic + p->kCO2 * p->dt * CO2 * 0.5;
-   return fabs(p->target - guess);
+   double term = p->kCO2 * p->carbonateEq->kHenryCO2 * dicOptim[1];
+   if (p->gwAlpha > 0) {
+      term += p->gwAlpha * dic;
+   }
+   return fabs(p->target - dic - 0.5 * p->dt * term);
 }
 
 CarbonateEq::CarbonateEq

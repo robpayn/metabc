@@ -11,6 +11,7 @@ MetabLagrangeDoDic::~MetabLagrangeDoDic()
    delete[] pCO2air_;
    delete[] upstreamAlkalinity_;
    delete[] downstreamAlkalinity_;
+   delete[] gwDIC_;
 
    delete[] upstreampCO2_;
    delete[] upstreampH_;
@@ -53,7 +54,10 @@ void MetabLagrangeDoDic::initialize
    double* upstreamDIC,
    double* pCO2air,
    double* upstreamAlkalinity,
-   double* downstreamAlkalinity
+   double* downstreamAlkalinity,
+   double* gwAlpha,
+   double* gwDO,
+   double* gwDIC
 )
 {
    MetabLagrangeDo::initialize(
@@ -73,13 +77,24 @@ void MetabLagrangeDoDic::initialize
       airPressure,
       stdAirPressure,
       numParcels,
-      timeSteps
+      timeSteps,
+      gwAlpha,
+      gwDO
    );
 
    upstreamDIC_ = new double[numParcels_];
    pCO2air_ = new double[numParcels_];
    upstreamAlkalinity_ = new double[numParcels_];
    downstreamAlkalinity_ = new double[numParcels_];
+
+   if (gwAlpha_ && gwDIC) {
+      gwDIC_ = new double[length_];
+      for(int i = 0; i < length_; i++) {
+         gwDIC_[i] = gwDIC[i];
+      }
+   } else {
+      gwDIC_ = nullptr;
+   }
 
    upstreampCO2_ = new double[numParcels_];
    upstreampH_ = new double[numParcels_];

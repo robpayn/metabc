@@ -46,6 +46,11 @@ void MetabForwardEulerDoDic::run()
          outputDic_.dicProduction[prevIndex] +
          outputDic_.dicConsumption[prevIndex] +
          outputDic_.co2Equilibration[prevIndex];
+      if (gwDIC_) {
+         outputDic_.dic[i] +=
+            dt_[prevIndex] * gwAlpha_[prevIndex] *
+            (gwDIC_[prevIndex] - outputDic_.dic[prevIndex]);
+      }
 
       carbonateEq_.optfCO2FromDICTotalAlk(
          outputDic_.dic[i] * 1e-6,
@@ -78,6 +83,11 @@ void MetabForwardEulerDoDic::run()
       outputDic_.dicProduction[prevLastIndex] +
       outputDic_.dicConsumption[prevLastIndex] +
       outputDic_.co2Equilibration[prevLastIndex];
+   if (gwDIC_) {
+      outputDic_.dic[lastIndex] +=
+         dt_[prevLastIndex] * gwAlpha_[prevLastIndex] *
+         (gwDIC_[prevLastIndex] - outputDic_.dic[prevLastIndex]);
+   }
 
    carbonateEq_.optfCO2FromDICTotalAlk(
       outputDic_.dic[lastIndex] * 1e-6,

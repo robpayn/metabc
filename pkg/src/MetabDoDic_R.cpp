@@ -18,33 +18,63 @@ SEXP MetabDoDic_initialize(
    SEXP ratioDicCResp,
    SEXP initialDIC,
    SEXP pCO2air,
-   SEXP alkalinity
+   SEXP alkalinity,
+   SEXP gwDICEnable,
+   SEXP gwAlpha,
+   SEXP gwDO,
+   SEXP gwDIC
 )
 {
    int length = length(time);
 
    MetabDoDic* basePointer = (MetabDoDic*)R_ExternalPtrAddr(baseExtPointer);
-   basePointer->initialize(
-      asReal(dailyGPP),
-      asReal(ratioDoCFix),
-      asReal(dailyER),
-      asReal(ratioDoCResp),
-      asReal(k600),
-      asReal(initialDO),
-      REAL(time),
-      REAL(temp),
-      REAL(par),
-      asReal(parTotal),
-      REAL(airPressure),
-      asReal(stdAirPressure),
-      length,
-      asReal(ratioDicCFix),
-      asReal(ratioDicCResp),
-      asReal(initialDIC),
-      REAL(pCO2air),
-      REAL(alkalinity)
-   );
 
+   if (asLogical(gwDICEnable)) {
+      basePointer->initialize(
+         asReal(dailyGPP),
+         asReal(ratioDoCFix),
+         asReal(dailyER),
+         asReal(ratioDoCResp),
+         asReal(k600),
+         asReal(initialDO),
+         REAL(time),
+         REAL(temp),
+         REAL(par),
+         asReal(parTotal),
+         REAL(airPressure),
+         asReal(stdAirPressure),
+         length,
+         asReal(ratioDicCFix),
+         asReal(ratioDicCResp),
+         asReal(initialDIC),
+         REAL(pCO2air),
+         REAL(alkalinity),
+         REAL(gwAlpha),
+         REAL(gwDO),
+         REAL(gwDIC)
+      );
+   } else {
+      basePointer->initialize(
+         asReal(dailyGPP),
+         asReal(ratioDoCFix),
+         asReal(dailyER),
+         asReal(ratioDoCResp),
+         asReal(k600),
+         asReal(initialDO),
+         REAL(time),
+         REAL(temp),
+         REAL(par),
+         asReal(parTotal),
+         REAL(airPressure),
+         asReal(stdAirPressure),
+         length,
+         asReal(ratioDicCFix),
+         asReal(ratioDicCResp),
+         asReal(initialDIC),
+         REAL(pCO2air),
+         REAL(alkalinity)
+      );
+   }
    return R_NilValue;
 }
 

@@ -486,6 +486,7 @@ class MetabDoDic : virtual public MetabDo {
       double initialDIC_;
       double* pCO2air_;
       double* alkalinity_;
+      double* gwDIC_;
       //! Array of gas exchange rates (per day) for carbon dioxide for each time element
       double* kCO2_;
       //! Array of henry's constants for carbon dioxide corresponding to each time element
@@ -557,7 +558,10 @@ class MetabDoDic : virtual public MetabDo {
          double ratioDicCResp,
          double initialDIC,
          double* pCO2air,
-         double* alkalinity
+         double* alkalinity,
+         double* gwAlpha = nullptr,
+         double* gwDO = nullptr,
+         double* gwDIC = nullptr
       );
 
       //!  Abstract definition of the run method
@@ -670,6 +674,8 @@ class MetabLagrangeDoDic : virtual public MetabLagrangeDo {
       //! \sa MetabDoDic(double, double, double, double, double, double, double*, double*, double*, double*, double, int, double, double, double, double*, double*)   double* pCO2air;
       double* downstreamAlkalinity_;
 
+      double* gwDIC_;
+
       //! pCO2 as a parcel passes the upstream end
       double* upstreampCO2_;
       //! pH as a parcel passes the upstream end
@@ -772,7 +778,10 @@ class MetabLagrangeDoDic : virtual public MetabLagrangeDo {
          double* upstreamDIC,
          double* pCO2air,
          double* upstreamAlkalinity,
-         double* downstreamAlkalinity
+         double* downstreamAlkalinity,
+         double* gwAlpha = nullptr,
+         double* gwDO = nullptr,
+         double* gwDIC = nullptr
       );
 
       //!  Abstract definition of the run method

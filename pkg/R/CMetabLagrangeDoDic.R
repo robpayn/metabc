@@ -169,6 +169,16 @@ CMetabLagrangeDoDic <- R6Class(
       #'    Note that certain calculation algorithms (e.g. "OneStep" calculators)
       #'    will ignore this argument.
       #'    Defaults to 2 (a single calculation per parcel).
+      #' @param gwAlpha
+      #'    The turnover rate of channel water due to groundwater input.
+      #'    Units of per day.
+      #'    Default value is NA, which disables groundwater inflow simulation.
+      #'    Can be a single value or a vector that provides a changing value over time.
+      #' @param gwDO
+      #'    The concentration of DO in inflowing groundwater.
+      #'    Units of micromolarity.
+      #'    Default value is NA, which disables groundwater inflow simulation.
+      #'    Can be a single value or a vector that provides a changing value over time.
       #' @param ratioDicCFix
       #'    Ratio of DIC-C atoms consumed relative to organic carbon atoms fixed.
       #'    Defaults to -1.
@@ -192,6 +202,11 @@ CMetabLagrangeDoDic <- R6Class(
       #'   the system.
       #'   If a single value is provided, a vector of the length of the time vector
       #'   will be created from that value.
+      #' @param gwDIC
+      #'    The concentration of DIC in inflowing groundwater.
+      #'    Units of micromolarity of C.
+      #'    Default value is NA, which disables groundwater inflow simulation.
+      #'    Can be a single value or a vector that provides a changing value over time.
       #'
       initialize = function
       (
@@ -212,12 +227,15 @@ CMetabLagrangeDoDic <- R6Class(
          airPressure,
          stdAirPressure = 1,
          timesteps = 2,
+         gwAlpha = NA,
+         gwDO = NA,
          ratioDicCFix = -1,
          ratioDicCResp = 1,
          upstreamDIC,
          pCO2air,
          upstreamAlkalinity,
-         downstreamAlkalinity
+         downstreamAlkalinity,
+         gwDIC = NA
       )
       {
          self$type <- type;
@@ -235,6 +253,14 @@ CMetabLagrangeDoDic <- R6Class(
          self$pointers <- .Call(
             sprintf("MetabLagrange%sDoDic_constructor", self$type)
          );
+
+         gwEnable = !(is.na(gwAlpha) || is.na(gwDO) || is.na(gwDIC));
+         if (gwEnable) {
+            gwAlpha <- rep(0, length(time)) + gwAlpha;
+            gwDO <- rep(0, length(time)) + gwDO;
+            gwDIC <- rep(0, length(time)) + gwDIC;
+         }
+
          .Call(
             "MetabLagrangeDoDic_initialize",
             self$pointers$baseExternalPointer,
@@ -259,7 +285,11 @@ CMetabLagrangeDoDic <- R6Class(
             upstreamDIC,
             pCO2air,
             upstreamAlkalinity,
-            downstreamAlkalinity
+            downstreamAlkalinity,
+            gwEnable,
+            gwAlpha,
+            gwDO,
+            gwDIC
          )
       },
 
