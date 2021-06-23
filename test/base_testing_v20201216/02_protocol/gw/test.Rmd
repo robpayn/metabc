@@ -1,0 +1,307 @@
+---
+title: "Parameter set test"
+author: "Rob Payn"
+date: "6/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load test data
+
+Load some realistic data for a river
+
+```{r}
+library(metab)
+library(metabc)
+
+load(file = "./01_input/2014-09-13/signal.RData")
+```
+
+## DO and DIC over time
+
+Set values for test
+
+```{r}
+
+gpp <- 610
+gppdo <- 1
+er <- 275
+erdo <- -1
+k600 <- 19.5
+initDO <- signalOut$getVariable("do")[1];
+time <- signalOut$time
+temp <- signalOut$getVariable("temp")
+par <- signalOut$getVariable("par")
+parTotal <- -1
+airPressure <- 638
+stdAirPressure <- 760
+
+gppdic <- -1
+erdic <- 1
+initDIC <- signalOut$getVariable("dic")[1]
+pCO2Air <- 400
+alkalinity <- 2857;
+
+```
+
+Create and run models with and without groundwater influence.
+
+```{r echo = FALSE, fig.width = 10, fig.height = 4}
+
+cppModel <- CMetabDoDic$new(
+   type = "ForwardEuler",
+   dailyGPP = gpp,
+   ratioDoCFix = gppdo,
+   dailyER = er,
+   ratioDoCResp = erdo,
+   k600 = k600,
+   initialDO = initDO,
+   time = time,
+   temp = temp,
+   par = par,
+   parTotal = parTotal,
+   airPressure = airPressure,
+   stdAirPressure = stdAirPressure,
+   ratioDicCFix = gppdic,
+   ratioDicCResp = erdic,
+   initialDIC = initDIC,
+   pCO2air = pCO2Air,
+   alkalinity = alkalinity
+);
+
+cppModel.out <- cppModel$run();
+
+cppModelGW <- CMetabDoDic$new(
+   type = "ForwardEuler",
+   dailyGPP = gpp,
+   ratioDoCFix = gppdo,
+   dailyER = er,
+   ratioDoCResp = erdo,
+   k600 = k600,
+   initialDO = initDO,
+   time = time,
+   temp = temp,
+   par = par,
+   parTotal = parTotal,
+   airPressure = airPressure,
+   stdAirPressure = stdAirPressure,
+   ratioDicCFix = gppdic,
+   ratioDicCResp = erdic,
+   initialDIC = initDIC,
+   pCO2air = pCO2Air,
+   alkalinity = alkalinity,
+   gwAlpha = 1,
+   gwDO = 0,
+   gwDIC = 0
+);
+
+cppModelGW.out <- cppModelGW$run();
+
+par(
+   mfrow = c(1, 3),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+allData <- c(
+  cppModel.out$do$dox, 
+  cppModelGW.out$do$dox
+)
+plot(
+  x = cppModel$timePOSIX,
+  y = cppModel.out$do$dox,
+  ylim = c(min(allData), max(allData)),
+  type = "l"
+)
+lines(
+  x = cppModelGW$timePOSIX,
+  y = cppModelGW.out$do$dox,
+  col = "red"
+)
+
+allData <- c(
+  cppModel.out$dic$pCO2, 
+  cppModelGW.out$dic$pCO2
+)
+plot(
+  x = cppModel$timePOSIX,
+  y = cppModel.out$dic$pCO2,
+  ylim = c(min(allData), max(allData)),
+  type = "l"
+)
+lines(
+  x = cppModelGW$timePOSIX,
+  y = cppModelGW.out$dic$pCO2,
+  col = "red"
+)
+
+allData <- c(
+  cppModel.out$dic$dic, 
+  cppModelGW.out$dic$dic
+)
+plot(
+  x = cppModel$timePOSIX,
+  y = cppModel.out$dic$dic,
+  ylim = c(min(allData), max(allData)),
+  type = "l"
+)
+lines(
+  x = cppModelGW$timePOSIX,
+  y = cppModelGW.out$dic$dic,
+  col = "red"
+)
+
+```
+
+
+## DO and DIC Lagrange
+
+Set base values for test
+
+```{r}
+
+gpp <- 610
+gppdo <- 1
+er <- 275
+erdo <- -1
+k600 <- 19.5
+upstreamDO <- signalIn$getVariable("do");
+upstreamTime <- signalIn$time
+downstreamTime <- signalOut$time
+upstreamTemp <- signalIn$getVariable("temp")
+downstreamTemp <- signalOut$getVariable("temp")
+upstreamPAR <- signalIn$getVariable("par")
+downstreamPAR <- signalOut$getVariable("par")
+parTotal <- -1
+airPressure <- 638
+stdAirPressure <- 760
+
+gppdic <- -1
+erdic <- 1
+upstreamDIC <- signalOut$getVariable("dic")
+upstreamDIC[15:17] <- 2846.699
+pCO2Air <- 400;
+upstreamAlkalinity <- 2857;
+downstreamAlkalinity <- 2857;
+
+```
+
+Create and run models with and without groundwater influence.
+
+```{r, fig.width = 10, fig.height = 4}
+
+cppModel <- CMetabLagrangeDoDic$new(
+   type = "CNOneStep",
+   dailyGPP = gpp,
+   ratioDoCFix = gppdo,
+   dailyER = er,
+   ratioDoCResp = erdo,
+   k600 = k600,
+   upstreamDO = upstreamDO,
+   upstreamTime = upstreamTime,
+   downstreamTime = downstreamTime,
+   upstreamTemp = upstreamTemp,
+   downstreamTemp = downstreamTemp,
+   upstreamPAR = upstreamPAR,
+   downstreamPAR = downstreamPAR,
+   parTotal = parTotal,
+   airPressure = airPressure,
+   stdAirPressure = stdAirPressure,
+   timesteps = 0,
+   ratioDicCFix = gppdic,
+   ratioDicCResp = erdic,
+   upstreamDIC = upstreamDIC,
+   pCO2air = pCO2Air,
+   upstreamAlkalinity = upstreamAlkalinity,
+   downstreamAlkalinity = downstreamAlkalinity
+)
+
+cppModel.out <- cppModel$run();
+
+cppModelGW <- CMetabLagrangeDoDic$new(
+   type = "CNOneStep",
+   dailyGPP = gpp,
+   ratioDoCFix = gppdo,
+   dailyER = er,
+   ratioDoCResp = erdo,
+   k600 = k600,
+   upstreamDO = upstreamDO,
+   upstreamTime = upstreamTime,
+   downstreamTime = downstreamTime,
+   upstreamTemp = upstreamTemp,
+   downstreamTemp = downstreamTemp,
+   upstreamPAR = upstreamPAR,
+   downstreamPAR = downstreamPAR,
+   parTotal = parTotal,
+   airPressure = airPressure,
+   stdAirPressure = stdAirPressure,
+   timesteps = 0,
+   ratioDicCFix = gppdic,
+   ratioDicCResp = erdic,
+   upstreamDIC = upstreamDIC,
+   pCO2air = pCO2Air,
+   upstreamAlkalinity = upstreamAlkalinity,
+   downstreamAlkalinity = downstreamAlkalinity,
+   gwAlpha = 1,
+   gwDO = 0,
+   gwDIC = 0
+)
+
+cppModelGW.out <- cppModelGW$run();
+
+par(
+   mfrow = c(1, 3),
+   mar = c(4.5, 4.5, 1, 1)
+)
+
+allData <- c(
+  cppModel.out$do$dox, 
+  cppModelGW.out$do$dox
+)
+plot(
+  x = cppModel$downstreamTimePOSIX,
+  y = cppModel.out$do$dox,
+  ylim = c(min(allData), max(allData)),
+  type = "l"
+)
+lines(
+  x = cppModelGW$downstreamTimePOSIX,
+  y = cppModelGW.out$do$dox,
+  col = "red"
+)
+
+allData <- c(
+  cppModel.out$dic$pCO2, 
+  cppModelGW.out$dic$pCO2
+)
+plot(
+  x = cppModel$downstreamTimePOSIX,
+  y = cppModel.out$dic$pCO2,
+  ylim = c(min(allData), max(allData)),
+  type = "l"
+)
+lines(
+  x = cppModelGW$downstreamTimePOSIX,
+  y = cppModelGW.out$dic$pCO2,
+  col = "red"
+)
+
+allData <- c(
+  cppModel.out$dic$dic, 
+  cppModelGW.out$dic$dic
+)
+plot(
+  x = cppModel$downstreamTimePOSIX,
+  y = cppModel.out$dic$dic,
+  ylim = c(min(allData), max(allData)),
+  type = "l"
+)
+lines(
+  x = cppModelGW$downstreamTimePOSIX,
+  y = cppModelGW.out$dic$dic,
+  col = "red"
+)
+
+```

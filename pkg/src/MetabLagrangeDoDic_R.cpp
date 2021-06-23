@@ -23,38 +23,74 @@ SEXP MetabLagrangeDoDic_initialize(
    SEXP upstreamDIC,
    SEXP pCO2air,
    SEXP upstreamAlkalinity,
-   SEXP downstreamAlkalinity
+   SEXP downstreamAlkalinity,
+   SEXP gwDICEnable,
+   SEXP gwAlpha,
+   SEXP gwDO,
+   SEXP gwDIC
 )
 {
    int length = length(upstreamTime);
 
    MetabLagrangeDoDic* basePointer =
       (MetabLagrangeDoDic*)R_ExternalPtrAddr(baseExtPointer);
-   basePointer->initialize(
-      asReal(dailyGPP),
-      asReal(ratioDoCFix),
-      asReal(dailyER),
-      asReal(ratioDoCResp),
-      asReal(k600),
-      REAL(upstreamDO),
-      REAL(upstreamTime),
-      REAL(downstreamTime),
-      REAL(upstreamTemp),
-      REAL(downstreamTemp),
-      REAL(upstreamPAR),
-      REAL(downstreamPAR),
-      asReal(parTotal),
-      REAL(airPressure),
-      asReal(stdAirPressure),
-      length,
-      asInteger(timesteps),
-      asReal(ratioDicCFix),
-      asReal(ratioDicCResp),
-      REAL(upstreamDIC),
-      REAL(pCO2air),
-      REAL(upstreamAlkalinity),
-      REAL(downstreamAlkalinity)
-   );
+
+   if (asLogical(gwDICEnable)) {
+      basePointer->initialize(
+         asReal(dailyGPP),
+         asReal(ratioDoCFix),
+         asReal(dailyER),
+         asReal(ratioDoCResp),
+         asReal(k600),
+         REAL(upstreamDO),
+         REAL(upstreamTime),
+         REAL(downstreamTime),
+         REAL(upstreamTemp),
+         REAL(downstreamTemp),
+         REAL(upstreamPAR),
+         REAL(downstreamPAR),
+         asReal(parTotal),
+         REAL(airPressure),
+         asReal(stdAirPressure),
+         length,
+         asInteger(timesteps),
+         asReal(ratioDicCFix),
+         asReal(ratioDicCResp),
+         REAL(upstreamDIC),
+         REAL(pCO2air),
+         REAL(upstreamAlkalinity),
+         REAL(downstreamAlkalinity),
+         REAL(gwAlpha),
+         REAL(gwDO),
+         REAL(gwDIC)
+      );
+   } else {
+      basePointer->initialize(
+         asReal(dailyGPP),
+         asReal(ratioDoCFix),
+         asReal(dailyER),
+         asReal(ratioDoCResp),
+         asReal(k600),
+         REAL(upstreamDO),
+         REAL(upstreamTime),
+         REAL(downstreamTime),
+         REAL(upstreamTemp),
+         REAL(downstreamTemp),
+         REAL(upstreamPAR),
+         REAL(downstreamPAR),
+         asReal(parTotal),
+         REAL(airPressure),
+         asReal(stdAirPressure),
+         length,
+         asInteger(timesteps),
+         asReal(ratioDicCFix),
+         asReal(ratioDicCResp),
+         REAL(upstreamDIC),
+         REAL(pCO2air),
+         REAL(upstreamAlkalinity),
+         REAL(downstreamAlkalinity)
+      );
+   }
 
    return R_NilValue;
 }

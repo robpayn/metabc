@@ -30,8 +30,8 @@ ParameterTranslatorMetabc <- R6Class(
       #'   and gas exchange at a Schmidt number of 600
       #'
       #' @param params
-      #'   Named vector of values to use for GPP (named "gpp"),
-      #'   ER (named "er"), and k600 (name "er") parameters.
+      #'   Named vector of values to use for GPP (named "dailyGPP"),
+      #'   ER (named "dailyER"), and k600 (name "k600") parameters.
       #'   Parameters with missing names will not be translated.
       #'   Any additional elements will be ignored.
       #'

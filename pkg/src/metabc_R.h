@@ -160,7 +160,11 @@ extern "C"
       SEXP ratioDicCResp,
       SEXP initialDIC,
       SEXP pCO2air,
-      SEXP alkalinity
+      SEXP alkalinity,
+      SEXP gwDICEnable,
+      SEXP gwAlpha,
+      SEXP gwDO,
+      SEXP gwDIC
    );
 
    SEXP MetabDoDic_setRatioDoCFix(SEXP baseExternalPointer, SEXP value);
@@ -204,7 +208,11 @@ extern "C"
       SEXP upstreamDIC,
       SEXP pCO2air,
       SEXP upstreamAlkalinity,
-      SEXP downstreamAlkalinity
+      SEXP downstreamAlkalinity,
+      SEXP gwDICEnable,
+      SEXP gwAlpha,
+      SEXP gwDO,
+      SEXP gwDIC
    );
 
    SEXP MetabLagrangeDoDic_setRatioDoCFix(SEXP baseExternalPointer, SEXP value);
