@@ -22,6 +22,10 @@ CMetabLagrangeOptim <- R6Class(
       #'   The intial parameter values to use for the MLE algorithm
       initParams = NULL,
 
+      #' @field fixedParams
+      #'   A named list of values for non-estimated parameters
+      fixedParams = NULL,
+
       #' @field objFunc
       #'   The objective function to use with optim for the inference
       objFunc = NULL,
@@ -126,6 +130,8 @@ CMetabLagrangeOptim <- R6Class(
       #'   See \link{TransferFunctionDerivation} for documentation on these parameters
       #' @param initParams
       #'   The intial parameter values to use for the MLE algorithm
+      #' @param fixedParams
+      #'   An optional named list of values for non-estimated parameters
       #' @param objFunc
       #'   The objective function to use with optim for the inference
       #' @param modelType
@@ -180,6 +186,7 @@ CMetabLagrangeOptim <- R6Class(
       (
          ...,
          initParams,
+         fixedParams = NULL,
          objFunc,
          modelType = "CNOneStep",
          useDO,
@@ -208,6 +215,7 @@ CMetabLagrangeOptim <- R6Class(
          super$initialize(...);
 
          self$initParams <- initParams;
+         self$fixedParams <- fixedParams;
          self$objFunc <- objFunc;
          self$modelType <- modelType;
          self$useDO <- useDO;
@@ -260,9 +268,25 @@ CMetabLagrangeOptim <- R6Class(
          signalIn = NULL,
          signalOut = NULL,
          prevResults = NULL,
-         path
+         path,
+         index
       )
       {
+         dailyGPP <- self$initParams["dailyGPP"];
+         dailyER <- self$initParams["dailyER"];
+         k600 <- self$initParams["k600"];
+         if(!is.null(self$fixedParams)) {
+            if(!is.null(self$fixedParams$dailyGPP)) {
+               dailyGPP <- self$fixedParams$dailyGPP[index];
+            }
+            if(!is.null(self$fixedParams$dailyER)) {
+               dailyER <- self$fixedParams$dailyER[index];
+            }
+            if(!is.null(self$fixedParams$k600)) {
+               k600 <- self$fixedParams$k600[index];
+            }
+         }
+
          if(!is.null(signalIn)) {
             self$signalIn <- signalIn;
          } else {
@@ -307,9 +331,9 @@ CMetabLagrangeOptim <- R6Class(
          if(!self$usepCO2) {
             model <- CMetabLagrangeDo$new(
                type = self$modelType,
-               dailyGPP = self$initParams["dailyGPP"],
-               dailyER = self$initParams["dailyER"],
-               k600 = self$initParams["k600"],
+               dailyGPP = dailyGPP,
+               dailyER = dailyER,
+               k600 = k600,
                upstreamDO = upstreamDO[validIndices],
                upstreamTime = self$signalIn$getTime()[validIndices],
                downstreamTime = self$signalOut$getTime()[validIndices],
@@ -354,9 +378,9 @@ CMetabLagrangeOptim <- R6Class(
 
             model <- CMetabLagrangeDoDic$new(
                type = self$modelType,
-               dailyGPP = self$initParams["dailyGPP"],
-               dailyER = self$initParams["dailyER"],
-               k600 = self$initParams["k600"],
+               dailyGPP = dailyGPP,
+               dailyER = dailyER,
+               k600 = k600,
                upstreamDO = upstreamDO[validIndices],
                upstreamTime = self$signalIn$getTime()[validIndices],
                downstreamTime = self$signalOut$getTime()[validIndices],

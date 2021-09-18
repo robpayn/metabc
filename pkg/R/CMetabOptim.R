@@ -25,6 +25,10 @@ CMetabOptim <- R6Class(
       #'   The intial parameter values to use for the MLE algorithm
       initParams = NULL,
 
+      #' @field fixedParams
+      #'   A named list of values for non-estimated parameters
+      fixedParams = NULL,
+
       #' @field objFunc
       #'   The objective function to use with optim for the inference
       objFunc = NULL,
@@ -128,6 +132,8 @@ CMetabOptim <- R6Class(
       #'   See \link{CMetabOptim} for documentation on these parameters
       #' @param initParams
       #'   The intial parameter values to use for the MLE algorithm
+      #' @param fixedParams
+      #'   An optional named list of values for non-estimated parameters
       #' @param objFunc
       #'   The objective function to use with optim for the inference
       #' @param modelType
@@ -182,6 +188,7 @@ CMetabOptim <- R6Class(
       (
          ...,
          initParams,
+         fixedParams = NULL,
          objFunc,
          modelType = "ForwardEuler",
          useDO,
@@ -210,6 +217,7 @@ CMetabOptim <- R6Class(
          super$initialize(...);
 
          self$initParams <- initParams;
+         self$fixedParams <- fixedParams;
          self$objFunc <- objFunc;
          self$modelType <- modelType;
          self$useDO <- useDO;
@@ -254,9 +262,26 @@ CMetabOptim <- R6Class(
       (
          signal = NULL,
          prevResults = NULL,
-         path
+         path,
+         index
       )
       {
+
+         dailyGPP <- self$initParams["dailyGPP"];
+         dailyER <- self$initParams["dailyER"];
+         k600 <- self$initParams["k600"];
+         if(!is.null(self$fixedParams)) {
+            if(!is.null(self$fixedParams$dailyGPP)) {
+               dailyGPP <- self$fixedParams$dailyGPP[index];
+            }
+            if(!is.null(self$fixedParams$dailyER)) {
+               dailyER <- self$fixedParams$dailyER[index];
+            }
+            if(!is.null(self$fixedParams$k600)) {
+               k600 <- self$fixedParams$k600[index];
+            }
+         }
+
          if(!is.null(signal)) {
             self$signal <- signal;
          } else {
@@ -289,9 +314,9 @@ CMetabOptim <- R6Class(
          if(!self$usepCO2) {
             model <- CMetabDo$new(
                type = self$modelType,
-               dailyGPP = self$initParams["dailyGPP"],
-               dailyER = self$initParams["dailyER"],
-               k600 = self$initParams["k600"],
+               dailyGPP = dailyGPP,
+               dailyER = dailyER,
+               k600 = k600,
                initialDO = self$signal$getVariable(self$doHeader)[1],
                time = self$signal$getTime(),
                temp = self$signal$getVariable(self$tempHeader),
@@ -304,9 +329,9 @@ CMetabOptim <- R6Class(
             dicobs <- dicobs[is.finite(dicobs)];
             model <- CMetabDoDic$new(
                type = self$modelType,
-               dailyGPP = self$initParams["dailyGPP"],
-               dailyER = self$initParams["dailyER"],
-               k600 = self$initParams["k600"],
+               dailyGPP = dailyGPP,
+               dailyER = dailyER,
+               k600 = k600,
                initialDO = self$signal$getVariable(self$doHeader)[1],
                time = self$signal$getTime(),
                temp = self$signal$getVariable(self$tempHeader),
