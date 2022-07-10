@@ -6,3 +6,5 @@ pkg/.Rproj.user
 pkg/.Rhistory
 pkg/.RData
 pkg/.Ruserdata
+pkg/src/*.o
+pkg/src/*.dll
