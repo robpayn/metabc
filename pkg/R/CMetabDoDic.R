@@ -3,7 +3,7 @@
 #' @importFrom R6 R6Class
 #' @useDynLib metabc
 
-# Class CMatabDo ####
+# R6 Class CMetabDoDic ####
 
 #' @export
 #'
@@ -22,7 +22,7 @@ CMetabDoDic <- R6Class(
    inherit = CMetab,
    public = list(
 
-      # Class CMatabDo: Attributes ####
+      ## Attributes ####
 
       #' @field type
       #'   A character string indicating type of solution used.
@@ -98,7 +98,7 @@ CMetabDoDic <- R6Class(
       #'   values are to be simulated
       alkalinity = NULL,
 
-      # Class CMatabDo: Methods ####
+      ## Method: constructor ####
 
       #' @description
       #'   Constructs an object that is a new instance of the class
@@ -264,6 +264,8 @@ CMetabDoDic <- R6Class(
          )
       },
 
+      ## Method: finalize ####
+
       #' @description
       #'   Calls the R wrapper of the destructor of the
       #'   underlying C object to release memory.
@@ -279,6 +281,8 @@ CMetabDoDic <- R6Class(
             self$pointers$modelExternalPointer
          )
       },
+
+      ## Method: run ####
 
       #' @description
       #'   Runs a simulation based on parameters and driving data
@@ -304,6 +308,8 @@ CMetabDoDic <- R6Class(
          );
          return(self$output);
       },
+
+      ## Method: setMetabDoDicParam ####
 
       #' @description
       #'   Sets one of the DO or DIC related model parameters to a new value.

@@ -2,12 +2,14 @@
 % Please edit documentation in R/CMetab.R
 \name{CMetab}
 \alias{CMetab}
-\title{Time series DO metabolism model based on C++ implementation}
+\title{C++ model of aqueous metabolism influence on oxygen}
 \description{
-Abstract class defining the base functionality of a metabolism
-  model in aquatic systems.
+Abstract class (should not be instantiated on its own) defining
+  the base functionality of a metabolism model in aquatic systems.
 
-  Implementation of models derived from this class is provided by C++ objects.
+  Implementations of models derived from this class are provided
+  by C++ objects. See \link{CMetabDo} as an example of a fully
+  functional implementation of this abstraction.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -38,7 +40,7 @@ Runs a simulation based on parameters and driving data
 }
 
 \subsection{Returns}{
-The SEXP object returned by the call to the C++ method
+The S expression object returned by the call to the C++ method
 }
 }
 \if{html}{\out{<hr>}}

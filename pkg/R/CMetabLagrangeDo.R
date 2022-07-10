@@ -3,7 +3,7 @@
 #' @importFrom R6 R6Class
 #' @useDynLib metabc
 
-# Class CMatabLagrangeDo ####
+# Class CMetabLagrangeDo ####
 
 #' @export
 #'
@@ -22,7 +22,7 @@ CMetabLagrangeDo <- R6Class(
    inherit = CMetab,
    public = list(
 
-      # Class CMatabLagrangeDo: attributes ####
+      ## Attributes ####
 
       #' @field type
       #'   A character string indicating type of solution used.
@@ -94,7 +94,7 @@ CMetabLagrangeDo <- R6Class(
       #'   }
       output = NULL,
 
-      # Class CMatabLagrangeDo: methods ####
+      ## Method: constructor ####
 
       #' @description
       #'   Constructs an object that is a new instance of the class
@@ -252,6 +252,8 @@ CMetabLagrangeDo <- R6Class(
          )
       },
 
+      ## Method: finalize ####
+
       #' @description
       #'   Calls the R wrapper of the destructor of the
       #'   underlying C object to release memory.
@@ -267,6 +269,8 @@ CMetabLagrangeDo <- R6Class(
             self$pointers$modelExternalPointer
          )
       },
+
+      ## Method: run ####
 
       #' @description
       #'   Runs a simulation based on parameters and driving data
@@ -292,6 +296,7 @@ CMetabLagrangeDo <- R6Class(
          return(self$output);
       },
 
+      ## Method: setMetabLagrangeDoParam ####
       #' @description
       #'   Sets one of the DO related model parameters to a new value.
       #'

@@ -3,31 +3,33 @@
 #' @importFrom R6 R6Class
 #' @useDynLib metabc
 
-# Class CMatab ####
+# R6 Class CMetab ####
 
 #' @export
 #'
 #' @title
-#'   Time series DO metabolism model based on C++ implementation
+#'   C++ model of aqueous metabolism influence on oxygen
 #'
 #' @description
-#'   Abstract class defining the base functionality of a metabolism
-#'   model in aquatic systems.
+#'   Abstract class (should not be instantiated on its own) defining
+#'   the base functionality of a metabolism model in aquatic systems.
 #'
-#'   Implementation of models derived from this class is provided by C++ objects.
+#'   Implementations of models derived from this class are provided
+#'   by C++ objects. See \link{CMetabDo} as an example of a fully
+#'   functional implementation of this abstraction.
 #'
 CMetab <- R6Class(
    classname = "CMetab",
    public = list(
 
-      # Class CMetab: Attributes ####
+      ## Attributes ####
 
       #' @field pointers
       #'   A list of external pointers to the C++ objects associated with
       #'   implementing the features of the model.
       pointers = NULL,
 
-      # Call CMetab: Methods ####
+      ## Method: run ####
 
       #' @description
       #'   Runs a simulation based on parameters and driving data
@@ -36,7 +38,7 @@ CMetab <- R6Class(
       #'   as a convenience.
       #'
       #' @return
-      #'   The SEXP object returned by the call to the C++ method
+      #'   The S expression object returned by the call to the C++ method
       #'
       run = function()
       {
@@ -45,6 +47,8 @@ CMetab <- R6Class(
             self$pointers$metabExternalPointer
          );
       },
+
+      ## Method: setMetabParam ####
 
       #' @description
       #'   Sets one of the model parameters to a new value.

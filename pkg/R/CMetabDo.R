@@ -4,7 +4,7 @@
 #' @useDynLib metabc
 
 
-# Class CMatabDo ####
+# R6 Class CMetabDo ####
 
 #' @export
 #'
@@ -23,7 +23,7 @@ CMetabDo <- R6Class(
    inherit = CMetab,
    public = list(
 
-      # Class CMatabDo: attributes ####
+      ## Attributes ####
 
       #' @field type
       #'   A character string indicating type of solution used.
@@ -80,7 +80,7 @@ CMetabDo <- R6Class(
       #'   }
       output = NULL,
 
-      # Class CMatabDo: methods ####
+      ## Method: constructor ####
 
       #' @description
       #'   Constructs an object that is a new instance of the class
@@ -203,6 +203,8 @@ CMetabDo <- R6Class(
          )
       },
 
+      ## Method: finalize ####
+
       #' @description
       #'   Calls the R wrapper of the destructor of the
       #'   underlying C object to release memory.
@@ -218,6 +220,8 @@ CMetabDo <- R6Class(
             self$pointers$modelExternalPointer
          )
       },
+
+      ## Method: run ####
 
       #' @description
       #'   Runs a simulation based on parameters and driving data
@@ -242,6 +246,8 @@ CMetabDo <- R6Class(
          );
          return(self$output);
       },
+
+      ## Method: setMetabDoParam ####
 
       #' @description
       #'   Sets one of the DO related model parameters to a new value.

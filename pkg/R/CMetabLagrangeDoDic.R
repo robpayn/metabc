@@ -3,7 +3,7 @@
 #' @importFrom R6 R6Class
 #' @useDynLib metabc
 
-# Class CMatabLagrangeDoDic ####
+# R6 Class CMetabLagrangeDoDic ####
 
 #' @export
 #'
@@ -22,7 +22,7 @@ CMetabLagrangeDoDic <- R6Class(
    inherit = CMetab,
    public = list(
 
-      # Class CMatabLagrangeDoDic: attributes ####
+      ## Attributes ####
 
       #' @field type
       #'   A character string indicating type of solution used.
@@ -88,7 +88,7 @@ CMetabLagrangeDoDic <- R6Class(
       #'   }
       output = NULL,
 
-      # Class CMatabLagrangeDoDic: methods ####
+      ## Method: constructor ####
 
       #' @description
       #'    Constructs an object that is a new instance of the class
@@ -293,6 +293,8 @@ CMetabLagrangeDoDic <- R6Class(
          )
       },
 
+      ## Method: finalize ####
+
       #' @description
       #'   Calls the R wrapper of the destructor of the
       #'   underlying C object to release memory.
@@ -308,6 +310,8 @@ CMetabLagrangeDoDic <- R6Class(
             self$pointers$modelExternalPointer
          )
       },
+
+      ## Method: run ####
 
       #' @description
       #'   Runs a simulation based on parameters and driving data
@@ -333,6 +337,8 @@ CMetabLagrangeDoDic <- R6Class(
          );
          return(self$output);
       },
+
+      ## Method: setMetabLagrangeDoDicParam ####
 
       #' @description
       #'   Sets one of the DO or DIC related model parameters to a new value.
