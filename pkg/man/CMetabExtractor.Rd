@@ -27,22 +27,22 @@ Extracts parameters used from metabolism models
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{CMetabExtractor$new()}}
-\item \href{#method-open}{\code{CMetabExtractor$open()}}
-\item \href{#method-summarize}{\code{CMetabExtractor$summarize()}}
-\item \href{#method-close}{\code{CMetabExtractor$close()}}
-\item \href{#method-clone}{\code{CMetabExtractor$clone()}}
+\item \href{#method-CMetabExtractor-new}{\code{CMetabExtractor$new()}}
+\item \href{#method-CMetabExtractor-open}{\code{CMetabExtractor$open()}}
+\item \href{#method-CMetabExtractor-summarize}{\code{CMetabExtractor$summarize()}}
+\item \href{#method-CMetabExtractor-close}{\code{CMetabExtractor$close()}}
+\item \href{#method-CMetabExtractor-clone}{\code{CMetabExtractor$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-CMetabExtractor-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabExtractor-new}{}}}
 \subsection{Method \code{new()}}{
 Constructs a new instance of the class
 \subsection{Usage}{
@@ -62,8 +62,8 @@ Constructs a new instance of the class
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-open"></a>}}
-\if{latex}{\out{\hypertarget{method-open}{}}}
+\if{html}{\out{<a id="method-CMetabExtractor-open"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabExtractor-open}{}}}
 \subsection{Method \code{open()}}{
 Prepare to write the summary file
 \subsection{Usage}{
@@ -82,8 +82,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-summarize"></a>}}
-\if{latex}{\out{\hypertarget{method-summarize}{}}}
+\if{html}{\out{<a id="method-CMetabExtractor-summarize"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabExtractor-summarize}{}}}
 \subsection{Method \code{summarize()}}{
 Collects the data for the summary
 \subsection{Usage}{
@@ -108,8 +108,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-close"></a>}}
-\if{latex}{\out{\hypertarget{method-close}{}}}
+\if{html}{\out{<a id="method-CMetabExtractor-close"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabExtractor-close}{}}}
 \subsection{Method \code{close()}}{
 Closes the summary output
 \subsection{Usage}{
@@ -121,8 +121,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CMetabExtractor-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabExtractor-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

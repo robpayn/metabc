@@ -14,21 +14,21 @@ A parameter translator allowing GPP, ER, and k600 to be used
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-translate}{\code{ParameterTranslatorMetabc$translate()}}
-\item \href{#method-clone}{\code{ParameterTranslatorMetabc$clone()}}
+\item \href{#method-ParameterTranslatorMetabc-translate}{\code{ParameterTranslatorMetabc$translate()}}
+\item \href{#method-ParameterTranslatorMetabc-clone}{\code{ParameterTranslatorMetabc$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="inferno" data-topic="ParameterTranslator" data-id="initialize">}\href{../../inferno/html/ParameterTranslator.html#method-initialize}{\code{inferno::ParameterTranslator$initialize()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="inferno" data-topic="ParameterTranslator" data-id="setModel">}\href{../../inferno/html/ParameterTranslator.html#method-setModel}{\code{inferno::ParameterTranslator$setModel()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="inferno" data-topic="ParameterTranslator" data-id="initialize"><a href='../../inferno/html/ParameterTranslator.html#method-ParameterTranslator-initialize'><code>inferno::ParameterTranslator$initialize()</code></a></li>
+<li><span class="pkg-link" data-pkg="inferno" data-topic="ParameterTranslator" data-id="setModel"><a href='../../inferno/html/ParameterTranslator.html#method-ParameterTranslator-setModel'><code>inferno::ParameterTranslator$setModel()</code></a></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-translate"></a>}}
-\if{latex}{\out{\hypertarget{method-translate}{}}}
+\if{html}{\out{<a id="method-ParameterTranslatorMetabc-translate"></a>}}
+\if{latex}{\out{\hypertarget{method-ParameterTranslatorMetabc-translate}{}}}
 \subsection{Method \code{translate()}}{
 Used to translate 3 parameters in the order of
   gross primary production, ecosystem respiration,
@@ -40,8 +40,8 @@ Used to translate 3 parameters in the order of
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{params}}{Named vector of values to use for GPP (named "gpp"),
-ER (named "er"), and k600 (name "er") parameters.
+\item{\code{params}}{Named vector of values to use for GPP (named "dailyGPP"),
+ER (named "dailyER"), and k600 (name "k600") parameters.
 Parameters with missing names will not be translated.
 Any additional elements will be ignored.}
 }
@@ -52,8 +52,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-ParameterTranslatorMetabc-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-ParameterTranslatorMetabc-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

@@ -14,6 +14,8 @@ Basic MLE inference for two station stream metabolism
 \describe{
 \item{\code{initParams}}{The intial parameter values to use for the MLE algorithm}
 
+\item{\code{fixedParams}}{A named list of values for non-estimated parameters}
+
 \item{\code{objFunc}}{The objective function to use with optim for the inference}
 
 \item{\code{modelType}}{Character string representing the type of model calculation to use}
@@ -53,13 +55,13 @@ channel turnover rate due to inflowing groundwater.}
 
 \item{\code{staticAlkalinity}}{The alkalinity.}
 
-\item{\code{staticGwpCO2}}{Static value for pCO2 groundwater}
+\item{\code{staticGwDIC}}{Static value for DIC in groundwater}
 
 \item{\code{co2AirHeader}}{Character string representing the header for co2 partial pressure in air to use.}
 
 \item{\code{alkalinityHeader}}{Character string representing the header for alkalinity to use.}
 
-\item{\code{gwpCO2Header}}{Character string representing the header for pCO2 groundwater}
+\item{\code{gwDICHeader}}{Character string representing the header for DIC in groundwater}
 
 \item{\code{optimArgs}}{A list representing arguments to pass to optim}
 }
@@ -68,26 +70,27 @@ channel turnover rate due to inflowing groundwater.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{CMetabLagrangeOptim$new()}}
-\item \href{#method-derive}{\code{CMetabLagrangeOptim$derive()}}
-\item \href{#method-clone}{\code{CMetabLagrangeOptim$clone()}}
+\item \href{#method-CMetabLagrangeOptim-new}{\code{CMetabLagrangeOptim$new()}}
+\item \href{#method-CMetabLagrangeOptim-derive}{\code{CMetabLagrangeOptim$derive()}}
+\item \href{#method-CMetabLagrangeOptim-clone}{\code{CMetabLagrangeOptim$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangeOptim-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangeOptim-new}{}}}
 \subsection{Method \code{new()}}{
 Initializes a new object of the class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CMetabLagrangeOptim$new(
   ...,
   initParams,
+  fixedParams = NULL,
   objFunc,
   modelType = "CNOneStep",
   useDO,
@@ -105,11 +108,11 @@ Initializes a new object of the class.
   staticAlkalinity = NULL,
   alkalinityHeader = "alkalinity",
   staticGwAlpha = NULL,
-  gwAlphaHeader = "gwAlpha",
+  gwAlphaHeader = NULL,
   staticGwDO = NULL,
-  gwDOHeader = "gwDO",
-  staticGwpCO2 = NULL,
-  gwpCO2Header = "gwpCO2",
+  gwDOHeader = NULL,
+  staticGwDIC = NULL,
+  gwDICHeader = NULL,
   optimArgs = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -121,6 +124,8 @@ Initializes a new object of the class.
 See \link{TransferFunctionDerivation} for documentation on these parameters}
 
 \item{\code{initParams}}{The intial parameter values to use for the MLE algorithm}
+
+\item{\code{fixedParams}}{An optional named list of values for non-estimated parameters}
 
 \item{\code{objFunc}}{The objective function to use with optim for the inference}
 
@@ -156,18 +161,33 @@ value will prevent pCO2 from being used in analysis.}
 
 \item{\code{alkalinityHeader}}{Character string representing the header for alkalinity to use.}
 
-\item{\code{staticGwAlpha}}{Static value for the channel turnover rate due to inflowing groundwater}
+\item{\code{staticGwAlpha}}{Static value for the channel turnover rate due to inflowing groundwater.
+Default value is NULL, meaning values will be taken from the
+variable specified by gwAlphaHeader in the output signal.}
 
 \item{\code{gwAlphaHeader}}{Character string representing the header for
-channel turnover rate due to inflowing groundwater.}
+channel turnover rate due to inflowing groundwater.
+Default value is NULL.
+When both static value and header are NULL, simulation of
+groundwater influence is disabled.}
 
-\item{\code{staticGwDO}}{Static value for DO concentration in inflowing groundwater}
+\item{\code{staticGwDO}}{Static value for DO concentration in inflowing groundwater.
+Default value is NULL, meaning values will be taken from the
+variable specified by gwDOHeader in the output signal.}
 
-\item{\code{gwDOHeader}}{Character string representing the header for DO in inflowing groundwater}
+\item{\code{gwDOHeader}}{Character string representing the header for DO in inflowing groundwater
+Default value is NULL.
+When both static value and header are NULL, simulation of
+groundwater influence is disabled.}
 
-\item{\code{staticGwpCO2}}{Static value for pCO2 groundwater}
+\item{\code{staticGwDIC}}{Static value for DIC in groundwater.
+Default value is NULL, meaning values will be taken from the
+variable specified by gwDICHeader in the output signal.}
 
-\item{\code{gwpCO2Header}}{Character string representing the header for pCO2 groundwater}
+\item{\code{gwDICHeader}}{Character string representing the header for DIC in groundwater
+Default value is NULL.
+When both static value and header are NULL, simulation of
+groundwater influence is disabled.}
 
 \item{\code{optimArgs}}{A list representing arguments to pass to optim}
 }
@@ -175,8 +195,8 @@ channel turnover rate due to inflowing groundwater.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-derive"></a>}}
-\if{latex}{\out{\hypertarget{method-derive}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangeOptim-derive"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangeOptim-derive}{}}}
 \subsection{Method \code{derive()}}{
 Uses a two-station model to infer whole-stream metabolism and
   gas exchange parameters from an upstream and downstream signal.
@@ -185,7 +205,8 @@ Uses a two-station model to infer whole-stream metabolism and
   signalIn = NULL,
   signalOut = NULL,
   prevResults = NULL,
-  path
+  path,
+  index
 )}\if{html}{\out{</div>}}
 }
 
@@ -199,6 +220,9 @@ Uses a two-station model to infer whole-stream metabolism and
 \item{\code{prevResults}}{The results from the previous inference}
 
 \item{\code{path}}{The path to where the results should be written}
+
+\item{\code{index}}{The index of the row of the data frame to use for any fixed
+parameter values.}
 }
 \if{html}{\out{</div>}}
 }
@@ -211,8 +235,8 @@ The two-element list containint the results of the MLE.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangeOptim-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangeOptim-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

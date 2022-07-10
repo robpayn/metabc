@@ -27,22 +27,22 @@ Extracts parameters used from metabolism models
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{CMetabLagrangeExtractor$new()}}
-\item \href{#method-open}{\code{CMetabLagrangeExtractor$open()}}
-\item \href{#method-summarize}{\code{CMetabLagrangeExtractor$summarize()}}
-\item \href{#method-close}{\code{CMetabLagrangeExtractor$close()}}
-\item \href{#method-clone}{\code{CMetabLagrangeExtractor$clone()}}
+\item \href{#method-CMetabLagrangeExtractor-new}{\code{CMetabLagrangeExtractor$new()}}
+\item \href{#method-CMetabLagrangeExtractor-open}{\code{CMetabLagrangeExtractor$open()}}
+\item \href{#method-CMetabLagrangeExtractor-summarize}{\code{CMetabLagrangeExtractor$summarize()}}
+\item \href{#method-CMetabLagrangeExtractor-close}{\code{CMetabLagrangeExtractor$close()}}
+\item \href{#method-CMetabLagrangeExtractor-clone}{\code{CMetabLagrangeExtractor$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangeExtractor-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangeExtractor-new}{}}}
 \subsection{Method \code{new()}}{
 Constructs a new instance of the class
 \subsection{Usage}{
@@ -66,8 +66,8 @@ Constructs a new instance of the class
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-open"></a>}}
-\if{latex}{\out{\hypertarget{method-open}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangeExtractor-open"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangeExtractor-open}{}}}
 \subsection{Method \code{open()}}{
 Prepare to write the summary file
 \subsection{Usage}{
@@ -86,8 +86,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-summarize"></a>}}
-\if{latex}{\out{\hypertarget{method-summarize}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangeExtractor-summarize"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangeExtractor-summarize}{}}}
 \subsection{Method \code{summarize()}}{
 Collects the data for the summary
 \subsection{Usage}{
@@ -120,8 +120,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-close"></a>}}
-\if{latex}{\out{\hypertarget{method-close}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangeExtractor-close"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangeExtractor-close}{}}}
 \subsection{Method \code{close()}}{
 Closes the summary output
 \subsection{Usage}{
@@ -133,8 +133,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangeExtractor-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangeExtractor-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

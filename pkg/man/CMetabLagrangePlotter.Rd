@@ -42,22 +42,22 @@ panel on legend.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{CMetabLagrangePlotter$new()}}
-\item \href{#method-open}{\code{CMetabLagrangePlotter$open()}}
-\item \href{#method-summarize}{\code{CMetabLagrangePlotter$summarize()}}
-\item \href{#method-clone}{\code{CMetabLagrangePlotter$clone()}}
+\item \href{#method-CMetabLagrangePlotter-new}{\code{CMetabLagrangePlotter$new()}}
+\item \href{#method-CMetabLagrangePlotter-open}{\code{CMetabLagrangePlotter$open()}}
+\item \href{#method-CMetabLagrangePlotter-summarize}{\code{CMetabLagrangePlotter$summarize()}}
+\item \href{#method-CMetabLagrangePlotter-clone}{\code{CMetabLagrangePlotter$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="disco" data-topic="TransferFunctionPlotter" data-id="close">}\href{../../disco/html/TransferFunctionPlotter.html#method-close}{\code{disco::TransferFunctionPlotter$close()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="disco" data-topic="TransferFunctionPlotter" data-id="close"><a href='../../disco/html/TransferFunctionPlotter.html#method-TransferFunctionPlotter-close'><code>disco::TransferFunctionPlotter$close()</code></a></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangePlotter-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangePlotter-new}{}}}
 \subsection{Method \code{new()}}{
 Construct a new instance of the class.
 \subsection{Usage}{
@@ -166,8 +166,8 @@ See defaults in usage.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-open"></a>}}
-\if{latex}{\out{\hypertarget{method-open}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangePlotter-open"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangePlotter-open}{}}}
 \subsection{Method \code{open()}}{
 Opens the pdf for writing the plots
 \subsection{Usage}{
@@ -186,8 +186,8 @@ No defined return value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-summarize"></a>}}
-\if{latex}{\out{\hypertarget{method-summarize}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangePlotter-summarize"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangePlotter-summarize}{}}}
 \subsection{Method \code{summarize()}}{
 Summarize the data in a two panel visualization
 \subsection{Usage}{
@@ -221,8 +221,8 @@ No defined return value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CMetabLagrangePlotter-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabLagrangePlotter-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

@@ -23,21 +23,21 @@ A prediction extractor allowing dissolved oxygen outputs
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{PredictionExtractorMetabc$new()}}
-\item \href{#method-extract}{\code{PredictionExtractorMetabc$extract()}}
-\item \href{#method-clone}{\code{PredictionExtractorMetabc$clone()}}
+\item \href{#method-PredictionExtractorMetabc-new}{\code{PredictionExtractorMetabc$new()}}
+\item \href{#method-PredictionExtractorMetabc-extract}{\code{PredictionExtractorMetabc$extract()}}
+\item \href{#method-PredictionExtractorMetabc-clone}{\code{PredictionExtractorMetabc$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="inferno" data-topic="PredictionExtractor" data-id="setModel">}\href{../../inferno/html/PredictionExtractor.html#method-setModel}{\code{inferno::PredictionExtractor$setModel()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="inferno" data-topic="PredictionExtractor" data-id="setModel"><a href='../../inferno/html/PredictionExtractor.html#method-PredictionExtractor-setModel'><code>inferno::PredictionExtractor$setModel()</code></a></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-PredictionExtractorMetabc-new"></a>}}
+\if{latex}{\out{\hypertarget{method-PredictionExtractorMetabc-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new instance of the class with provided values for
   extraction flags
@@ -61,8 +61,8 @@ A new instance of the class
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-extract"></a>}}
-\if{latex}{\out{\hypertarget{method-extract}{}}}
+\if{html}{\out{<a id="method-PredictionExtractorMetabc-extract"></a>}}
+\if{latex}{\out{\hypertarget{method-PredictionExtractorMetabc-extract}{}}}
 \subsection{Method \code{extract()}}{
 Used to extract dissolved oxygen predictions from a metabolism model
 \subsection{Usage}{
@@ -74,8 +74,8 @@ A data frame with a single column of DO data
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-PredictionExtractorMetabc-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-PredictionExtractorMetabc-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

@@ -5,6 +5,8 @@
 #' @importFrom R6 R6Class
 NULL
 
+# R6 Class CMetabLagrangeOptim ####
+
 #' @export
 #'
 #' @title
@@ -17,6 +19,8 @@ CMetabLagrangeOptim <- R6Class(
    classname = "CMetabLagrangeOptim",
    inherit = disco::TransferFunctionDerivation,
    public = list(
+
+      ## Attributes ####
 
       #' @field initParams
       #'   The intial parameter values to use for the MLE algorithm
@@ -121,6 +125,8 @@ CMetabLagrangeOptim <- R6Class(
       #'   A list representing arguments to pass to optim
       optimArgs = NULL,
 
+
+      ## Method: constructor ####
 
       #' @description
       #'   Initializes a new object of the class.
@@ -256,7 +262,8 @@ CMetabLagrangeOptim <- R6Class(
          self$optimArgs = optimArgs;
       },
 
-      # Method TwoStationMetabMLE$derive ####
+      ## Method: derive ####
+
       #
       #' @description
       #'   Uses a two-station model to infer whole-stream metabolism and
@@ -270,6 +277,9 @@ CMetabLagrangeOptim <- R6Class(
       #'   The results from the previous inference
       #' @param path
       #'   The path to where the results should be written
+      #' @param index
+      #'   The index of the row of the data frame to use for any fixed
+      #'   parameter values.
       #'
       #' @return
       #'   The two-element list containint the results of the MLE.

@@ -17,6 +17,8 @@ Processes a signal of DO and pCO2 data
 \describe{
 \item{\code{initParams}}{The intial parameter values to use for the MLE algorithm}
 
+\item{\code{fixedParams}}{A named list of values for non-estimated parameters}
+
 \item{\code{objFunc}}{The objective function to use with optim for the inference}
 
 \item{\code{modelType}}{Character string representing the type of model calculation to use}
@@ -56,13 +58,13 @@ channel turnover rate due to inflowing groundwater.}
 
 \item{\code{staticAlkalinity}}{The alkalinity.}
 
-\item{\code{staticGwpCO2}}{Static value for pCO2 groundwater}
+\item{\code{staticGwDIC}}{Static value for DIC in groundwater}
 
 \item{\code{co2AirHeader}}{Character string representing the header for co2 partial pressure in air to use.}
 
 \item{\code{alkalinityHeader}}{Character string representing the header for alkalinity to use.}
 
-\item{\code{gwpCO2Header}}{Character string representing the header for pCO2 groundwater}
+\item{\code{gwDICHeader}}{Character string representing the header for DIC in groundwater}
 
 \item{\code{optimArgs}}{A list representing arguments to pass to optim}
 }
@@ -71,26 +73,27 @@ channel turnover rate due to inflowing groundwater.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{CMetabOptim$new()}}
-\item \href{#method-derive}{\code{CMetabOptim$derive()}}
-\item \href{#method-clone}{\code{CMetabOptim$clone()}}
+\item \href{#method-CMetabOptim-new}{\code{CMetabOptim$new()}}
+\item \href{#method-CMetabOptim-derive}{\code{CMetabOptim$derive()}}
+\item \href{#method-CMetabOptim-clone}{\code{CMetabOptim$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-CMetabOptim-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabOptim-new}{}}}
 \subsection{Method \code{new()}}{
 Initializes a new object of the class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CMetabOptim$new(
   ...,
   initParams,
+  fixedParams = NULL,
   objFunc,
   modelType = "ForwardEuler",
   useDO,
@@ -108,11 +111,11 @@ Initializes a new object of the class.
   staticAlkalinity = NULL,
   alkalinityHeader = "alkalinity",
   staticGwAlpha = NULL,
-  gwAlphaHeader = "gwAlpha",
+  gwAlphaHeader = NULL,
   staticGwDO = NULL,
-  gwDOHeader = "gwDO",
-  staticGwpCO2 = NULL,
-  gwpCO2Header = "gwpCO2",
+  gwDOHeader = NULL,
+  staticGwDIC = NULL,
+  gwDICHeader = NULL,
   optimArgs = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -123,7 +126,10 @@ Initializes a new object of the class.
 \item{\code{...}}{Parameters passed to the initialize method of the super class.
 See \link{CMetabOptim} for documentation on these parameters}
 
-\item{\code{initParams}}{The intial parameter values to use for the MLE algorithm}
+\item{\code{initParams}}{The initial parameter values to use in the MLE algorithm}
+
+\item{\code{fixedParams}}{An optional named list of values for non-estimated parameters.
+Defaults to NULL, which indicates no fixed parameters.}
 
 \item{\code{objFunc}}{The objective function to use with optim for the inference}
 
@@ -159,18 +165,33 @@ value will prevent pCO2 from being used in analysis.}
 
 \item{\code{alkalinityHeader}}{Character string representing the header for alkalinity to use.}
 
-\item{\code{staticGwAlpha}}{Static value for the channel turnover rate due to inflowing groundwater}
+\item{\code{staticGwAlpha}}{Static value for the channel turnover rate due to inflowing groundwater.
+Default value is NULL, meaning values will be taken from the
+variable specified by gwAlphaHeader in the signal.}
 
 \item{\code{gwAlphaHeader}}{Character string representing the header for
-channel turnover rate due to inflowing groundwater.}
+channel turnover rate due to inflowing groundwater.
+Default value is NULL.
+When both static value and header are NULL, simulation of
+groundwater influence is disabled.}
 
-\item{\code{staticGwDO}}{Static value for DO concentration in inflowing groundwater}
+\item{\code{staticGwDO}}{Static value for DO concentration in inflowing groundwater.
+Default value is NULL, meaning values will be taken from the
+variable specified by gwDOHeader in the signal.}
 
-\item{\code{gwDOHeader}}{Character string representing the header for DO in inflowing groundwater}
+\item{\code{gwDOHeader}}{Character string representing the header for DO in inflowing groundwater
+Default value is NULL.
+When both static value and header are NULL, simulation of
+groundwater influence is disabled.}
 
-\item{\code{staticGwpCO2}}{Static value for pCO2 groundwater}
+\item{\code{staticGwDIC}}{Static value for DIC in groundwater.
+Default value is NULL, meaning values will be taken from the
+variable specified by gwDICHeader in the signal.}
 
-\item{\code{gwpCO2Header}}{Character string representing the header for pCO2 groundwater}
+\item{\code{gwDICHeader}}{Character string representing the header for DIC in groundwater
+Default value is NULL.
+When both static value and header are NULL, simulation of
+groundwater influence is disabled.}
 
 \item{\code{optimArgs}}{A list representing arguments to pass to optim}
 }
@@ -178,13 +199,13 @@ channel turnover rate due to inflowing groundwater.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-derive"></a>}}
-\if{latex}{\out{\hypertarget{method-derive}{}}}
+\if{html}{\out{<a id="method-CMetabOptim-derive"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabOptim-derive}{}}}
 \subsection{Method \code{derive()}}{
 Performs a metabolism analysis using the minimization of a
   value from a provided objective function.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CMetabOptim$derive(signal = NULL, prevResults = NULL, path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CMetabOptim$derive(signal = NULL, prevResults = NULL, path, index)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -196,6 +217,9 @@ If null, the signal attribute will be used.}
 \item{\code{prevResults}}{If available, the results from the previous window of analysis.}
 
 \item{\code{path}}{The path to the location where the output file is written}
+
+\item{\code{index}}{The index of the row of the data frame to use for any fixed
+parameter values.}
 }
 \if{html}{\out{</div>}}
 }
@@ -204,8 +228,8 @@ The results object from the analysis
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CMetabOptim-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabOptim-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

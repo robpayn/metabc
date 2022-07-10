@@ -19,16 +19,16 @@ Provides tools for calculating activities of inorganic carbon
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{CCarbonateEq$new()}}
-\item \href{#method-finalize}{\code{CCarbonateEq$finalize()}}
-\item \href{#method-reset}{\code{CCarbonateEq$reset()}}
-\item \href{#method-optfCO2FromDICTotalAlk}{\code{CCarbonateEq$optfCO2FromDICTotalAlk()}}
-\item \href{#method-clone}{\code{CCarbonateEq$clone()}}
+\item \href{#method-CCarbonateEq-new}{\code{CCarbonateEq$new()}}
+\item \href{#method-CCarbonateEq-finalize}{\code{CCarbonateEq$finalize()}}
+\item \href{#method-CCarbonateEq-reset}{\code{CCarbonateEq$reset()}}
+\item \href{#method-CCarbonateEq-optfCO2FromDICTotalAlk}{\code{CCarbonateEq$optfCO2FromDICTotalAlk()}}
+\item \href{#method-CCarbonateEq-clone}{\code{CCarbonateEq$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-CCarbonateEq-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CCarbonateEq-new}{}}}
 \subsection{Method \code{new()}}{
 Constructs an object that is a new instance of the class
 \subsection{Usage}{
@@ -47,8 +47,8 @@ Default value is 0 (results in an ionic strength of 0)}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-finalize"></a>}}
-\if{latex}{\out{\hypertarget{method-finalize}{}}}
+\if{html}{\out{<a id="method-CCarbonateEq-finalize"></a>}}
+\if{latex}{\out{\hypertarget{method-CCarbonateEq-finalize}{}}}
 \subsection{Method \code{finalize()}}{
 Calls the R wrapper of the destructor of the
   underlying C object to release memory.
@@ -62,8 +62,8 @@ SEXP object returned by the destructor method
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-reset"></a>}}
-\if{latex}{\out{\hypertarget{method-reset}{}}}
+\if{html}{\out{<a id="method-CCarbonateEq-reset"></a>}}
+\if{latex}{\out{\hypertarget{method-CCarbonateEq-reset}{}}}
 \subsection{Method \code{reset()}}{
 Resets the calculator to a new temperature and electrical conductivity
 \subsection{Usage}{
@@ -82,8 +82,8 @@ Default value is 0 (results in an ionic strength of 0)}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-optfCO2FromDICTotalAlk"></a>}}
-\if{latex}{\out{\hypertarget{method-optfCO2FromDICTotalAlk}{}}}
+\if{html}{\out{<a id="method-CCarbonateEq-optfCO2FromDICTotalAlk"></a>}}
+\if{latex}{\out{\hypertarget{method-CCarbonateEq-optfCO2FromDICTotalAlk}{}}}
 \subsection{Method \code{optfCO2FromDICTotalAlk()}}{
 Performs an optimization calculation to estimate the partial
   pressure of carbon dioxide based on a known DIC and total
@@ -120,8 +120,8 @@ Default value is 12.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CCarbonateEq-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CCarbonateEq-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

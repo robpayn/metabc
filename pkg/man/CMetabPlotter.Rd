@@ -41,22 +41,22 @@ panel on legend.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{CMetabPlotter$new()}}
-\item \href{#method-open}{\code{CMetabPlotter$open()}}
-\item \href{#method-summarize}{\code{CMetabPlotter$summarize()}}
-\item \href{#method-clone}{\code{CMetabPlotter$clone()}}
+\item \href{#method-CMetabPlotter-new}{\code{CMetabPlotter$new()}}
+\item \href{#method-CMetabPlotter-open}{\code{CMetabPlotter$open()}}
+\item \href{#method-CMetabPlotter-summarize}{\code{CMetabPlotter$summarize()}}
+\item \href{#method-CMetabPlotter-clone}{\code{CMetabPlotter$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="disco" data-topic="SignalPlotter" data-id="close">}\href{../../disco/html/SignalPlotter.html#method-close}{\code{disco::SignalPlotter$close()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="disco" data-topic="SignalPlotter" data-id="close"><a href='../../disco/html/SignalPlotter.html#method-SignalPlotter-close'><code>disco::SignalPlotter$close()</code></a></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-CMetabPlotter-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabPlotter-new}{}}}
 \subsection{Method \code{new()}}{
 Construct a new instance of the class.
 \subsection{Usage}{
@@ -153,8 +153,8 @@ See defaults in usage.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-open"></a>}}
-\if{latex}{\out{\hypertarget{method-open}{}}}
+\if{html}{\out{<a id="method-CMetabPlotter-open"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabPlotter-open}{}}}
 \subsection{Method \code{open()}}{
 Opens the pdf for writing the plots
 \subsection{Usage}{
@@ -173,8 +173,8 @@ No defined return value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-summarize"></a>}}
-\if{latex}{\out{\hypertarget{method-summarize}{}}}
+\if{html}{\out{<a id="method-CMetabPlotter-summarize"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabPlotter-summarize}{}}}
 \subsection{Method \code{summarize()}}{
 Summarize the data in a two panel visualization
 \subsection{Usage}{
@@ -200,8 +200,8 @@ No defined return value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CMetabPlotter-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabPlotter-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

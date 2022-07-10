@@ -81,23 +81,23 @@ values are to be simulated}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{CMetabDoDic$new()}}
-\item \href{#method-finalize}{\code{CMetabDoDic$finalize()}}
-\item \href{#method-run}{\code{CMetabDoDic$run()}}
-\item \href{#method-setMetabDoDicParam}{\code{CMetabDoDic$setMetabDoDicParam()}}
-\item \href{#method-clone}{\code{CMetabDoDic$clone()}}
+\item \href{#method-CMetabDoDic-new}{\code{CMetabDoDic$new()}}
+\item \href{#method-CMetabDoDic-finalize}{\code{CMetabDoDic$finalize()}}
+\item \href{#method-CMetabDoDic-run}{\code{CMetabDoDic$run()}}
+\item \href{#method-CMetabDoDic-setMetabDoDicParam}{\code{CMetabDoDic$setMetabDoDicParam()}}
+\item \href{#method-CMetabDoDic-clone}{\code{CMetabDoDic$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="metabc" data-topic="CMetab" data-id="setMetabParam">}\href{../../metabc/html/CMetab.html#method-setMetabParam}{\code{metabc::CMetab$setMetabParam()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="metabc" data-topic="CMetab" data-id="setMetabParam"><a href='../../metabc/html/CMetab.html#method-CMetab-setMetabParam'><code>metabc::CMetab$setMetabParam()</code></a></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-CMetabDoDic-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabDoDic-new}{}}}
 \subsection{Method \code{new()}}{
 Constructs an object that is a new instance of the class
 \subsection{Usage}{
@@ -221,8 +221,8 @@ Can be a single value or a vector that provides a changing value over time.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-finalize"></a>}}
-\if{latex}{\out{\hypertarget{method-finalize}{}}}
+\if{html}{\out{<a id="method-CMetabDoDic-finalize"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabDoDic-finalize}{}}}
 \subsection{Method \code{finalize()}}{
 Calls the R wrapper of the destructor of the
   underlying C object to release memory.
@@ -236,8 +236,8 @@ SEXP object returned by the destructor method
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run"></a>}}
-\if{latex}{\out{\hypertarget{method-run}{}}}
+\if{html}{\out{<a id="method-CMetabDoDic-run"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabDoDic-run}{}}}
 \subsection{Method \code{run()}}{
 Runs a simulation based on parameters and driving data
   in the object attributes. Output will be stored in the
@@ -253,8 +253,8 @@ A named list of dataframes containing model output. See description
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-setMetabDoDicParam"></a>}}
-\if{latex}{\out{\hypertarget{method-setMetabDoDicParam}{}}}
+\if{html}{\out{<a id="method-CMetabDoDic-setMetabDoDicParam"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabDoDic-setMetabDoDicParam}{}}}
 \subsection{Method \code{setMetabDoDicParam()}}{
 Sets one of the DO or DIC related model parameters to a new value.
 \subsection{Usage}{
@@ -281,8 +281,8 @@ The previous value of the parameter
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CMetabDoDic-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabDoDic-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

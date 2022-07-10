@@ -20,14 +20,14 @@ implementing the features of the model.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-run}{\code{CMetab$run()}}
-\item \href{#method-setMetabParam}{\code{CMetab$setMetabParam()}}
-\item \href{#method-clone}{\code{CMetab$clone()}}
+\item \href{#method-CMetab-run}{\code{CMetab$run()}}
+\item \href{#method-CMetab-setMetabParam}{\code{CMetab$setMetabParam()}}
+\item \href{#method-CMetab-clone}{\code{CMetab$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run"></a>}}
-\if{latex}{\out{\hypertarget{method-run}{}}}
+\if{html}{\out{<a id="method-CMetab-run"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetab-run}{}}}
 \subsection{Method \code{run()}}{
 Runs a simulation based on parameters and driving data
   in the object attributes. Output will be stored in the
@@ -42,8 +42,8 @@ The SEXP object returned by the call to the C++ method
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-setMetabParam"></a>}}
-\if{latex}{\out{\hypertarget{method-setMetabParam}{}}}
+\if{html}{\out{<a id="method-CMetab-setMetabParam"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetab-setMetabParam}{}}}
 \subsection{Method \code{setMetabParam()}}{
 Sets one of the model parameters to a new value.
 \subsection{Usage}{
@@ -69,8 +69,8 @@ The previous value of the parameter
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CMetab-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetab-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

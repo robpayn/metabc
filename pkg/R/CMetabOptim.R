@@ -5,6 +5,8 @@
 #' @importFrom R6 R6Class
 NULL
 
+# R6 Class CMetabOptim ####
+
 #' @export
 #'
 #' @title
@@ -20,6 +22,8 @@ CMetabOptim <- R6Class(
    classname = "CMetabOptim",
    inherit = disco::SignalDerivation,
    public = list(
+
+      ## Attributes ####
 
       #' @field initParams
       #'   The intial parameter values to use for the MLE algorithm
@@ -124,6 +128,8 @@ CMetabOptim <- R6Class(
       #'   A list representing arguments to pass to optim
       optimArgs = NULL,
 
+      ## Method: constructor ####
+
       #' @description
       #'   Initializes a new object of the class.
       #'
@@ -131,9 +137,10 @@ CMetabOptim <- R6Class(
       #'   Parameters passed to the initialize method of the super class.
       #'   See \link{CMetabOptim} for documentation on these parameters
       #' @param initParams
-      #'   The intial parameter values to use for the MLE algorithm
+      #'   The initial parameter values to use in the MLE algorithm
       #' @param fixedParams
-      #'   An optional named list of values for non-estimated parameters
+      #'   An optional named list of values for non-estimated parameters.
+      #'   Defaults to NULL, which indicates no fixed parameters.
       #' @param objFunc
       #'   The objective function to use with optim for the inference
       #' @param modelType
@@ -258,6 +265,8 @@ CMetabOptim <- R6Class(
          self$optimArgs = optimArgs;
       },
 
+      ## Method: derive ####
+
       #' @description
       #'   Performs a metabolism analysis using the minimization of a
       #'   value from a provided objective function.
@@ -269,6 +278,9 @@ CMetabOptim <- R6Class(
       #'   If available, the results from the previous window of analysis.
       #' @param path
       #'   The path to the location where the output file is written
+      #' @param index
+      #'   The index of the row of the data frame to use for any fixed
+      #'   parameter values.
       #'
       #' @return
       #'   The results object from the analysis

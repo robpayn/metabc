@@ -70,23 +70,23 @@ This is a list of dataframes with the following named elements.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{CMetabDo$new()}}
-\item \href{#method-finalize}{\code{CMetabDo$finalize()}}
-\item \href{#method-run}{\code{CMetabDo$run()}}
-\item \href{#method-setMetabDoParam}{\code{CMetabDo$setMetabDoParam()}}
-\item \href{#method-clone}{\code{CMetabDo$clone()}}
+\item \href{#method-CMetabDo-new}{\code{CMetabDo$new()}}
+\item \href{#method-CMetabDo-finalize}{\code{CMetabDo$finalize()}}
+\item \href{#method-CMetabDo-run}{\code{CMetabDo$run()}}
+\item \href{#method-CMetabDo-setMetabDoParam}{\code{CMetabDo$setMetabDoParam()}}
+\item \href{#method-CMetabDo-clone}{\code{CMetabDo$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="metabc" data-topic="CMetab" data-id="setMetabParam">}\href{../../metabc/html/CMetab.html#method-setMetabParam}{\code{metabc::CMetab$setMetabParam()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="metabc" data-topic="CMetab" data-id="setMetabParam"><a href='../../metabc/html/CMetab.html#method-CMetab-setMetabParam'><code>metabc::CMetab$setMetabParam()</code></a></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-CMetabDo-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabDo-new}{}}}
 \subsection{Method \code{new()}}{
 Constructs an object that is a new instance of the class
 \subsection{Usage}{
@@ -178,8 +178,8 @@ Can be a single value or a vector that provides a changing value over time.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-finalize"></a>}}
-\if{latex}{\out{\hypertarget{method-finalize}{}}}
+\if{html}{\out{<a id="method-CMetabDo-finalize"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabDo-finalize}{}}}
 \subsection{Method \code{finalize()}}{
 Calls the R wrapper of the destructor of the
   underlying C object to release memory.
@@ -193,8 +193,8 @@ SEXP object returned by the destructor method
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run"></a>}}
-\if{latex}{\out{\hypertarget{method-run}{}}}
+\if{html}{\out{<a id="method-CMetabDo-run"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabDo-run}{}}}
 \subsection{Method \code{run()}}{
 Runs a simulation based on parameters and driving data
   in the object attributes. Output will be stored in the
@@ -210,8 +210,8 @@ A named list of dataframes containing model output. See description
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-setMetabDoParam"></a>}}
-\if{latex}{\out{\hypertarget{method-setMetabDoParam}{}}}
+\if{html}{\out{<a id="method-CMetabDo-setMetabDoParam"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabDo-setMetabDoParam}{}}}
 \subsection{Method \code{setMetabDoParam()}}{
 Sets one of the DO related model parameters to a new value.
 \subsection{Usage}{
@@ -236,8 +236,8 @@ The previous value of the parameter
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CMetabDo-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CMetabDo-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{
