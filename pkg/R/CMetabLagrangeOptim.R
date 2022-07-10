@@ -101,9 +101,9 @@ CMetabLagrangeOptim <- R6Class(
       #'   The alkalinity.
       staticAlkalinity = NULL,
 
-      #' @field staticGwpCO2
-      #'   Static value for pCO2 groundwater
-      staticGwpCO2 = NULL,
+      #' @field staticGwDIC
+      #'   Static value for DIC in groundwater
+      staticGwDIC = NULL,
 
       #' @field co2AirHeader
       #'   Character string representing the header for co2 partial pressure in air to use.
@@ -113,9 +113,9 @@ CMetabLagrangeOptim <- R6Class(
       #'   Character string representing the header for alkalinity to use.
       alkalinityHeader = NULL,
 
-      #' @field gwpCO2Header
-      #'   Character string representing the header for pCO2 groundwater
-      gwpCO2Header = NULL,
+      #' @field gwDICHeader
+      #'   Character string representing the header for DIC in groundwater
+      gwDICHeader = NULL,
 
       #' @field optimArgs
       #'   A list representing arguments to pass to optim
@@ -167,18 +167,33 @@ CMetabLagrangeOptim <- R6Class(
       #' @param alkalinityHeader
       #'   Character string representing the header for alkalinity to use.
       #' @param staticGwAlpha
-      #'   Static value for the channel turnover rate due to inflowing groundwater
+      #'   Static value for the channel turnover rate due to inflowing groundwater.
+      #'   Default value is NULL, meaning values will be taken from the
+      #'   variable specified by gwAlphaHeader in the output signal.
       #' @param gwAlphaHeader
       #'   Character string representing the header for
       #'   channel turnover rate due to inflowing groundwater.
+      #'   Default value is NULL.
+      #'   When both static value and header are NULL, simulation of
+      #'   groundwater influence is disabled.
       #' @param staticGwDO
-      #'   Static value for DO concentration in inflowing groundwater
+      #'   Static value for DO concentration in inflowing groundwater.
+      #'   Default value is NULL, meaning values will be taken from the
+      #'   variable specified by gwDOHeader in the output signal.
       #' @param gwDOHeader
       #'   Character string representing the header for DO in inflowing groundwater
-      #' @param staticGwpCO2
-      #'   Static value for pCO2 groundwater
-      #' @param gwpCO2Header
-      #'   Character string representing the header for pCO2 groundwater
+      #'   Default value is NULL.
+      #'   When both static value and header are NULL, simulation of
+      #'   groundwater influence is disabled.
+      #' @param staticGwDIC
+      #'   Static value for DIC in groundwater.
+      #'   Default value is NULL, meaning values will be taken from the
+      #'   variable specified by gwDICHeader in the output signal.
+      #' @param gwDICHeader
+      #'   Character string representing the header for DIC in groundwater
+      #'   Default value is NULL.
+      #'   When both static value and header are NULL, simulation of
+      #'   groundwater influence is disabled.
       #' @param optimArgs
       #'   A list representing arguments to pass to optim
       #'
@@ -204,11 +219,11 @@ CMetabLagrangeOptim <- R6Class(
          staticAlkalinity = NULL,
          alkalinityHeader = "alkalinity",
          staticGwAlpha = NULL,
-         gwAlphaHeader = "gwAlpha",
+         gwAlphaHeader = NULL,
          staticGwDO = NULL,
-         gwDOHeader = "gwDO",
-         staticGwpCO2 = NULL,
-         gwpCO2Header = "gwpCO2",
+         gwDOHeader = NULL,
+         staticGwDIC = NULL,
+         gwDICHeader = NULL,
          optimArgs = NULL
       )
       {
@@ -236,8 +251,8 @@ CMetabLagrangeOptim <- R6Class(
          self$gwAlphaHeader = gwAlphaHeader;
          self$staticGwDO = staticGwDO;
          self$gwDOHeader = gwDOHeader;
-         self$staticGwpCO2 = staticGwpCO2;
-         self$gwpCO2Header = gwpCO2Header;
+         self$staticGwDIC = staticGwDIC;
+         self$gwDICHeader = gwDICHeader;
          self$optimArgs = optimArgs;
       },
 
@@ -314,6 +329,29 @@ CMetabLagrangeOptim <- R6Class(
             airPressure <- self$signalOut$getVariable(self$airPressureHeader);
          }
 
+         gwDODisabled <-
+            (is.null(self$staticGwAlpha) && is.null(self$gwAlphaHeader)) ||
+            (is.null(self$staticGwDO) && is.null(self$gwDOHeader));
+         if (gwDODisabled) {
+            gwAlpha <- NA;
+            gwDO <- NA;
+         } else {
+            if (!is.null(self$staticGwAlpha)) {
+               gwAlpha <-
+                  rep(x = 0 , times = self$signalOut$getLength()) +
+                  self$staticGwAlpha;
+            } else {
+               gwAlpha <- self$signalOut$getVariable(self$gwAlphaHeader);
+            }
+            if (!is.null(self$staticGwDO)) {
+               gwDO <-
+                  rep(x = 0 , times = self$signalOut$getLength()) +
+                  self$staticGwDO;
+            } else {
+               gwDO <- self$signalOut$getVariable(self$gwDOHeader);
+            }
+         }
+
          upstreamDO <- self$signalIn$getVariable(self$doHeader);
          upstreamTemp <- self$signalIn$getVariable(self$tempHeader);
          downstreamTemp <- self$signalOut$getVariable(self$tempHeader);
@@ -342,7 +380,9 @@ CMetabLagrangeOptim <- R6Class(
                upstreamPAR = upstreamPAR[validIndices],
                downstreamPAR = downstreamPAR[validIndices],
                airPressure = airPressure[validIndices],
-               stdAirPressure = 1
+               stdAirPressure = 1,
+               gwAlpha = gwAlpha,
+               gwDO = gwDO
             );
          } else {
             upstreamDIC <- self$signalIn$getVariable(self$dicHeader);
@@ -369,6 +409,22 @@ CMetabLagrangeOptim <- R6Class(
                   self$signalOut$getVariable(self$alkalinityHeader);
             }
 
+            gwDICDisabled <-
+               gwDODisabled ||
+               (is.null(self$staticGwDIC) && is.null(self$gwDICHeader));
+            if (gwDICDisabled)
+            {
+               gwDIC <- NA;
+            } else {
+               if (!is.null(self$staticGwDIC)) {
+                  gwDIC <-
+                     rep(x = 0 , times = self$signalOut$getLength()) +
+                     self$staticGwDIC;
+               } else {
+                  gwDIC <- self$signalOut$getVariable(self$gwDICHeader);
+               }
+            }
+
             validIndices <-
                validIndices &
                is.finite(upstreamDIC) &
@@ -390,10 +446,13 @@ CMetabLagrangeOptim <- R6Class(
                downstreamPAR = downstreamPAR[validIndices],
                airPressure = airPressure[validIndices],
                stdAirPressure = 1,
+               gwAlpha = gwAlpha,
+               gwDO = gwDO,
                upstreamDIC = upstreamDIC[validIndices],
                pCO2air = co2Air[validIndices],
                upstreamAlkalinity = upstreamAlkalinity[validIndices],
-               downstreamAlkalinity = downstreamAlkalinity[validIndices]
+               downstreamAlkalinity = downstreamAlkalinity[validIndices],
+               gwDIC = gwDIC
             );
          }
 
