@@ -1,0 +1,225 @@
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+rm(list = ls())
+
+library(metabc)
+library(inferno)
+library(disco)
+
+```
+
+# Test disco optimization tools
+
+Read the data for the test.
+
+```{r}
+
+inputSignal <- readRDS(file = "./01_input/inputSignal.RData")
+outputSignal <- readRDS(file = "./01_input/outputSignal.RData")
+
+```
+
+
+
+```{r}
+
+dir.create(
+  path = "./03_incremental", 
+  showWarnings = FALSE,
+  recursive = TRUE
+)
+
+dw <- DielWindowedSignal$new(
+  signal = inputSignal,
+  path = "./03_incremental/onestation",
+  dateStart = "2022-07-13",
+  dateEnd = "2022-07-18",
+  windowStart = "00:00:00",
+  windowEnd = "00:00:00",
+  windowDays = 1,
+  "America/Denver"
+)
+
+dw$generateWindowInput(outerDir = "")
+
+dev <- dw$summarizeWindows(
+  signalSummarizer = CMetabPlotter$new(
+    fileName = "summary_input.pdf",
+    timeTicks = 13
+  ),
+  summaryDir = "",
+  useResults = FALSE
+)
+
+```
+
+
+
+```{r}
+
+dailyGPP <- 600
+dailyER <- 600
+k600 <- 10
+initDO <- 232
+initDIC <- 1195
+
+simulator <- Simulator$new(
+  parameterTranslator = ParameterTranslatorMetabc$new(),
+  model = NULL,
+  predictionExtractor = PredictionExtractorMetabc$new(
+    extractDO = TRUE,
+    extractCO2 = TRUE
+  ) 
+)
+
+objFunc <- LogLikelihood$new(
+  simulator = simulator,
+  sd = c(do = 1, pCO2 = 1),
+  negate = TRUE
+)
+
+dw$analyze(
+  signalDerivation = CMetabOptim$new(
+    initParams = c(
+      dailyGPP = dailyGPP,
+      dailyER = dailyER,
+      k600 = k600
+    ) * 0.8,
+    objFunc = objFunc,
+    useDO = TRUE,
+    usepCO2 = TRUE,
+    staticAirPressure = 0.85,
+    staticCO2Air = 400,
+    gwAlphaHeader = "gwAlpha",
+    gwDOHeader = "gwDO",
+    gwDICHeader = "gwDIC"
+  ),
+  outerDir = ""
+)
+
+```
+
+
+```{r}
+
+dev <- dw$summarizeWindows(
+  signalSummarizer = CMetabPlotter$new(
+    fileName = "summary_results.pdf",
+    timeTicks = 13
+  ),
+  summaryDir = ""
+)
+
+```
+
+
+
+```{r}
+
+dwtf <- DielWindowedTransferFunction$new(
+  signalIn = inputSignal,
+  signalOut = outputSignal,
+  path = "./03_incremental/twostation",
+  dateStart = "2022-07-13",
+  dateEnd = "2022-07-18",
+  windowStart = "00:00:00",
+  windowEnd = "00:00:00",
+  windowDays = 1,
+  timeZone = "America/Denver"
+)
+
+dwtf$generateWindowInputOffset(
+  offsetTime = 5400, 
+  headersIn = c(
+    "par", "temp", "gwAlpha", 
+    "gwDO", "gwDIC", "alkalinity", 
+    "do", "dic", "pCO2"
+  ),
+  outerDir = ""
+)
+
+dev <- dwtf$summarizeWindows(
+  transferFunctionSummarizer = CMetabLagrangePlotter$new(
+    fileName = "summary_input.pdf",
+    timeTicks = 13
+  ),
+  summaryDir = "",
+  useResults = FALSE
+)
+
+dev <- dwtf$summarizeWindows(
+  transferFunctionSummarizer = CMetabLagrangePlotter$new(
+    fileName = "summary_input_delta.pdf",
+    timeTicks = 13,
+    plotDelta = TRUE
+  ),
+  summaryDir = "",
+  useResults = FALSE
+)
+
+```
+
+
+```{r}
+
+simulator <- Simulator$new(
+  parameterTranslator = ParameterTranslatorMetabc$new(),
+  model = NULL,
+  predictionExtractor = PredictionExtractorMetabc$new(
+    extractDO = TRUE,
+    extractCO2 = TRUE
+  ) 
+)
+
+objFunc <- LogLikelihood$new(
+  simulator = simulator,
+  sd = c(do = 1, pCO2 = 1),
+  negate = TRUE
+)
+
+dwtf$analyze(
+  transferFunctionDerivation = CMetabLagrangeOptim$new(
+    initParams = c(
+      dailyGPP = dailyGPP,
+      dailyER = dailyER,
+      k600 = k600
+    ) * 0.8,
+    objFunc = objFunc,
+    useDO = TRUE,
+    usepCO2 = TRUE,
+    staticAirPressure = 0.85,
+    staticCO2Air = 400,
+    gwAlphaHeader = "gwAlpha",
+    gwDOHeader = "gwDO",
+    gwDICHeader = "gwDIC"
+  ),
+  outerDir = ""
+)
+
+```
+
+
+```{r}
+
+dev <- dwtf$summarizeWindows(
+  transferFunctionSummarizer = CMetabLagrangePlotter$new(
+    fileName = "summary_results.pdf",
+    timeTicks = 13
+  ),
+  summaryDir = "",
+  useResults = TRUE
+)
+
+dev <- dwtf$summarizeWindows(
+  transferFunctionSummarizer = CMetabLagrangePlotter$new(
+    fileName = "summary_results_delta.pdf",
+    timeTicks = 13,
+    plotDelta = TRUE
+  ),
+  summaryDir = "",
+  useResults = TRUE
+)
+
+```

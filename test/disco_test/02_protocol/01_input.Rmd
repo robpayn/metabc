@@ -1,0 +1,388 @@
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+library(solartools)
+library(metabc)
+library(disco)
+
+```
+
+# Generate test input
+
+Last compiled on `r format(x = Sys.time(), format = "%Y %b %d, %H:%M")`
+
+Generates artificial data for use in a test of the disco automation of daily metabolism parameter estimation analysis.
+
+## Photosynthetically Active Radiation (PAR) and temperature
+
+```{r}
+
+# Define the travel time between upstream and downstream locations
+tau_t <- 1.5
+
+```
+
+Calculate PAR at the top of Earth's atmosphere for 5 days in July at Bozeman, Montana USA. Get values for the upstream and downstream locations, assuming a travel time of `r tau_t ` hours.
+
+Temperature set to a constant value of 10 deg C.
+
+```{r fig.width = 6, fig.height = 5}
+
+dfUp <- data.frame(
+  time = seq.POSIXt(
+    from = as.POSIXct("2022-07-13 00:00:00"),
+    to = as.POSIXct("2022-07-17 23:55:00"),
+    by = "15 min"
+  )
+)
+
+dfDown <- data.frame(
+  time = dfUp$time + tau_t * 3600
+)
+
+
+solar <- SolarRadiation$new(
+  latitude = 45.67554852034746, 
+  longitude = -111.0597586545199
+)
+dfUp$par <- solar$getExtraterrestrialInsolation(dfUp$time)
+dfDown$par <- solar$getExtraterrestrialInsolation(dfDown$time)
+
+
+par(mar = c(4.3, 4.3, 0.5, 0.5))
+
+xlim <- c(
+  min(dfUp$time, dfDown$time),
+  max(dfUp$time, dfDown$time)
+)
+plot.default(
+  x = dfDown$time,
+  xlim = xlim,
+  xaxt = "n",
+  xlab = "Time of arrival of parcel downstream (Gregorian US Mountain)",
+  y = dfDown$par,
+  ylab = bquote("PAR experienced by parcel (" ~ W ~ m^{-2} * ")")
+)
+
+points(
+  x = dfDown$time,
+  y = dfUp$par,
+  col = "darkorange"
+)
+
+lines(
+  x = dfDown$time,
+  y = 0.5 * (dfDown$par + dfUp$par)
+)
+
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+
+dfUp$temp <- 10
+dfDown$temp <- dfUp$temp
+
+```
+
+## Dissolved Oxygen (DO) and Dissolved Inorganic Carbon (DIC)
+
+Define the metabolic parameters and initial concentrations for the test case.
+
+```{r}
+
+dailyGPP <- 5 * 600
+dailyER <- 600
+k600 <- 10
+initDO <- 232
+initDIC <- 1195
+
+```
+
+Define the parameters controlling the influence of groundwater inflow. Groundwater inflow starts at zero and increases with each day. 
+
+```{r}
+
+dfUp$gwAlpha <- rep(
+  x = c(0, 0.2, 0.5, 0.8, 1.1),
+  each = 96
+)
+# dfUp$gwAlpha <- rep(
+#   rep(NA, times = 5),
+#   each = 96
+# )
+dfDown$gwAlpha <- dfUp$gwAlpha
+
+dfUp$gwDO <- rep(
+  x = rep(0, times = 5),
+  each = 96
+)
+dfDown$gwDO <- dfUp$gwDO
+
+dfUp$gwDIC <- rep(
+  x = rep(1500, time = 5),
+  each = 96
+)
+dfDown$gwDIC <- dfUp$gwDIC
+
+```
+
+Define the upstream and downstream alkalinity for use in calculating $\mathrm{pCO}_{2}$ from DIC concentrations.
+
+```{r}
+
+dfUp$alkalinity <- rep(
+  x = rep(1100, times = 5),
+  each = 96
+)
+dfDown$alkalinity <- dfUp$alkalinity
+
+```
+
+Build a single-station model to create artificial data for the upstream location.
+
+```{r}
+
+modelUp <- CMetabDoDic$new(
+  dailyGPP = dailyGPP,
+  dailyER = dailyER,
+  k600 = k600,
+  initialDO = initDO,
+  time = dfUp$time,
+  temp = dfUp$temp,
+  par = dfUp$par,
+  airPressure = 0.85,
+  gwAlpha = dfUp$gwAlpha,
+  gwDO = dfUp$gwDO,
+  initialDIC = initDIC,
+  pCO2air = 400,
+  alkalinity = dfUp$alkalinity,
+  gwDIC = dfUp$gwDIC
+)
+out <- modelUp$run()
+
+dfUp$do <- modelUp$output$do$dox + 
+  rnorm(n = nrow(modelUp$output$do), sd = 2)
+dfUp$dic <- modelUp$output$dic$dic
+dfUp$pCO2 <- modelUp$output$dic$pCO2 + 
+  rnorm(n = nrow(modelUp$output$dic), sd = 10)
+
+```
+
+Build a Lagrangian model to build artificial data for the downstream location based on the artificial data for the upstream location. 
+
+```{r}
+
+modelDown <- CMetabLagrangeDoDic$new(
+  dailyGPP = dailyGPP,
+  dailyER = dailyER,
+  k600 = k600,
+  upstreamDO = dfUp$do, 
+  upstreamTime = dfUp$time,
+  downstreamTime = dfDown$time,
+  upstreamTemp = dfUp$temp,
+  downstreamTemp = dfDown$temp,
+  upstreamPAR = dfUp$par,
+  downstreamPAR = dfDown$par,
+  airPressure = 0.85,
+  gwAlpha = dfDown$gwAlpha,
+  gwDO = dfDown$gwDO,
+  upstreamDIC = dfUp$dic,
+  pCO2air = 400,
+  upstreamAlkalinity = dfUp$alkalinity,
+  downstreamAlkalinity = dfDown$alkalinity,
+  gwDIC = dfDown$gwDIC
+)
+out <- modelDown$run()
+
+dfDown$do <- modelDown$output$do$dox
+dfDown$dic <- modelDown$output$dic$dic
+dfDown$pCO2 <- modelDown$output$dic$pCO2
+
+```
+
+Visualize the upstream and downstream concentrations from a Lagrangian perspective, which is the upstream and downstream concentration for parcels of water traveling the reach plotted at the time the parcels pass the downstream end of the reach.
+
+```{r fig.width = 6, fig.height = 12}
+
+par (
+  mar = c(4.3, 4.3, 0.5, 0.5),
+  mfrow = c(3, 1)
+)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$do,
+  ylab = bquote("DO (" * mu * mol ~ L^{-1} * ")")
+)
+points(
+  x = dfDown$time,
+  y = dfUp$do,
+  col = "darkorange"
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$dic,
+  ylab = bquote("DIC (" * mu * mol ~ L^{-1} * ")")
+)
+points(
+  x = dfDown$time,
+  y = dfUp$dic,
+  col = "darkorange"
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$pCO2,
+  ylab = bquote(pCO[2] ~ "(" * mu * atm * ")" )
+)
+points(
+  x = dfDown$time,
+  y = dfUp$pCO2,
+  col = "darkorange"
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+
+```
+
+Visualize the change in concentration in parcels of water travelling the reach from a Lagrangian perspective, which is the change in concentration for parcels of water travelling the reach plotted at the time the parcels pass the downstream end of the reach.
+
+```{r fig.width = 6, fig.height = 12}
+
+par (
+  mar = c(4.3, 4.3, 0.5, 0.5),
+  mfrow = c(3, 1)
+)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$do - dfUp$do,
+  ylab = bquote(Delta * "DO in parcels travelling reach (" * mu * mol ~ L^{-1} * ")")
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+abline(h = 0)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$dic - dfUp$dic,
+  ylab = bquote(Delta * "DIC in parcels travelling reach (" * mu * mol ~ L^{-1} * ")")
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+abline(h = 0)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$pCO2 - dfUp$pCO2,
+  ylab = bquote(Delta * pCO[2] ~ "in parcels travelling reach (" * mu * atm * ")" )
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+abline(h = 0)
+
+```
+
+## Create the signals
+
+Convert data frames to disco Signal objects and save to the pipeline input.
+
+```{r}
+
+inputSignal <- Signal$new(
+  x = dfUp,
+  metaColumns = data.frame(
+    time = "Gregorian US Mountain",
+    par = "watts per square meter",
+    temp = "degrees celsius",
+    gwAlpha = "fraction turnover per day",
+    gwDO = "micromoles dioxygen gas per liter",
+    gwDIC = "micromoles carbon per liter",
+    alkalinity = "micromoles anc per liter",
+    do = "micromoles dioxygen gas per liter",
+    dic = "micromoles carbon per liter",
+    pCO2 = "microatmospheres",
+    
+    row.names = c(
+      "units"
+    )
+  )
+)
+outputSignal <- Signal$new(
+  x = dfDown,
+  metaColumns = data.frame(
+    time = "Gregorian US Mountain",
+    par = "watts per square meter",
+    temp = "degrees celsius",
+    gwAlpha = "fraction turnover per day",
+    gwDO = "micromoles dioxygen gas per liter",
+    gwDIC = "micromoles carbon per liter",
+    alkalinity = "micromoles anc per liter",
+    do = "micromoles dioxygen gas per liter",
+    dic = "micromoles carbon per liter",
+    pCO2 = "microatmospheres",
+    
+    row.names = c(
+      "units"
+    )
+  )
+)
+
+dir.create(
+  path = "./01_input", 
+  showWarnings = FALSE,
+  recursive = TRUE
+)
+
+saveRDS(object = inputSignal, file = "./01_input/inputSignal.RData")
+saveRDS(object = outputSignal, file = "./01_input/outputSignal.RData")
+
+saveRDS(object = modelUp, "./03_incremental/modelUp.RData")
+saveRDS(object = modelDown, "./03_incremental/modelDown.RData")
+
+```

@@ -221,7 +221,7 @@ CMetabLagrangeDo <- R6Class(
             sprintf("MetabLagrange%sDo_constructor", self$type)
          );
 
-         gwDOEnable = !(is.na(gwAlpha) || is.na(gwDO));
+         gwDOEnable = !(anyNA(gwAlpha) || anyNA(gwDO));
          if (gwDOEnable) {
             gwAlpha <- rep(0, length(upstreamTime)) + gwAlpha;
             gwDO <- rep(0, length(upstreamTime)) + gwDO;

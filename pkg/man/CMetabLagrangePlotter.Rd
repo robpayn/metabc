@@ -74,22 +74,22 @@ Construct a new instance of the class.
   tempHeader = "temp",
   format.doObsUp = list(name = "[DO] observed upstream", lty = NA, pch = 46, col =
     "black", lwd = 1),
-  format.doObsDown = list(name = "[DO] observed downstream", lty = NA, pch = 176, col =
+  format.doObsDown = list(name = "[DO] observed downstream", lty = NA, pch = 1, col =
     "black", lwd = 1),
   format.doPred = list(name = "[DO] modeled downstream", lty = "solid", pch = NA, col =
     "black", lwd = 2),
   format.parUp = list(name = "PAR upstream", lty = NA, pch = 46, col = "red", lwd = 1),
-  format.parDown = list(name = "PAR downstream", lty = NA, pch = 176, col = "red", lwd
-    = 1),
+  format.parDown = list(name = "PAR downstream", lty = NA, pch = 1, col = "red", lwd =
+    1),
   format.pCO2ObsUp = list(name = "pCO2 observed upstream", lty = NA, pch = 46, col =
     "green3", lwd = 1),
-  format.pCO2ObsDown = list(name = "pCO2 observed downstream", lty = NA, pch = 176, col
-    = "green3", lwd = 1),
+  format.pCO2ObsDown = list(name = "pCO2 observed downstream", lty = NA, pch = 1, col =
+    "green3", lwd = 1),
   format.pCO2Pred = list(name = "pCO2 modeled downstream", lty = "solid", pch = NA, col
     = "green3", lwd = 2),
   format.tempUp = list(name = "Temperature upstream", lty = NA, pch = 46, col =
     "black", lwd = 1),
-  format.tempDown = list(name = "Temperature downstream", lty = NA, pch = 176, col =
+  format.tempDown = list(name = "Temperature downstream", lty = NA, pch = 1, col =
     "black", lwd = 1),
   format.doSatDown = list(name = "[DO] saturated downstream", lty = "dotted", pch = NA,
     col = "black", lwd = 1)

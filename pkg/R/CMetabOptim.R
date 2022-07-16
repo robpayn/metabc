@@ -137,9 +137,15 @@ CMetabOptim <- R6Class(
       #'   Parameters passed to the initialize method of the super class.
       #'   See \link{CMetabOptim} for documentation on these parameters
       #' @param initParams
-      #'   The initial parameter values to use in the MLE algorithm
+      #'   The initial parameter values to use in the MLE algorithm.
+      #'   A named vector of numeric values should be provided.
+      #'   Parameter names currently supported include
+      #'   dailyGPP, dailyER, and k600.
       #' @param fixedParams
       #'   An optional named list of values for non-estimated parameters.
+      #'   A named vector of numeric values should be provided.
+      #'   Parameter names currently supported include
+      #'   dailyGPP, dailyER, and k600.
       #'   Defaults to NULL, which indicates no fixed parameters.
       #' @param objFunc
       #'   The objective function to use with optim for the inference
@@ -333,18 +339,14 @@ CMetabOptim <- R6Class(
             gwDO <- NA;
          } else {
             if (!is.null(self$staticGwAlpha)) {
-               gwAlpha <-
-                  rep(x = 0 , times = self$signalOut$getLength()) +
-                  self$staticGwAlpha;
+               gwAlpha <- self$staticGwAlpha;
             } else {
-               gwAlpha <- self$signalOut$getVariable(self$gwAlphaHeader);
+               gwAlpha <- self$signal$getVariable(self$gwAlphaHeader);
             }
             if (!is.null(self$staticGwDO)) {
-               gwDO <-
-                  rep(x = 0 , times = self$signalOut$getLength()) +
-                  self$staticGwDO;
+               gwDO <- self$staticGwDO;
             } else {
-               gwDO <- self$signalOut$getVariable(self$gwDOHeader);
+               gwDO <- self$signal$getVariable(self$gwDOHeader);
             }
          }
 
@@ -370,11 +372,9 @@ CMetabOptim <- R6Class(
                gwDIC <- NA;
             } else {
                if (!is.null(self$staticGwDIC)) {
-                  gwDIC <-
-                     rep(x = 0 , times = self$signalOut$getLength()) +
-                     self$staticGwDIC;
+                  gwDIC <- self$staticGwDIC;
                } else {
-                  gwDIC <- self$signalOut$getVariable(self$gwDICHeader);
+                  gwDIC <- self$signal$getVariable(self$gwDICHeader);
                }
             }
          }

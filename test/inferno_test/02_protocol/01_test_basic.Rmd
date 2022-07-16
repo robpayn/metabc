@@ -1,0 +1,352 @@
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+rm(list = ls())
+
+library(solartools)
+library(metabc)
+library(disco)
+library(inferno)
+
+```
+
+
+
+```{r}
+
+# Define the travel time between upstream and downstream locations
+tau_t <- 1.5
+
+```
+
+
+
+```{r fig.width = 6, fig.height = 5}
+
+dfUp <- data.frame(
+  time = seq.POSIXt(
+    from = as.POSIXct("2022-07-13 00:00:00"),
+    to = as.POSIXct("2022-07-14 00:00:00"),
+    by = "15 min"
+  )
+)
+
+dfDown <- data.frame(
+  time = dfUp$time + tau_t * 3600
+)
+
+
+solar <- SolarRadiation$new(
+  latitude = 45.67554852034746, 
+  longitude = -111.0597586545199
+)
+dfUp$par <- solar$getExtraterrestrialInsolation(dfUp$time)
+dfDown$par <- solar$getExtraterrestrialInsolation(dfDown$time)
+
+
+par(mar = c(4.3, 4.3, 0.5, 0.5))
+
+xlim <- c(
+  min(dfUp$time, dfDown$time),
+  max(dfUp$time, dfDown$time)
+)
+plot.default(
+  x = dfDown$time,
+  xlim = xlim,
+  xaxt = "n",
+  xlab = "Time of arrival of parcel downstream (Gregorian US Mountain)",
+  y = dfDown$par,
+  ylab = bquote("PAR experienced by parcel (" ~ W ~ m^{-2} * ")")
+)
+
+points(
+  x = dfDown$time,
+  y = dfUp$par,
+  col = "darkorange"
+)
+
+lines(
+  x = dfDown$time,
+  y = 0.5 * (dfDown$par + dfUp$par)
+)
+
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+
+dfUp$temp <- 10
+dfDown$temp <- dfUp$temp
+
+```
+
+
+
+```{r}
+
+known <- new.env()
+
+known$dailyGPP <- 300
+known$dailyER <- 300
+known$k600 <- 10
+
+known$initDO <- 275
+known$initDIC <- 520
+
+known$airPressure <- 0.85
+
+known$alkalinity <- 500
+known$pCO2air <- 400
+
+known$errDO <- 1
+known$errpCO2 <- 5
+
+```
+
+
+
+```{r}
+
+modelUp <- CMetabDoDic$new(
+  dailyGPP = known$dailyGPP,
+  dailyER = known$dailyER,
+  k600 = known$k600,
+  initialDO = known$initDO,
+  time = dfUp$time,
+  temp = dfUp$temp,
+  par = dfUp$par,
+  airPressure = known$airPressure,
+  initialDIC = known$initDIC,
+  pCO2air = known$pCO2air,
+  alkalinity = known$alkalinity
+)
+out <- modelUp$run()
+
+dfUp$do <- modelUp$output$do$dox + 
+  rnorm(n = nrow(modelUp$output$do), sd = known$errDO)
+dfUp$dic <- modelUp$output$dic$dic
+dfUp$pCO2 <- modelUp$output$dic$pCO2 + 
+  rnorm(n = nrow(modelUp$output$dic), sd = known$errpCO2)
+
+```
+
+
+```{r}
+
+modelDown <- CMetabLagrangeDoDic$new(
+  dailyGPP = known$dailyGPP,
+  dailyER = known$dailyER,
+  k600 = known$k600,
+  upstreamDO = dfUp$do, 
+  upstreamTime = dfUp$time,
+  downstreamTime = dfDown$time,
+  upstreamTemp = dfUp$temp,
+  downstreamTemp = dfDown$temp,
+  upstreamPAR = dfUp$par,
+  downstreamPAR = dfDown$par,
+  airPressure = known$airPressure,
+  upstreamDIC = dfUp$dic,
+  pCO2air = known$pCO2air,
+  upstreamAlkalinity = known$alkalinity,
+  downstreamAlkalinity = known$alkalinity
+)
+out <- modelDown$run()
+
+dfDown$do <- modelDown$output$do$dox
+dfDown$dic <- modelDown$output$dic$dic
+dfDown$pCO2 <- modelDown$output$dic$pCO2 +
+  rnorm(n = nrow(modelDown$output$dic), sd = known$errpCO2)
+
+```
+
+
+```{r fig.width = 6, fig.height = 12}
+
+par (
+  mar = c(4.3, 4.3, 0.5, 0.5),
+  mfrow = c(3, 1)
+)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$do,
+  ylab = bquote("DO (" * mu * mol ~ L^{-1} * ")")
+)
+points(
+  x = dfDown$time,
+  y = dfUp$do,
+  col = "darkorange"
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$dic,
+  ylab = bquote("DIC (" * mu * mol ~ L^{-1} * ")")
+)
+points(
+  x = dfDown$time,
+  y = dfUp$dic,
+  col = "darkorange"
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$pCO2,
+  ylab = bquote(pCO[2] ~ "(" * mu * atm * ")" )
+)
+points(
+  x = dfDown$time,
+  y = dfUp$pCO2,
+  col = "darkorange"
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+
+```
+
+
+
+```{r fig.width = 6, fig.height = 12}
+
+par (
+  mar = c(4.3, 4.3, 0.5, 0.5),
+  mfrow = c(3, 1)
+)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$do - dfUp$do,
+  ylab = bquote(Delta * "DO in parcels travelling reach (" * mu * mol ~ L^{-1} * ")")
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+abline(h = 0)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$dic - dfUp$dic,
+  ylab = bquote(Delta * "DIC in parcels travelling reach (" * mu * mol ~ L^{-1} * ")")
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+abline(h = 0)
+
+plot(
+  x = dfDown$time,
+  xaxt = "n",
+  xlab = "Time (Gregorian US Mountain)",
+  y = dfDown$pCO2 - dfUp$pCO2,
+  ylab = bquote(Delta * pCO[2] ~ "in parcels travelling reach (" * mu * atm * ")" )
+)
+axis.POSIXct(
+  side = 1,
+  x = dfUp$time,
+  format = "%b %d\n%H:%M",
+  padj = 0.5
+)
+abline(h = 0)
+
+```
+
+
+```{r}
+
+simulator <- Simulator$new(
+  parameterTranslator = ParameterTranslatorMetabc$new(),
+  model = modelUp,
+  predictionExtractor = PredictionExtractorMetabc$new(
+    extractDO = TRUE,
+    extractCO2 = FALSE
+  ) 
+)
+
+objFunc <- LogLikelihood$new(
+  simulator = simulator,
+  observation = data.frame(
+    do = dfUp$do
+  ),
+  sd = c(do = 1),
+  negate = TRUE
+)
+
+optim(
+  par = c(
+    dailyGPP = known$dailyGPP, 
+    dailyER = known$dailyER, 
+    k600 = known$k600
+  ) * 0.8,
+  fn = objFunc$propose
+)
+
+```
+
+
+
+```{r}
+
+simulator <- Simulator$new(
+  parameterTranslator = ParameterTranslatorMetabc$new(),
+  model = modelDown,
+  predictionExtractor = PredictionExtractorMetabc$new(
+    extractDO = TRUE,
+    extractCO2 = FALSE
+  ) 
+)
+
+objFunc <- LogLikelihood$new(
+  simulator = simulator,
+  observation = data.frame(
+    do = dfDown$do
+  ),
+  sd = c(do = 1),
+  negate = TRUE
+)
+
+optim(
+  par = c(
+    dailyGPP = known$dailyGPP, 
+    dailyER = known$dailyER, 
+    k600 = known$k600
+  ) * 0.8,
+  fn = objFunc$propose
+)
+
+```
+

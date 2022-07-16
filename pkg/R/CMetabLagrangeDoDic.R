@@ -254,7 +254,7 @@ CMetabLagrangeDoDic <- R6Class(
             sprintf("MetabLagrange%sDoDic_constructor", self$type)
          );
 
-         gwEnable = !(is.na(gwAlpha) || is.na(gwDO) || is.na(gwDIC));
+         gwEnable = !(anyNA(gwAlpha) || anyNA(gwDO) || anyNA(gwDIC));
          if (gwEnable) {
             gwAlpha <- rep(0, length(time)) + gwAlpha;
             gwDO <- rep(0, length(time)) + gwDO;

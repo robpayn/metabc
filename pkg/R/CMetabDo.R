@@ -176,7 +176,7 @@ CMetabDo <- R6Class(
             sprintf("Metab%sDo_constructor", self$type)
          );
 
-         gwDOEnable = !(is.na(gwAlpha) || is.na(gwDO));
+         gwDOEnable = !(anyNA(gwAlpha) || anyNA(gwDO));
          if (gwDOEnable) {
             gwAlpha <- rep(0, length(time)) + gwAlpha;
             gwDO <- rep(0, length(time)) + gwDO;
@@ -203,7 +203,7 @@ CMetabDo <- R6Class(
          )
       },
 
-      ## Method: finalize ####
+      ## Method: destructor ####
 
       #' @description
       #'   Calls the R wrapper of the destructor of the

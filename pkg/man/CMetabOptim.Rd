@@ -126,9 +126,15 @@ Initializes a new object of the class.
 \item{\code{...}}{Parameters passed to the initialize method of the super class.
 See \link{CMetabOptim} for documentation on these parameters}
 
-\item{\code{initParams}}{The initial parameter values to use in the MLE algorithm}
+\item{\code{initParams}}{The initial parameter values to use in the MLE algorithm.
+A named vector of numeric values should be provided.
+Parameter names currently supported include
+dailyGPP, dailyER, and k600.}
 
 \item{\code{fixedParams}}{An optional named list of values for non-estimated parameters.
+A named vector of numeric values should be provided.
+Parameter names currently supported include
+dailyGPP, dailyER, and k600.
 Defaults to NULL, which indicates no fixed parameters.}
 
 \item{\code{objFunc}}{The objective function to use with optim for the inference}

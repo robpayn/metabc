@@ -155,7 +155,7 @@ CMetabLagrangePlotter <- R6Class(
          format.doObsDown = list(
             name = "[DO] observed downstream",
             lty = NA,
-            pch = 176,
+            pch = 1,
             col = "black",
             lwd = 1
          ),
@@ -176,7 +176,7 @@ CMetabLagrangePlotter <- R6Class(
          format.parDown = list(
             name = "PAR downstream",
             lty = NA,
-            pch = 176,
+            pch = 1,
             col = "red",
             lwd = 1
          ),
@@ -190,7 +190,7 @@ CMetabLagrangePlotter <- R6Class(
          format.pCO2ObsDown = list(
             name = "pCO2 observed downstream",
             lty = NA,
-            pch = 176,
+            pch = 1,
             col = "green3",
             lwd = 1
          ),
@@ -211,7 +211,7 @@ CMetabLagrangePlotter <- R6Class(
          format.tempDown = list(
             name = "Temperature downstream",
             lty = NA,
-            pch = 176,
+            pch = 1,
             col = "black",
             lwd = 1
          ),
