@@ -104,15 +104,23 @@ CMetabLagrangeDo <- R6Class(
       #'    (e.g. "CNOneStep" is a known solution using a single
       #'    calculation with Crank Nicolson type approximations)
       #' @param dailyGPP
-      #'    Model parameter for daily gross primary production
+      #'    Model parameter for total gross primary production
       #'    based on an effective concentration of DOC fixed.
+      #'    Note the modifier "daily" is an artifact of models like this one
+      #'    typically being used over a single photoperiod. The value for
+      #'    total GPP provided via this argument is redistributed according to
+      #'    the relative distribution of PAR over the analysis period.
+      #'    Therefore, this number should reflect the total GPP over
+      #'    however many photoperiods are being analyzed in a given simulation.
       #'    Units of micromoles per liter per day.
       #' @param ratioDoCFix
       #'    Ratio of DO molecules produced relative to carbon atoms fixed.
       #'    Defaults to 1.
       #' @param dailyER
-      #'    Model parameter for daily aerobic ecosystem respiration
-      #'    based on an effective concentration of DOC respired
+      #'    Model parameter for daily the rate of aerobic ecosystem respiration
+      #'    based on an effective concentration of DOC respired.
+      #'    This is applied as a constant zero-order rate over the entire
+      #'    period of analysis.
       #'    Units of micromoles per liter per day.
       #' @param ratioDoCResp
       #'    Ratio of DO molecules consumed relative to carbon atoms respired.
