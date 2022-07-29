@@ -527,7 +527,7 @@ CMetabLagrangePlotter <- R6Class(
             ));
             if(self$plotDelta) {
                y.res.vars <- list(
-                  do = self$results$pred$do$dox - doIn
+                  do = self$results$pred$do$dox - self$results$upstreamDO
                );
                ymin <- min(
                   ymin,

@@ -376,6 +376,13 @@ CMetabLagrangeOptim <- R6Class(
             is.finite(downstreamPAR) &
             is.finite(airPressure);
 
+         if (!gwDODisabled) {
+            validIndices <-
+               validIndices &
+               is.finite(gwAlpha) &
+               is.finite(gwDO)
+         }
+
          if(!self$usepCO2) {
             model <- CMetabLagrangeDo$new(
                type = self$modelType,
@@ -391,8 +398,8 @@ CMetabLagrangeOptim <- R6Class(
                downstreamPAR = downstreamPAR[validIndices],
                airPressure = airPressure[validIndices],
                stdAirPressure = 1,
-               gwAlpha = gwAlpha,
-               gwDO = gwDO
+               gwAlpha = gwAlpha[validIndices],
+               gwDO = gwDO[validIndices]
             );
          } else {
             upstreamDIC <- self$signalIn$getVariable(self$dicHeader);
@@ -442,6 +449,12 @@ CMetabLagrangeOptim <- R6Class(
                is.finite(upstreamAlkalinity) &
                is.finite(downstreamAlkalinity);
 
+            if (!gwDICDisabled) {
+               validIndices <-
+                  validIndices &
+                  is.finite(gwDIC)
+            }
+
             model <- CMetabLagrangeDoDic$new(
                type = self$modelType,
                dailyGPP = dailyGPP,
@@ -456,13 +469,13 @@ CMetabLagrangeOptim <- R6Class(
                downstreamPAR = downstreamPAR[validIndices],
                airPressure = airPressure[validIndices],
                stdAirPressure = 1,
-               gwAlpha = gwAlpha,
-               gwDO = gwDO,
+               gwAlpha = gwAlpha[validIndices],
+               gwDO = gwDO[validIndices],
                upstreamDIC = upstreamDIC[validIndices],
                pCO2air = co2Air[validIndices],
                upstreamAlkalinity = upstreamAlkalinity[validIndices],
                downstreamAlkalinity = downstreamAlkalinity[validIndices],
-               gwDIC = gwDIC
+               gwDIC = gwDIC[validIndices]
             );
          }
 
@@ -505,6 +518,7 @@ CMetabLagrangeOptim <- R6Class(
             params = optimr$par,
             upstreamTime = self$signalIn$getTime()[validIndices],
             downstreamTime = self$signalOut$getTime()[validIndices],
+            upstreamDO = upstreamDO[validIndices],
             upstreamTemp = upstreamTemp[validIndices],
             downstreamTemp = downstreamTemp[validIndices],
             upstreamPAR = upstreamPAR[validIndices],
